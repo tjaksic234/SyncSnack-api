@@ -65,12 +65,14 @@ public class JwtUtils {
                 .getPayload();
     }
 
-    public Cookie createJwtCookie(String token) {
-        Cookie cookie = new Cookie(jwtCookieName, token);
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(jwtExpirationMs / 1000);
-        cookie.setPath("/");
-        cookie.setAttribute("SameSite", "None");
+    public ResponseCookie createJwtCookie(String token) {
+        ResponseCookie cookie = ResponseCookie.from(jwtCookieName, token)
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("None")
+                .path("/")
+                .maxAge(jwtExpirationMs)
+                .build();
         return cookie;
     }
 

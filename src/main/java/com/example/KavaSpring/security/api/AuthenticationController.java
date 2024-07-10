@@ -9,7 +9,9 @@ import com.example.KavaSpring.security.utils.JwtUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -63,10 +65,12 @@ public class AuthenticationController {
 
         String token = jwtUtils.generateJwtToken(authentication);
 
-        Cookie cookie = jwtUtils.createJwtCookie(token);
-        response.addCookie(cookie);
+        ResponseCookie cookie = jwtUtils.createJwtCookie(token);
 
-        return new ResponseEntity<>(new LoginResponse(token), HttpStatus.OK);
+
+        return  ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(new LoginResponse(token));
     }
 
 
