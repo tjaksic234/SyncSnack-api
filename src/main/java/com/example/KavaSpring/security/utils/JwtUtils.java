@@ -68,8 +68,8 @@ public class JwtUtils {
     public ResponseCookie createJwtCookie(String token) {
         ResponseCookie cookie = ResponseCookie.from(jwtCookieName, token)
                 .httpOnly(true)
-                .secure(true)
-                .sameSite("None")
+                .secure(false)
+                .sameSite("Strict")
                 .path("/")
                 .maxAge(jwtExpirationMs)
                 .build();
