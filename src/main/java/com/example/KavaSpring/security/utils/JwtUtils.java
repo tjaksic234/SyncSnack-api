@@ -31,6 +31,9 @@ public class JwtUtils {
     @Value("${jwtExpirationMs}")
     private int jwtExpirationMs;
 
+    @Value("${jwtCookieName}")
+    private String jwtCookieName;
+
     public String generateJwtToken(Authentication authentication) {
 
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
@@ -60,6 +63,19 @@ public class JwtUtils {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+    public Cookie createJwtCookie(String token) {
+        Cookie cookie = new Cookie(jwtCookieName, token);
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(jwtExpirationMs / 1000);
+        cookie.setPath("/");
+        return cookie;
+    }
+
+    public String getJwtFromCookies(HttpServletRequest request) {
+        Cookie cookie = WebUtils.getCookie(request, jwtCookieName);
+        return cookie != null ? cookie.getValue() : null;
     }
 
     public boolean validateToken(String token) {
