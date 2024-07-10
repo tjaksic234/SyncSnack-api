@@ -18,6 +18,7 @@ import org.springframework.web.util.WebUtils;
 import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
+import java.util.Map;
 
 @Component
 public class JwtUtils {
@@ -40,6 +41,12 @@ public class JwtUtils {
                 .issuedAt(new Date())
                 .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(key())
+                .addClaims(Map.of(
+                        "firstName", userPrincipal.getFirstName(),
+                        "lastName", userPrincipal.getLastName(),
+                        "coffeeCounter", userPrincipal.getCoffeeCounter(),
+                        "coffeeRating", userPrincipal.getCoffeeRating()
+                ))
                 .compact();
     }
 

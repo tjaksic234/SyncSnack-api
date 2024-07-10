@@ -42,7 +42,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             if (jwt != null && jwtUtils.validateToken(jwt)) {
                 Claims claims = jwtUtils.getEmailFromJwtToken(jwt);
                 String email = (String) claims.get("sub");
-                logger.info("Extracted email from JWT: {}", email);
+                // logger.info("Extracted email from JWT: {}", email);
 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
                 logger.info("Loaded user details: {}", userDetails);
