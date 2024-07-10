@@ -70,6 +70,7 @@ public class JwtUtils {
         cookie.setHttpOnly(true);
         cookie.setMaxAge(jwtExpirationMs / 1000);
         cookie.setPath("/");
+        cookie.setAttribute("SameSite", "None");
         return cookie;
     }
 
