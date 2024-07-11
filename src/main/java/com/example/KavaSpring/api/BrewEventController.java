@@ -23,7 +23,7 @@ public class BrewEventController {
     @Autowired
     private UserRepository userRepository;
 
-    @PostMapping("create-event")
+    @PostMapping("create")
     public ResponseEntity<String> create(@RequestBody CreateBrewEventRequest request) {
 
         User creator = userRepository.findById(request.getCreatorId())
