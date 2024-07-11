@@ -38,8 +38,12 @@ public class AuthenticationController {
 
     @PostMapping("register")
     public ResponseEntity<String> register(@RequestBody RegisterUserRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            return new ResponseEntity<>("Email is already taken!", HttpStatus.BAD_REQUEST);
+        if (userRepository.existsByEmail(request.getEmail()) || request.getEmail() == null) {
+            return new ResponseEntity<>("Email is already taken or it is not entered in correct format!", HttpStatus.BAD_REQUEST);
+        }
+
+        if (request.getFirstName() == null || request.getLastName() == null) {
+            return new ResponseEntity<>("First name and last name are required fields", HttpStatus.BAD_REQUEST);
         }
 
         User user = new User();
