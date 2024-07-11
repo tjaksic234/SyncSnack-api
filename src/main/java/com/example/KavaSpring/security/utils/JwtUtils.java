@@ -72,6 +72,7 @@ public class JwtUtils {
                 .sameSite("None")
                 .path("/")
                 .maxAge(jwtExpirationMs)
+                .domain(".localhost")
                 .build();
         return cookie;
     }

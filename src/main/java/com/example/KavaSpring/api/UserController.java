@@ -1,5 +1,6 @@
 package com.example.KavaSpring.api;
 
+import com.example.KavaSpring.api.dto.GetUsersResponse;
 import com.example.KavaSpring.models.dao.User;
 import com.example.KavaSpring.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +20,14 @@ public class UserController {
     private UserRepository userRepository;
 
     @GetMapping
-    public ResponseEntity<List<User>> getAll() {
+    public ResponseEntity<List<GetUsersResponse>> getAll() {
 
-        List<User> users = userRepository.getAllBy();
+        List<GetUsersResponse> users = userRepository.getAllBy();
 
         if (users.isEmpty()) {
             ResponseEntity.status(HttpStatus.OK).body("The user collection is empty.");
         }
+
 
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
