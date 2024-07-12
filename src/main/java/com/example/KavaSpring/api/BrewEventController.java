@@ -2,6 +2,7 @@ package com.example.KavaSpring.api;
 
 import com.example.KavaSpring.api.dto.CreateBrewEventRequest;
 import com.example.KavaSpring.api.dto.CompleteBrewEventRequest;
+import com.example.KavaSpring.api.dto.GetBrewEventsResponse;
 import com.example.KavaSpring.helper.BrewEventAggregation;
 import com.example.KavaSpring.helper.dto.BrewEventResult;
 import com.example.KavaSpring.models.dao.BrewEvent;
@@ -16,7 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/events")
@@ -82,10 +85,23 @@ public class BrewEventController {
         return ResponseEntity.ok(results);
     }
 
-    @GetMapping("inProgress")
-    public ResponseEntity<List<BrewEvent>> inProgress(@RequestParam(name = "status", defaultValue = "IN_PROGRESS") EventStatus status) {
+    @GetMapping()
+    public ResponseEntity<List<GetBrewEventsResponse>> inProgress(@RequestParam(name = "status", defaultValue = "IN_PROGRESS") EventStatus status) {
         List<BrewEvent> events = brewEventRepository.findByStatus(status);
-        return ResponseEntity.ok(events);
+
+        List<GetBrewEventsResponse> responseList = events.stream()
+                .map(event -> {
+                    GetBrewEventsResponse response = new GetBrewEventsResponse();
+                    response.setEventId(event.getEventId());
+                    response.setCreatorId(event.getCreator().getId());
+                    response.setFirstName(event.getCreator().getFirstName());
+                    response.setLastName(event.getCreator().getLastName());
+                    response.setStatus(event.getStatus());
+                    return response;
+                })
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(responseList);
     }
 
 }
