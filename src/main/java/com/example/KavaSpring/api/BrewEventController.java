@@ -65,9 +65,9 @@ public class BrewEventController {
         return new ResponseEntity<>("The brew event has been successfully altered", HttpStatus.OK);
     }
 
-    @GetMapping("ongoing/{id}")
+   /* @GetMapping("ongoing/{id}")
     public ResponseEntity<List<BrewEvent>> ongoing(@PathVariable("id") String id) {
 
-    }
+    }*/
 
 }
