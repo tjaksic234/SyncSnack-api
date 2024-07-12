@@ -19,7 +19,7 @@ public class BrewEventSchedulerServiceImpl implements BrewEventSchedulerService 
     private BrewEventRepository brewEventRepository;
 
     @Override
-    @Scheduled(fixedRate = 5, timeUnit = TimeUnit.MINUTES)
+    @Scheduled(fixedRate = 1, timeUnit = TimeUnit.MINUTES)
     public void updatePendingEvents() {
         LocalDateTime now = LocalDateTime.now();
         List<BrewEvent> pendingEvents = brewEventRepository.findByStatusAndStartTimeBefore(EventStatus.PENDING, now);

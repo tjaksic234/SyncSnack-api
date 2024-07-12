@@ -38,7 +38,7 @@ public class UserController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/orders/{id}")
     public ResponseEntity<List<CoffeeOrder>> getOrdersForUser(@PathVariable("id") String id) {
         List<CoffeeOrder> orders = coffeeOrderRepository.findByCreatorId(id);
 
