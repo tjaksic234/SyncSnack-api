@@ -1,7 +1,6 @@
 package com.example.KavaSpring.repository;
 
 import com.example.KavaSpring.models.dao.CoffeeOrder;
-import com.example.KavaSpring.models.dao.CoffeeType;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,4 +12,6 @@ public interface CoffeeOrderRepository extends MongoRepository<CoffeeOrder, Stri
 
     Optional<CoffeeOrder> findByCoffeeOrderId(String coffeeOrderId);
     boolean existsByCoffeeOrderId(String coffeeOrderId);
+    List<CoffeeOrder> findByCreatorId(String creatorId);
+
 }

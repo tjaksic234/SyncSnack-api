@@ -46,9 +46,7 @@ public class JwtUtils {
                 .signWith(key())
                 .addClaims(Map.of(
                         "firstName", userPrincipal.getFirstName(),
-                        "lastName", userPrincipal.getLastName(),
-                        "coffeeCounter", userPrincipal.getCoffeeCounter(),
-                        "coffeeRating", userPrincipal.getCoffeeRating()
+                        "lastName", userPrincipal.getLastName()
                 ))
                 .compact();
     }

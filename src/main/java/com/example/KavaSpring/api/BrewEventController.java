@@ -3,7 +3,7 @@ package com.example.KavaSpring.api;
 import com.example.KavaSpring.api.dto.CreateBrewEventRequest;
 import com.example.KavaSpring.api.dto.EditBrewEventRequest;
 import com.example.KavaSpring.models.dao.BrewEvent;
-import com.example.KavaSpring.models.dao.EventStatus;
+import com.example.KavaSpring.models.dao.enums.EventStatus;
 import com.example.KavaSpring.models.dao.User;
 import com.example.KavaSpring.repository.BrewEventRepository;
 import com.example.KavaSpring.repository.UserRepository;
@@ -29,16 +29,17 @@ public class BrewEventController {
         User creator = userRepository.findById(request.getCreatorId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        boolean hasActiveEvent = brewEventRepository.existsByCreator_IdAndStatus(creator.getId(), EventStatus.IN_PROGRESS);
+        boolean hasActiveEvent = brewEventRepository.existsByCreator_IdAndStatus(creator.getId(),
+                 EventStatus.PENDING);
 
         if (hasActiveEvent) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
-                    .body("User already has an active brewing event in progress.");
+                    .body("User already has a PENDING brewing event in progress.");
         }
 
 
-        BrewEvent newBrewEvent = new BrewEvent(creator, request.getEndTime());
+        BrewEvent newBrewEvent = new BrewEvent(creator, request.getPendingTime());
         BrewEvent savedBrewEvent = brewEventRepository.save(newBrewEvent);
 
         return new ResponseEntity<>("Event successfully created!", HttpStatus.OK);
@@ -57,7 +58,7 @@ public class BrewEventController {
             event.setStatus(request.getEventStatus());
             brewEventRepository.save(event);
         } else {
-            return new ResponseEntity<>("The user has no active brewing events present!", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("The user has no active brewing events IN_PROGRESS!", HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>("The brew event has been successfully altered", HttpStatus.OK);
     }

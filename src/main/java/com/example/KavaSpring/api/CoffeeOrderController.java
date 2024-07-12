@@ -3,11 +3,13 @@ package com.example.KavaSpring.api;
 
 import com.example.KavaSpring.api.dto.CreateCoffeeOrderRequest;
 import com.example.KavaSpring.models.dao.CoffeeOrder;
-import com.example.KavaSpring.models.dao.CoffeeType;
+import com.example.KavaSpring.models.dao.User;
 import com.example.KavaSpring.repository.CoffeeOrderRepository;
+import com.example.KavaSpring.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,23 +22,29 @@ public class CoffeeOrderController {
     @Autowired
     private CoffeeOrderRepository coffeeOrderRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @PostMapping("create")
     public ResponseEntity<String> create(@RequestBody CreateCoffeeOrderRequest request) {
 
-       /* if (coffeeOrderRepository.existsByCoffeeOrderId(request.getCoffeeOrderId())) {
-            return new ResponseEntity<>("The coffee order already exists" ,HttpStatus.BAD_REQUEST);
-        }*/
+        User creator = userRepository.findById(request.getCreatorId())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         CoffeeOrder order = new CoffeeOrder (
+                creator,
                 request.getType(),
                 request.getSugarQuantity(),
-                request.getMilkQuantity()
+                request.getMilkQuantity(),
+                request.getRating()
         );
 
         coffeeOrderRepository.save(order);
 
         return new ResponseEntity<>("Order successfully created", HttpStatus.OK);
     }
+
+
 
     @GetMapping
     public ResponseEntity<List<CoffeeOrder>> getCoffeeOrders() {

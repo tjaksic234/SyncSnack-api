@@ -1,5 +1,6 @@
 package com.example.KavaSpring.models.dao;
 
+import com.example.KavaSpring.models.dao.enums.CoffeeType;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -7,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "coffeeOrders")
@@ -15,6 +17,10 @@ public class CoffeeOrder {
 
     @Id
     private String coffeeOrderId;
+
+    @NotBlank
+    @DBRef
+    private User creatorId;
 
     @NotBlank
     private CoffeeType type;
@@ -29,10 +35,17 @@ public class CoffeeOrder {
     @Max(5)
     private int milkQuantity;
 
-    public CoffeeOrder(CoffeeType type, int sugarQuantity, int milkQuantity) {
+    @NotNull
+    @Min(0)
+    @Max(5)
+    private int rating;
+
+    public CoffeeOrder(User creatorId, CoffeeType type, int sugarQuantity, int milkQuantity, int rating) {
+        this.creatorId = creatorId;
         this.type = type;
         this.sugarQuantity = sugarQuantity;
         this.milkQuantity = milkQuantity;
+        this.rating = rating;
     }
 
     @Override

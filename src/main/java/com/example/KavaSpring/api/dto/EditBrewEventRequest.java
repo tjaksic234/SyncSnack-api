@@ -1,6 +1,6 @@
 package com.example.KavaSpring.api.dto;
 
-import com.example.KavaSpring.models.dao.EventStatus;
+import com.example.KavaSpring.models.dao.enums.EventStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

@@ -1,12 +1,15 @@
 package com.example.KavaSpring.api;
 
 import com.example.KavaSpring.api.dto.GetUsersResponse;
-import com.example.KavaSpring.models.dao.User;
+import com.example.KavaSpring.models.dao.CoffeeOrder;
+import com.example.KavaSpring.repository.CoffeeOrderRepository;
 import com.example.KavaSpring.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,6 +21,9 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private CoffeeOrderRepository coffeeOrderRepository;
 
     @GetMapping
     public ResponseEntity<List<GetUsersResponse>> getAll() {
@@ -31,4 +37,16 @@ public class UserController {
 
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<List<CoffeeOrder>> getOrdersForUser(@PathVariable("id") String id) {
+        List<CoffeeOrder> orders = coffeeOrderRepository.findByCreatorId(id);
+
+        if (orders.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.ok(orders);
+        }
+    }
+
 }

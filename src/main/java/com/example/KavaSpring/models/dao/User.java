@@ -29,11 +29,6 @@ public class User {
     @Size(max = 50)
     private String lastName;
 
-    @NotNull
-    private int coffeeCounter;
-
-    private int coffeeRating;
-
     @NotBlank
     @Size(max = 120)
     private String password;
@@ -46,8 +41,6 @@ public class User {
         this.id = id;
         this.email = email;
         this.password = password;
-        this.coffeeCounter = 0;
-        this.coffeeRating = 0;
     }
 
 
@@ -58,8 +51,6 @@ public class User {
                 ", email='" + email + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
-                ", coffeeCounter=" + coffeeCounter +
-                ", coffeeRating=" + coffeeRating +
                 ", password='" + password + '\'' +
                 '}';
     }

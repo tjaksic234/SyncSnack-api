@@ -1,4 +1,4 @@
-package com.example.KavaSpring.models.dao;
+package com.example.KavaSpring.models.dao.enums;
 
 public enum CoffeeType {
     TURKISH,
