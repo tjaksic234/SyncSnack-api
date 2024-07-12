@@ -1,7 +1,7 @@
 package com.example.KavaSpring.api;
 
 import com.example.KavaSpring.api.dto.CreateBrewEventRequest;
-import com.example.KavaSpring.api.dto.EditBrewEventRequest;
+import com.example.KavaSpring.api.dto.CompleteBrewEventRequest;
 import com.example.KavaSpring.models.dao.BrewEvent;
 import com.example.KavaSpring.models.dao.enums.EventStatus;
 import com.example.KavaSpring.models.dao.User;
@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/events")
@@ -45,8 +47,8 @@ public class BrewEventController {
         return new ResponseEntity<>("Event successfully created!", HttpStatus.OK);
     }
 
-    @PatchMapping("edit")
-    public ResponseEntity<String> editBrewEvent(@RequestBody EditBrewEventRequest request) {
+    @PatchMapping("complete-event")
+    public ResponseEntity<String> editBrewEvent(@RequestBody CompleteBrewEventRequest request) {
 
         userRepository.findById(request.getCreatorId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -55,12 +57,17 @@ public class BrewEventController {
 
         if (hasActiveEvent) {
             BrewEvent event = brewEventRepository.findByCreatorIdAndEventId(request.getCreatorId(), request.getEventId());
-            event.setStatus(request.getEventStatus());
+            event.setStatus(EventStatus.COMPLETED);
             brewEventRepository.save(event);
         } else {
             return new ResponseEntity<>("The user has no active brewing events IN_PROGRESS!", HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>("The brew event has been successfully altered", HttpStatus.OK);
+    }
+
+    @GetMapping("ongoing/{id}")
+    public ResponseEntity<List<BrewEvent>> ongoing(@PathVariable("id") String id) {
+
     }
 
 }
