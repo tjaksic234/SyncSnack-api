@@ -2,12 +2,15 @@ package com.example.KavaSpring.api;
 
 import com.example.KavaSpring.api.dto.CreateBrewEventRequest;
 import com.example.KavaSpring.api.dto.CompleteBrewEventRequest;
+import com.example.KavaSpring.helper.BrewEventAggregation;
+import com.example.KavaSpring.helper.dto.BrewEventResult;
 import com.example.KavaSpring.models.dao.BrewEvent;
 import com.example.KavaSpring.models.dao.enums.EventStatus;
 import com.example.KavaSpring.models.dao.User;
 import com.example.KavaSpring.repository.BrewEventRepository;
 import com.example.KavaSpring.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,6 +27,12 @@ public class BrewEventController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private BrewEventAggregation brewEventAggregation;
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     @PostMapping("create")
     public ResponseEntity<String> create(@RequestBody CreateBrewEventRequest request) {
@@ -65,9 +74,12 @@ public class BrewEventController {
         return new ResponseEntity<>("The brew event has been successfully altered", HttpStatus.OK);
     }
 
-   /* @GetMapping("ongoing/{id}")
-    public ResponseEntity<List<BrewEvent>> ongoing(@PathVariable("id") String id) {
-
-    }*/
+    @GetMapping("/ongoing/{id}")
+    public ResponseEntity<List<BrewEventResult>> ongoing(@PathVariable("id") String id) {
+        BrewEventAggregation aggregation = new BrewEventAggregation(mongoTemplate);
+        aggregation.setId(id);
+        List<BrewEventResult> results = aggregation.aggregateBrewEvents();
+        return ResponseEntity.ok(results);
+    }
 
 }

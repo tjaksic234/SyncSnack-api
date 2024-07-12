@@ -23,10 +23,4 @@ public interface BrewEventRepository extends MongoRepository<BrewEvent, String> 
 
     // Method to check the pending status of the events
     List<BrewEvent> findByStatusAndStartTimeBefore(EventStatus status, LocalDateTime time);
-
-    @Aggregation({
-            "{$match: { _id: {$ne: ObjectId('6690c8a718c47237f3b7c666')} }}",
-            "{$lookup: { from: 'users', localField: 'id', foreignField: 'creator.$id', as: 'EventDetails' }}"
-    })
-    List<BrewEvent> findOngoingEvents(String id);
 }
