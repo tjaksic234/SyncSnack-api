@@ -11,17 +11,15 @@ import java.util.Optional;
 
 @Repository
 public interface BrewEventRepository extends MongoRepository<BrewEvent, String> {
-
-    Optional<BrewEvent> findByEventId(String eventId);
+    BrewEvent findByEventId(String eventId);
     Boolean existsByEventId(String eventId);
 
-
-    // New method to check for active events for a user
+    // Method to check for active events for a user
     boolean existsByCreator_IdAndStatus(String creator, EventStatus status);
 
-    // New method to edit the brew events
+    // Method to edit the brew events
     BrewEvent findByCreatorIdAndEventId(String creatorId, String eventId);
 
+    // Method to check the pending status of the events
     List<BrewEvent> findByStatusAndStartTimeBefore(EventStatus status, LocalDateTime time);
-
 }

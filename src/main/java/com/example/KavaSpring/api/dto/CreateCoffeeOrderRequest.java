@@ -9,6 +9,9 @@ import lombok.Data;
 public class CreateCoffeeOrderRequest {
 
     @NotBlank
+    private String eventId;
+
+    @NotBlank
     private String creatorId;
 
     @NotBlank

@@ -2,8 +2,10 @@ package com.example.KavaSpring.api;
 
 
 import com.example.KavaSpring.api.dto.CreateCoffeeOrderRequest;
+import com.example.KavaSpring.models.dao.BrewEvent;
 import com.example.KavaSpring.models.dao.CoffeeOrder;
 import com.example.KavaSpring.models.dao.User;
+import com.example.KavaSpring.repository.BrewEventRepository;
 import com.example.KavaSpring.repository.CoffeeOrderRepository;
 import com.example.KavaSpring.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,9 @@ public class CoffeeOrderController {
     private CoffeeOrderRepository coffeeOrderRepository;
 
     @Autowired
+    private BrewEventRepository brewEventRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     @PostMapping("create")
@@ -39,7 +44,11 @@ public class CoffeeOrderController {
                 request.getRating()
         );
 
+        BrewEvent event = brewEventRepository.findByEventId(request.getEventId());
+        event.getOrders().add(order);
+
         coffeeOrderRepository.save(order);
+        brewEventRepository.save(event);
 
         return new ResponseEntity<>("Order successfully created", HttpStatus.OK);
     }

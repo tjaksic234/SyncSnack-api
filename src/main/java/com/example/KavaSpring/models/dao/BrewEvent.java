@@ -14,6 +14,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 @Document(collection = "brewEvents")
 @Getter @Setter
@@ -41,6 +43,8 @@ public class BrewEvent {
     @Min(0)
     private int pendingTime;
 
+    private List<CoffeeOrder> orders;
+
     public BrewEvent() {
     }
 
@@ -49,6 +53,7 @@ public class BrewEvent {
         this.startTime = LocalDateTime.now().plusMinutes(pendingTime);
         this.endTime = null;
         this.status = EventStatus.PENDING;
+        this.orders = new ArrayList<>();
     }
 
     @Override
