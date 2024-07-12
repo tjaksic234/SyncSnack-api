@@ -4,6 +4,8 @@ import com.example.KavaSpring.models.dao.BrewEvent;
 import com.example.KavaSpring.models.dao.enums.EventStatus;
 import com.example.KavaSpring.repository.BrewEventRepository;
 import com.example.KavaSpring.services.BrewEventSchedulerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class BrewEventSchedulerServiceImpl implements BrewEventSchedulerService {
 
+    private static final Logger log = LoggerFactory.getLogger(BrewEventSchedulerServiceImpl.class);
     @Autowired
     private BrewEventRepository brewEventRepository;
 

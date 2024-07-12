@@ -2,6 +2,7 @@ package com.example.KavaSpring.api;
 
 
 import com.example.KavaSpring.api.dto.CreateCoffeeOrderRequest;
+import com.example.KavaSpring.api.dto.EditOrderRequest;
 import com.example.KavaSpring.models.dao.BrewEvent;
 import com.example.KavaSpring.models.dao.CoffeeOrder;
 import com.example.KavaSpring.models.dao.User;
@@ -51,6 +52,20 @@ public class CoffeeOrderController {
         brewEventRepository.save(event);
 
         return new ResponseEntity<>("Order successfully created", HttpStatus.OK);
+    }
+
+    @PatchMapping("/edit")
+    public ResponseEntity<CoffeeOrder> editOrder(@RequestBody EditOrderRequest request) {
+
+        CoffeeOrder order = coffeeOrderRepository.findById(request.getCoffeeOrderId())
+                .orElseThrow(() -> new NullPointerException("Order not found!"));
+
+        order.setRating(request.getRatingUpdate());
+
+        coffeeOrderRepository.save(order);
+
+        return new ResponseEntity<>(order, HttpStatus.OK);
+
     }
 
 
