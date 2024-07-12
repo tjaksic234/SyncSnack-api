@@ -40,12 +40,12 @@ public class JwtUtils {
 
 
         return Jwts.builder()
-                .subject(userPrincipal.getId())
+                .subject(userPrincipal.getEmail())
                 .issuedAt(new Date())
                 .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(key())
                 .addClaims(Map.of(
-                        "email", userPrincipal.getEmail(),
+                        "userId", userPrincipal.getId(),
                         "firstName", userPrincipal.getFirstName(),
                         "lastName", userPrincipal.getLastName()
                 ))
