@@ -75,11 +75,17 @@ public class BrewEventController {
     }
 
     @GetMapping("/ongoing/{id}")
-    public ResponseEntity<List<BrewEventResult>> ongoing(@PathVariable("id") String id) {
+    public ResponseEntity<List<BrewEventResult>> pending(@PathVariable("id") String id) {
         BrewEventAggregation aggregation = new BrewEventAggregation(mongoTemplate);
         aggregation.setId(id);
         List<BrewEventResult> results = aggregation.aggregateBrewEvents();
         return ResponseEntity.ok(results);
+    }
+
+    @GetMapping("inProgress")
+    public ResponseEntity<List<BrewEvent>> inProgress(@RequestParam(name = "status", defaultValue = "IN_PROGRESS") EventStatus status) {
+        List<BrewEvent> events = brewEventRepository.findByStatus(status);
+        return ResponseEntity.ok(events);
     }
 
 }

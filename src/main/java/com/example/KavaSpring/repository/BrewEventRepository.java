@@ -23,4 +23,7 @@ public interface BrewEventRepository extends MongoRepository<BrewEvent, String> 
 
     // Method to check the pending status of the events
     List<BrewEvent> findByStatusAndStartTimeBefore(EventStatus status, LocalDateTime time);
+
+    // Method to get all brew events by status
+    List<BrewEvent> findByStatus(EventStatus status);
 }
