@@ -55,7 +55,7 @@ public class UserController {
     @GetMapping("events")
     public ResponseEntity<String> getEventsForUser(@RequestBody GetEventsForUserRequest request) {
 
-        //ovo je grozno nemoj ovo gledat 
+        //ovo je grozno nemoj ovo gledat
         List<BrewEvent> events = brewEventRepository.findByCreator(request.getCreatorId());
 
         for (BrewEvent event : events) {
