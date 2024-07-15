@@ -55,16 +55,27 @@ public class CoffeeOrderController {
     }
 
     @PatchMapping("/edit")
-    public ResponseEntity<CoffeeOrder> editOrder(@RequestBody EditOrderRequest request) {
+    public ResponseEntity<String> editOrder(@RequestBody EditOrderRequest request) {
 
         CoffeeOrder order = coffeeOrderRepository.findById(request.getCoffeeOrderId())
                 .orElseThrow(() -> new NullPointerException("Order not found!"));
 
         order.setRating(request.getRatingUpdate());
-
         coffeeOrderRepository.save(order);
 
-        return new ResponseEntity<>(order, HttpStatus.OK);
+
+        BrewEvent event = brewEventRepository.findByEventId(request.getEventId());
+
+        for (CoffeeOrder embeddedOrder : event.getOrders()) {
+            if (embeddedOrder.getCoffeeOrderId().equals(request.getCoffeeOrderId())) {
+                embeddedOrder.setRating(request.getRatingUpdate());
+                break;
+            }
+        }
+        brewEventRepository.save(event);
+
+
+        return ResponseEntity.ok("Order successfully edited!");
 
     }
 

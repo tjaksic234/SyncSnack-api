@@ -7,6 +7,10 @@ import lombok.Data;
 @Data
 public class EditOrderRequest {
 
+
+    @NotBlank
+    private String eventId;
+
     @NotBlank
     private String coffeeOrderId;
 

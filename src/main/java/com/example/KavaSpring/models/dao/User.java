@@ -1,9 +1,6 @@
 package com.example.KavaSpring.models.dao;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
@@ -33,6 +30,13 @@ public class User {
     @Size(max = 120)
     private String password;
 
+    @Min(0)
+    @Max(5)
+    private int coffeeNumber;
+
+    @Min(0)
+    @Max(5)
+    private float score;
 
     public User() {
     }
@@ -44,14 +48,12 @@ public class User {
     }
 
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id='" + id + '\'' +
-                ", email='" + email + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", password='" + password + '\'' +
-                '}';
+    public User(String id, String email, String firstName, String lastName, int coffeeNumber, float score) {
+        this.id = id;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.coffeeNumber = coffeeNumber;
+        this.score = score;
     }
 }
