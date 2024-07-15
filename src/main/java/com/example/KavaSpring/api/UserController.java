@@ -1,7 +1,10 @@
 package com.example.KavaSpring.api;
 
+import com.example.KavaSpring.api.dto.GetBrewEventOrdersResponse;
 import com.example.KavaSpring.api.dto.GetUsersResponse;
+import com.example.KavaSpring.models.dao.BrewEvent;
 import com.example.KavaSpring.models.dao.CoffeeOrder;
+import com.example.KavaSpring.repository.BrewEventRepository;
 import com.example.KavaSpring.repository.CoffeeOrderRepository;
 import com.example.KavaSpring.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,9 @@ public class UserController {
 
     @Autowired
     private CoffeeOrderRepository coffeeOrderRepository;
+
+    @Autowired
+    private BrewEventRepository brewEventRepository;
 
     @GetMapping
     public ResponseEntity<List<GetUsersResponse>> getAll() {
@@ -45,6 +51,16 @@ public class UserController {
         }
     }
 
+    @GetMapping("{userId}/brew-events/orders")
+    public ResponseEntity<GetBrewEventOrdersResponse> getUserBrewEventOrders(@PathVariable("userId") String userId) {
+        BrewEvent event = brewEventRepository.findByCreatorId(userId);
 
+        GetBrewEventOrdersResponse response = new GetBrewEventOrdersResponse();
+
+        response.setStartTime(event.getStartTime());
+        response.setOrders(event.getOrders());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
 }

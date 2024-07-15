@@ -1,6 +1,7 @@
 package com.example.KavaSpring.repository;
 
 import com.example.KavaSpring.models.dao.BrewEvent;
+import com.example.KavaSpring.models.dao.CoffeeOrder;
 import com.example.KavaSpring.models.enums.EventStatus;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
@@ -14,7 +15,7 @@ public interface BrewEventRepository extends MongoRepository<BrewEvent, String> 
     Boolean existsByEventId(String eventId);
 
     // Method to check for active events for a user
-    boolean existsByCreator_IdAndStatus(String creator, EventStatus status);
+    boolean existsByCreator_IdAndStatus(String creatorId, EventStatus status);
 
     // Method to edit the brew events
     BrewEvent findByCreatorIdAndEventId(String creatorId, String eventId);
@@ -24,4 +25,7 @@ public interface BrewEventRepository extends MongoRepository<BrewEvent, String> 
 
     // Method to get all brew events by status
     List<BrewEvent> findByStatus(EventStatus status);
+
+    // Method to retrieve the brew event associated with the creator of the event
+    BrewEvent findByCreatorId(String creatorId);
 }
