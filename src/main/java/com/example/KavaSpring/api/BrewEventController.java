@@ -68,7 +68,7 @@ public class BrewEventController {
         boolean hasActiveEvent = brewEventRepository.existsByCreator_IdAndStatus(request.getCreatorId(), EventStatus.IN_PROGRESS);
 
         if (hasActiveEvent) {
-            BrewEvent event = brewEventRepository.findByCreatorIdAndEventId(request.getCreatorId(), request.getEventId());
+            BrewEvent event = brewEventRepository.findByCreatorId(request.getCreatorId());
             event.setStatus(EventStatus.COMPLETED);
             brewEventRepository.save(event);
         } else {
