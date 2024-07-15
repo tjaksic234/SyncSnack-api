@@ -1,7 +1,6 @@
 package com.example.KavaSpring.api.dto;
 
-import com.example.KavaSpring.models.dao.enums.CoffeeType;
-import com.mongodb.lang.Nullable;
+import com.example.KavaSpring.models.enums.CoffeeType;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 

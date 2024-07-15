@@ -6,7 +6,7 @@ import com.example.KavaSpring.api.dto.GetBrewEventsResponse;
 import com.example.KavaSpring.helper.BrewEventAggregation;
 import com.example.KavaSpring.helper.dto.BrewEventResult;
 import com.example.KavaSpring.models.dao.BrewEvent;
-import com.example.KavaSpring.models.dao.enums.EventStatus;
+import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.models.dao.User;
 import com.example.KavaSpring.repository.BrewEventRepository;
 import com.example.KavaSpring.repository.UserRepository;
@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,13 +42,14 @@ public class BrewEventController {
         User creator = userRepository.findById(request.getCreatorId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        boolean hasActiveEvent = brewEventRepository.existsByCreator_IdAndStatus(creator.getId(),
-                 EventStatus.PENDING);
+        boolean hasActiveEvent = brewEventRepository.existsByCreator_IdAndStatus(creator.getId(), EventStatus.PENDING)
+                ? true
+                : brewEventRepository.existsByCreator_IdAndStatus(creator.getId(), EventStatus.IN_PROGRESS);
 
         if (hasActiveEvent) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
-                    .body("User already has a PENDING brewing event in progress.");
+                    .body("User already has a brewing event in progress.");
         }
 
 
@@ -77,7 +77,7 @@ public class BrewEventController {
         return new ResponseEntity<>("The brew event has been successfully altered", HttpStatus.OK);
     }
 
-    @GetMapping("/ongoing/{id}")
+    @GetMapping("/pending/{id}")
     public ResponseEntity<List<BrewEventResult>> pending(@PathVariable("id") String id) {
         BrewEventAggregation aggregation = new BrewEventAggregation(mongoTemplate);
         aggregation.setId(id);

@@ -1,4 +1,4 @@
-package com.example.KavaSpring.models.dao.enums;
+package com.example.KavaSpring.models.enums;
 
 public enum EventStatus {
     COMPLETED,

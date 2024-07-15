@@ -1,14 +1,12 @@
 package com.example.KavaSpring.repository;
 
 import com.example.KavaSpring.models.dao.BrewEvent;
-import com.example.KavaSpring.models.dao.enums.EventStatus;
-import org.springframework.data.mongodb.repository.Aggregation;
+import com.example.KavaSpring.models.enums.EventStatus;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface BrewEventRepository extends MongoRepository<BrewEvent, String> {

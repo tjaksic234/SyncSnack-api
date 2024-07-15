@@ -1,6 +1,6 @@
 package com.example.KavaSpring.models.dao;
 
-import com.example.KavaSpring.models.dao.enums.CoffeeType;
+import com.example.KavaSpring.models.enums.CoffeeType;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

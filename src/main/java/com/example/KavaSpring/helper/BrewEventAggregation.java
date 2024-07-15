@@ -1,7 +1,7 @@
 package com.example.KavaSpring.helper;
 
 import com.example.KavaSpring.helper.dto.BrewEventResult;
-import com.example.KavaSpring.models.dao.enums.EventStatus;
+import com.example.KavaSpring.models.enums.EventStatus;
 import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;

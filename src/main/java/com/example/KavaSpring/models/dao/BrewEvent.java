@@ -1,6 +1,6 @@
 package com.example.KavaSpring.models.dao;
 
-import com.example.KavaSpring.models.dao.enums.EventStatus;
+import com.example.KavaSpring.models.enums.EventStatus;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -13,7 +13,6 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 

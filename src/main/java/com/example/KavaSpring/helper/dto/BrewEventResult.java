@@ -1,6 +1,6 @@
 package com.example.KavaSpring.helper.dto;
 
-import com.example.KavaSpring.models.dao.enums.EventStatus;
+import com.example.KavaSpring.models.enums.EventStatus;
 import lombok.Data;
 
 @Data
