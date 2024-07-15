@@ -1,6 +1,7 @@
 package com.example.KavaSpring.api;
 
 import com.example.KavaSpring.api.dto.GetBrewEventOrdersResponse;
+import com.example.KavaSpring.api.dto.GetEventsForUserRequest;
 import com.example.KavaSpring.api.dto.GetUsersResponse;
 import com.example.KavaSpring.models.dao.BrewEvent;
 import com.example.KavaSpring.models.dao.CoffeeOrder;
@@ -50,6 +51,23 @@ public class UserController {
             return ResponseEntity.ok(orders);
         }
     }
+
+    @GetMapping("events")
+    public ResponseEntity<String> getEventsForUser(@RequestBody GetEventsForUserRequest request) {
+
+        //ovo je grozno nemoj ovo gledat 
+        List<BrewEvent> events = brewEventRepository.findByCreator(request.getCreatorId());
+
+        for (BrewEvent event : events) {
+            for (CoffeeOrder order : event.getOrders()) {
+                if (order.getCoffeeOrderId().equals(request.getCoffeeOrderId())) {
+                    return new ResponseEntity<>(event.getEventId(), HttpStatus.OK);
+                }
+            }
+        }
+        return new ResponseEntity<>("", HttpStatus.NO_CONTENT);
+    }
+
 
     @GetMapping("{userId}/brew-events/orders")
     public ResponseEntity<GetBrewEventOrdersResponse> getUserBrewEventOrders(@PathVariable("userId") String userId) {

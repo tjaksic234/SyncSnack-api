@@ -29,4 +29,7 @@ public interface BrewEventRepository extends MongoRepository<BrewEvent, String> 
     // Method to retrieve the brew event associated with the creator of the event
     BrewEvent findByCreatorId(String creatorId);
 
+    // Method to retrieve the brew events
+    List<BrewEvent> findByCreator(String creatorId);
+
 }
