@@ -65,7 +65,7 @@ public class BrewEventController {
     }
 
     @PatchMapping("complete-event")
-    public ResponseEntity<String> editBrewEvent(@RequestParam(name = "userId") String userId) {
+    public ResponseEntity<String> finishBrewEvent(@RequestParam(name = "userId") String userId) {
 
         userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -73,7 +73,7 @@ public class BrewEventController {
         boolean hasActiveEvent = brewEventRepository.existsByUserIdAndStatus(userId, EventStatus.IN_PROGRESS);
 
         if (hasActiveEvent) {
-            BrewEvent event = brewEventRepository.findByUserId(userId);
+            BrewEvent event = brewEventRepository.findByUserIdAndStatus(userId, EventStatus.IN_PROGRESS);
             event.setStatus(EventStatus.COMPLETED);
             brewEventRepository.save(event);
         } else {
