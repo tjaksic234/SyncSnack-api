@@ -6,25 +6,24 @@ import com.example.KavaSpring.models.dto.EditOrderRequest;
 import com.example.KavaSpring.models.dao.BrewEvent;
 import com.example.KavaSpring.models.dao.CoffeeOrder;
 import com.example.KavaSpring.models.dao.User;
+import com.example.KavaSpring.models.dto.GetOrderResponse;
 import com.example.KavaSpring.repository.BrewEventRepository;
 import com.example.KavaSpring.repository.CoffeeOrderRepository;
 import com.example.KavaSpring.repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("api/orders")
+@Slf4j
 public class CoffeeOrderController {
-
-
-    private static final Logger log = LoggerFactory.getLogger(CoffeeOrderController.class);
 
     private final CoffeeOrderRepository coffeeOrderRepository;
 
@@ -83,7 +82,24 @@ public class CoffeeOrderController {
         return ResponseEntity.ok("Order successfully edited!");
     }
 
+    @GetMapping("{id}")
+    public ResponseEntity<GetOrderResponse> getOrder(@PathVariable("id") String coffeeOrderId) {
+        CoffeeOrder order = coffeeOrderRepository.findByCoffeeOrderId(coffeeOrderId);
 
+        if (order == null) {
+            log.error("Bad coffeeOrder object returned!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "An error occurred while processing the request");
+        }
+
+        GetOrderResponse response = new GetOrderResponse();
+        response.setCoffeeOrderId(order.getCoffeeOrderId());
+        response.setType(order.getType());
+        response.setSugarQuantity(order.getSugarQuantity());
+        response.setMilkQuantity(order.getMilkQuantity());
+
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
     @GetMapping
     public ResponseEntity<List<CoffeeOrder>> getCoffeeOrders() {

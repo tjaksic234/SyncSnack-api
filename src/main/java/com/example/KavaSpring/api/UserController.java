@@ -110,6 +110,7 @@ public class UserController {
         return new ResponseEntity<>(event, HttpStatus.OK);
     }
 
+    //* This retrieves the event that is associated with the order id that is in the request body
     @GetMapping("events")
     public ResponseEntity<String> getEventForOrder(@RequestBody GetEventsForUserRequest request) {
 
@@ -123,6 +124,7 @@ public class UserController {
 
     }
 
+    //* this retrieves all the average scores of the users in the database
     @GetMapping("rating")
     public ResponseEntity<List<UserCoffeeStats>> getRatings() {
 

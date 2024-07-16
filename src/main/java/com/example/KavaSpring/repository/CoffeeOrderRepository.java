@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface CoffeeOrderRepository extends MongoRepository<CoffeeOrder, String> {
 
-    Optional<CoffeeOrder> findByCoffeeOrderId(String coffeeOrderId);
+    CoffeeOrder findByCoffeeOrderId(String coffeeOrderId);
     boolean existsByCoffeeOrderId(String coffeeOrderId);
     List<CoffeeOrder> findByUserId(String userId);
 
