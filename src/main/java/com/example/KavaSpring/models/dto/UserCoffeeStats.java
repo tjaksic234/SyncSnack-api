@@ -1,15 +1,15 @@
-package com.example.KavaSpring.api.dto;
+package com.example.KavaSpring.models.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class EditOrderRequest {
+public class UserCoffeeStats {
 
     @NotBlank
-    private String coffeeOrderId;
+    private String userId;
 
     @NotNull
-    private int ratingUpdate;
+    private double averageRating;
 }

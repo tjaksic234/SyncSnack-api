@@ -1,4 +1,4 @@
-package com.example.KavaSpring.helper.dto;
+package com.example.KavaSpring.models.dto;
 
 import com.example.KavaSpring.models.enums.EventStatus;
 import lombok.Data;

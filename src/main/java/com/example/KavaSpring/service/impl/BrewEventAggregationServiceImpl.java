@@ -1,9 +1,9 @@
-package com.example.KavaSpring.helper;
+package com.example.KavaSpring.service.impl;
 
-import com.example.KavaSpring.helper.dto.BrewEventResult;
+import com.example.KavaSpring.models.dto.BrewEventResult;
 import com.example.KavaSpring.models.enums.EventStatus;
+import com.example.KavaSpring.service.BrewEventAggregationService;
 import lombok.Setter;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -15,14 +15,14 @@ import java.util.List;
 
 @Component
 @Setter
-public class BrewEventAggregation {
+public class BrewEventAggregationServiceImpl implements BrewEventAggregationService {
 
-    private static final Logger log = LoggerFactory.getLogger(BrewEventAggregation.class);
+    private static final Logger log = LoggerFactory.getLogger(BrewEventAggregationServiceImpl.class);
     private String id;
 
     private final MongoTemplate mongoTemplate;
 
-    public BrewEventAggregation(MongoTemplate mongoTemplate) {
+    public BrewEventAggregationServiceImpl(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
     }
 

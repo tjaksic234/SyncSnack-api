@@ -28,6 +28,8 @@ public interface BrewEventRepository extends MongoRepository<BrewEvent, String> 
     List<BrewEvent> findByStatus(EventStatus status);
 
     // Method to retrieve the brew event associated with the creator of the event
+    BrewEvent findByUserIdAndStatus(String userId, EventStatus status);
+
     BrewEvent findByUserId(String userId);
 
     BrewEvent findByUserIdAndOrderIdsContaining(String userId, String orderId);

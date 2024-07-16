@@ -1,10 +1,10 @@
 package com.example.KavaSpring.api;
 
-import com.example.KavaSpring.api.dto.CreateBrewEventRequest;
-import com.example.KavaSpring.api.dto.CompleteBrewEventRequest;
-import com.example.KavaSpring.api.dto.GetBrewEventsResponse;
-import com.example.KavaSpring.helper.BrewEventAggregation;
-import com.example.KavaSpring.helper.dto.BrewEventResult;
+import com.example.KavaSpring.models.dto.CreateBrewEventRequest;
+import com.example.KavaSpring.models.dto.GetBrewEventsResponse;
+import com.example.KavaSpring.service.BrewEventAggregationService;
+import com.example.KavaSpring.service.impl.BrewEventAggregationServiceImpl;
+import com.example.KavaSpring.models.dto.BrewEventResult;
 import com.example.KavaSpring.models.dao.BrewEvent;
 import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.models.dao.User;
@@ -25,17 +25,22 @@ import java.util.stream.Collectors;
 @RequestMapping("api/events")
 public class BrewEventController {
 
-    @Autowired
-    private BrewEventRepository brewEventRepository;
+    private final BrewEventRepository brewEventRepository;
+
+    private final UserRepository userRepository;
+
+    private final BrewEventAggregationService brewEventAggregationService;
+
+    private final MongoTemplate mongoTemplate;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private BrewEventAggregation brewEventAggregation;
-
-    @Autowired
-    private MongoTemplate mongoTemplate;
+    public BrewEventController(BrewEventRepository brewEventRepository, UserRepository userRepository,
+                               BrewEventAggregationService brewEventAggregationService, MongoTemplate mongoTemplate) {
+        this.brewEventRepository = brewEventRepository;
+        this.userRepository = userRepository;
+        this.brewEventAggregationService = brewEventAggregationService;
+        this.mongoTemplate = mongoTemplate;
+    }
 
     @PostMapping("create")
     public ResponseEntity<String> create(@RequestBody CreateBrewEventRequest request) {
@@ -78,18 +83,16 @@ public class BrewEventController {
     }
 
 
-    //TODO FIX THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // This will aggregate data to return all the pending brew events except for the user that is calling this endpoint
-    // We input the user id into the path variable
+    //* This will aggregate data to return all the pending brew events except for the user that is calling this endpoint
     @GetMapping("/pending/{id}")
     public ResponseEntity<List<BrewEventResult>> getPendingEvents(@PathVariable("id") String userId) {
-        BrewEventAggregation aggregation = new BrewEventAggregation(mongoTemplate);
+        BrewEventAggregationServiceImpl aggregation = new BrewEventAggregationServiceImpl(mongoTemplate);
         aggregation.setId(new ObjectId(userId).toString());
         List<BrewEventResult> results = aggregation.aggregateBrewEvents();
         return ResponseEntity.ok(results);
     }
 
-    // Retrieve all events based on their event status enums
+    //* Retrieve all events based on their event status enums
     @GetMapping()
     public ResponseEntity<List<GetBrewEventsResponse>> inProgress(@RequestParam(name = "status", defaultValue = "PENDING") EventStatus status) {
         List<BrewEvent> events = brewEventRepository.findByStatus(status);

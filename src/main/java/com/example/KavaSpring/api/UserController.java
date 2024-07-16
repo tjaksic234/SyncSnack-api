@@ -1,35 +1,48 @@
 package com.example.KavaSpring.api;
 
-import com.example.KavaSpring.api.dto.CoffeeOrderDto;
-import com.example.KavaSpring.api.dto.GetBrewEventHistoryResponse;
-import com.example.KavaSpring.api.dto.GetEventsForUserRequest;
-import com.example.KavaSpring.api.dto.GetUsersResponse;
+import com.example.KavaSpring.models.dao.User;
+import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.models.dao.BrewEvent;
 import com.example.KavaSpring.models.dao.CoffeeOrder;
+import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.repository.BrewEventRepository;
 import com.example.KavaSpring.repository.CoffeeOrderRepository;
 import com.example.KavaSpring.repository.UserRepository;
+import com.example.KavaSpring.service.AverageScoreAggregationService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/users")
+@Slf4j
 public class UserController {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    private final CoffeeOrderRepository coffeeOrderRepository;
+
+    private final BrewEventRepository brewEventRepository;
+
+    private final AverageScoreAggregationService scoreAggregationService;
 
     @Autowired
-    private CoffeeOrderRepository coffeeOrderRepository;
+    public UserController(UserRepository userRepository, CoffeeOrderRepository coffeeOrderRepository,
+                          BrewEventRepository brewEventRepository, AverageScoreAggregationService scoreAggregationService) {
+        this.userRepository = userRepository;
+        this.coffeeOrderRepository = coffeeOrderRepository;
+        this.brewEventRepository = brewEventRepository;
+        this.scoreAggregationService = scoreAggregationService;
+    }
 
-    @Autowired
-    private BrewEventRepository brewEventRepository;
 
+    //* Retrieve all users
     @GetMapping
     public ResponseEntity<List<GetUsersResponse>> getAll() {
 
@@ -43,8 +56,27 @@ public class UserController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    // This retrieves all the orders associated with the user that called this method
-    @GetMapping("/orders/{id}")
+    //* Get a specific user with his id
+    @GetMapping("{id}")
+    public ResponseEntity<GetUserResponse> getUser(@PathVariable("id") String id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        GetUserResponse userResponse = new GetUserResponse();
+
+        userResponse.setUserId(user.getId());
+        userResponse.setFirstName(user.getFirstName());
+        userResponse.setLastName(user.getLastName());
+        userResponse.setEmail(user.getEmail());
+        userResponse.setCoffeeNumber(user.getCoffeeNumber());
+        userResponse.setScore(user.getScore());
+
+
+        return new ResponseEntity<>(userResponse, HttpStatus.OK);
+    }
+
+    //* This retrieves all the orders associated with the user that called this method
+    @GetMapping("{id}/orders")
     public ResponseEntity<List<CoffeeOrderDto>> getOrders(@PathVariable("id") String id) {
         List<CoffeeOrder> orders = coffeeOrderRepository.findByUserId(id);
 
@@ -66,6 +98,18 @@ public class UserController {
         }
     }
 
+    //* Retrieve all brew events of the specific user that called this method
+    @GetMapping("{userId}/events")
+    public ResponseEntity<BrewEvent> getBrewEventHistory(@PathVariable("userId") String userId) {
+        BrewEvent event = brewEventRepository.findByUserIdAndStatus(userId, EventStatus.IN_PROGRESS);
+
+        GetBrewEventHistoryResponse response = new GetBrewEventHistoryResponse();
+
+        response.setOrderIds(event.getOrderIds());
+
+        return new ResponseEntity<>(event, HttpStatus.OK);
+    }
+
     @GetMapping("events")
     public ResponseEntity<String> getEventForOrder(@RequestBody GetEventsForUserRequest request) {
 
@@ -79,16 +123,17 @@ public class UserController {
 
     }
 
-    // retrieve all brew events of the specific user
-    @GetMapping("history/{userId}")
-    public ResponseEntity<GetBrewEventHistoryResponse> getBrewEventHistory(@PathVariable("userId") String userId) {
-        BrewEvent event = brewEventRepository.findByUserId(userId);
+    @GetMapping("rating")
+    public ResponseEntity<List<UserCoffeeStats>> getRatings() {
 
-        GetBrewEventHistoryResponse response = new GetBrewEventHistoryResponse();
+        try {
+            List<CoffeeOrder> orders = coffeeOrderRepository.findAll();
 
-        response.setStartTime(event.getStartTime());
-        response.setOrderIds(event.getOrderIds());
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
+            return ResponseEntity.ok(scoreAggregationService.calculate(orders));
+        } catch (Exception e) {
+            log.error("Database error while fetching coffee orders", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while processing the request", e);
+        }
     }
+
 }

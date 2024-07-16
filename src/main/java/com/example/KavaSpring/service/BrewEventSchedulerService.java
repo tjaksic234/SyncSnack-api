@@ -1,4 +1,4 @@
-package com.example.KavaSpring.services;
+package com.example.KavaSpring.service;
 
 public interface BrewEventSchedulerService {
 

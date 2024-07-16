@@ -1,20 +1,30 @@
-package com.example.KavaSpring.api.dto;
+package com.example.KavaSpring.models.dto;
 
 import com.example.KavaSpring.models.enums.CoffeeType;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class CoffeeOrderDto {
+public class CreateCoffeeOrderRequest {
 
-    private String coffeeOrderId;
+    @NotBlank
     private String eventId;
+
+    @NotBlank
     private String userId;
+
+    @NotBlank
     private CoffeeType type;
+
+    @NotNull
+    @Min(0)
+    @Max(5)
     private int sugarQuantity;
+
+    @NotNull
+    @Min(0)
+    @Max(5)
     private int milkQuantity;
+
     private int rating;
 }

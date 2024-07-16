@@ -1,4 +1,4 @@
-package com.example.KavaSpring.api.dto;
+package com.example.KavaSpring.models.dto;
 
 import lombok.Data;
 

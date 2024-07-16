@@ -1,9 +1,9 @@
-package com.example.KavaSpring.services.impl;
+package com.example.KavaSpring.service.impl;
 
 import com.example.KavaSpring.models.dao.BrewEvent;
 import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.repository.BrewEventRepository;
-import com.example.KavaSpring.services.BrewEventSchedulerService;
+import com.example.KavaSpring.service.BrewEventSchedulerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,8 +1,8 @@
 package com.example.KavaSpring.api;
 
 
-import com.example.KavaSpring.api.dto.CreateCoffeeOrderRequest;
-import com.example.KavaSpring.api.dto.EditOrderRequest;
+import com.example.KavaSpring.models.dto.CreateCoffeeOrderRequest;
+import com.example.KavaSpring.models.dto.EditOrderRequest;
 import com.example.KavaSpring.models.dao.BrewEvent;
 import com.example.KavaSpring.models.dao.CoffeeOrder;
 import com.example.KavaSpring.models.dao.User;
@@ -25,20 +25,25 @@ public class CoffeeOrderController {
 
 
     private static final Logger log = LoggerFactory.getLogger(CoffeeOrderController.class);
-    @Autowired
-    private CoffeeOrderRepository coffeeOrderRepository;
+
+    private final CoffeeOrderRepository coffeeOrderRepository;
+
+    private final BrewEventRepository brewEventRepository;
+
+    private final UserRepository userRepository;
 
     @Autowired
-    private BrewEventRepository brewEventRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
+    public CoffeeOrderController(CoffeeOrderRepository coffeeOrderRepository, BrewEventRepository brewEventRepository,
+                                 UserRepository userRepository) {
+        this.coffeeOrderRepository = coffeeOrderRepository;
+        this.brewEventRepository = brewEventRepository;
+        this.userRepository = userRepository;
+    }
 
     @PostMapping("create")
     public ResponseEntity<String> create(@RequestBody CreateCoffeeOrderRequest request) {
 
-        User creator = userRepository.findById(request.getUserId())
+        User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         CoffeeOrder order = new CoffeeOrder (
@@ -55,6 +60,10 @@ public class CoffeeOrderController {
         BrewEvent event = brewEventRepository.findByEventId(request.getEventId());
         event.getOrderIds().add(order.getCoffeeOrderId());
         brewEventRepository.save(event);
+
+        //* This will update the coffee order counter for the user in the user repository
+        user.setCoffeeNumber(user.getCoffeeNumber() + 1);
+        userRepository.save(user);
 
         return new ResponseEntity<>(order.getCoffeeOrderId(), HttpStatus.OK);
     }

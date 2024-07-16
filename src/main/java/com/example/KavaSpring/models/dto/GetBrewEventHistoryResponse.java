@@ -1,4 +1,4 @@
-package com.example.KavaSpring.api.dto;
+package com.example.KavaSpring.models.dto;
 
 
 import jakarta.validation.constraints.NotBlank;
@@ -10,9 +10,6 @@ import java.util.List;
 
 @Data
 public class GetBrewEventHistoryResponse {
-
-    @NotBlank
-    private LocalDateTime startTime;
 
     @NotNull
     private List<String> orderIds;
