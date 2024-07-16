@@ -7,7 +7,7 @@ import lombok.Data;
 public class GetEventsForUserRequest {
 
     @NotBlank
-    private String creatorId;
+    private String userId;
 
     @NotBlank
     private String coffeeOrderId;

@@ -7,7 +7,6 @@ import lombok.Data;
 public class BrewEventResult {
 
     private String eventId;
-    private String firstName;
-    private String lastName;
+    private String userId;
     private EventStatus status;
 }

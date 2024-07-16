@@ -6,8 +6,5 @@ import lombok.Data;
 @Data
 public class CompleteBrewEventRequest {
     @NotBlank
-    private String creatorId;
-
-    @NotBlank
-    private String eventId;
+    private String userId;
 }

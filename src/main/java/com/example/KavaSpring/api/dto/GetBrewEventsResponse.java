@@ -11,13 +11,7 @@ public class GetBrewEventsResponse {
     private String eventId;
 
     @NotBlank
-    private String creatorId;
-
-    @NotBlank
-    private String firstName;
-
-    @NotBlank
-    private String lastName;
+    private String userId;
 
     @NotBlank
     private EventStatus status;

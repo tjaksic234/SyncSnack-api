@@ -11,14 +11,15 @@ import java.util.List;
 
 @Repository
 public interface BrewEventRepository extends MongoRepository<BrewEvent, String> {
+
     BrewEvent findByEventId(String eventId);
     Boolean existsByEventId(String eventId);
 
     // Method to check for active events for a user
-    boolean existsByCreator_IdAndStatus(String creatorId, EventStatus status);
+    boolean existsByUserIdAndStatus(String userId, EventStatus status);
 
     // Method to edit the brew events
-    BrewEvent findByCreatorIdAndEventId(String creatorId, String eventId);
+    BrewEvent findByUserIdAndEventId(String userId, String eventId);
 
     // Method to check the pending status of the events
     List<BrewEvent> findByStatusAndStartTimeBefore(EventStatus status, LocalDateTime time);
@@ -27,9 +28,10 @@ public interface BrewEventRepository extends MongoRepository<BrewEvent, String> 
     List<BrewEvent> findByStatus(EventStatus status);
 
     // Method to retrieve the brew event associated with the creator of the event
-    BrewEvent findByCreatorId(String creatorId);
+    BrewEvent findByUserId(String userId);
 
-    // Method to retrieve the brew events
-    List<BrewEvent> findByCreator(String creatorId);
+    BrewEvent findByUserIdAndOrderIdsContaining(String userId, String orderId);
+
+
 
 }

@@ -1,6 +1,7 @@
 package com.example.KavaSpring.api;
 
-import com.example.KavaSpring.api.dto.GetBrewEventOrdersResponse;
+import com.example.KavaSpring.api.dto.CoffeeOrderDto;
+import com.example.KavaSpring.api.dto.GetBrewEventHistoryResponse;
 import com.example.KavaSpring.api.dto.GetEventsForUserRequest;
 import com.example.KavaSpring.api.dto.GetUsersResponse;
 import com.example.KavaSpring.models.dao.BrewEvent;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/users")
@@ -41,44 +43,52 @@ public class UserController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
+    // This retrieves all the orders associated with the user that called this method
     @GetMapping("/orders/{id}")
-    public ResponseEntity<List<CoffeeOrder>> getOrdersForUser(@PathVariable("id") String id) {
-        List<CoffeeOrder> orders = coffeeOrderRepository.findByCreatorId(id);
+    public ResponseEntity<List<CoffeeOrderDto>> getOrders(@PathVariable("id") String id) {
+        List<CoffeeOrder> orders = coffeeOrderRepository.findByUserId(id);
 
         if (orders.isEmpty()) {
             return ResponseEntity.noContent().build();
         } else {
-            return ResponseEntity.ok(orders);
+            List<CoffeeOrderDto> orderDTOs = orders.stream()
+                    .map(order -> new CoffeeOrderDto(
+                            order.getCoffeeOrderId(),
+                            order.getEventId(),
+                            order.getUserId(),
+                            order.getType(),
+                            order.getSugarQuantity(),
+                            order.getMilkQuantity(),
+                            order.getRating()
+                    ))
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(orderDTOs);
         }
     }
 
     @GetMapping("events")
-    public ResponseEntity<String> getEventsForUser(@RequestBody GetEventsForUserRequest request) {
+    public ResponseEntity<String> getEventForOrder(@RequestBody GetEventsForUserRequest request) {
 
-        //ovo je grozno nemoj ovo gledat
-        List<BrewEvent> events = brewEventRepository.findByCreator(request.getCreatorId());
+        BrewEvent event = brewEventRepository.findByUserIdAndOrderIdsContaining(request.getUserId(), request.getCoffeeOrderId());
 
-        for (BrewEvent event : events) {
-            for (CoffeeOrder order : event.getOrders()) {
-                if (order.getCoffeeOrderId().equals(request.getCoffeeOrderId())) {
-                    return new ResponseEntity<>(event.getEventId(), HttpStatus.OK);
-                }
-            }
+        if (event == null) {
+            return ResponseEntity.noContent().build();
         }
-        return new ResponseEntity<>("", HttpStatus.NO_CONTENT);
+
+        return ResponseEntity.ok(event.getEventId());
+
     }
 
+    // retrieve all brew events of the specific user
+    @GetMapping("history/{userId}")
+    public ResponseEntity<GetBrewEventHistoryResponse> getBrewEventHistory(@PathVariable("userId") String userId) {
+        BrewEvent event = brewEventRepository.findByUserId(userId);
 
-    @GetMapping("{userId}/brew-events/orders")
-    public ResponseEntity<GetBrewEventOrdersResponse> getUserBrewEventOrders(@PathVariable("userId") String userId) {
-        BrewEvent event = brewEventRepository.findByCreatorId(userId);
-
-        GetBrewEventOrdersResponse response = new GetBrewEventOrdersResponse();
+        GetBrewEventHistoryResponse response = new GetBrewEventHistoryResponse();
 
         response.setStartTime(event.getStartTime());
-        response.setOrders(event.getOrders());
+        response.setOrderIds(event.getOrderIds());
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
 }

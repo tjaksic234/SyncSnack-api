@@ -30,6 +30,7 @@ public class BrewEventSchedulerServiceImpl implements BrewEventSchedulerService 
         for (BrewEvent event : pendingEvents) {
             event.setStatus(EventStatus.IN_PROGRESS);
             brewEventRepository.save(event);
+            log.info("Updated event {} to IN_PROGRESS", event.getEventId());
         }
     }
 }

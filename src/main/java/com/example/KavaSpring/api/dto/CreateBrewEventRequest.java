@@ -8,7 +8,7 @@ import lombok.Data;
 public class CreateBrewEventRequest {
 
     @NotBlank
-    private String creatorId;
+    private String userId;
 
     @NotNull
     private int pendingTime;

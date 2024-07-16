@@ -24,8 +24,7 @@ public class BrewEvent {
     private String eventId;
 
     @NotBlank
-    @DBRef
-    private User creator;
+    private String userId;
 
     @NotNull
     @Indexed
@@ -42,24 +41,24 @@ public class BrewEvent {
     @Min(0)
     private int pendingTime;
 
-    private List<CoffeeOrder> orders;
+    private List<String> orderIds;
 
     public BrewEvent() {
     }
 
-    public BrewEvent(User creator, int pendingTime) {
-        this.creator = creator;
+    public BrewEvent(String userId, int pendingTime) {
+        this.userId = userId;
         this.startTime = LocalDateTime.now().plusMinutes(pendingTime);
         this.endTime = null;
         this.status = EventStatus.PENDING;
-        this.orders = new ArrayList<>();
+        this.orderIds = new ArrayList<>();
     }
 
     @Override
     public String toString() {
         return "Event{" +
                 "eventId='" + eventId + '\'' +
-                ", creatorId='" + creator + '\'' +
+                ", userId='" + userId + '\'' +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +
                 ", status='" + status + '\'' +

@@ -19,8 +19,10 @@ public class CoffeeOrder {
     private String coffeeOrderId;
 
     @NotBlank
-    @DBRef
-    private User creatorId;
+    private String eventId;
+
+    @NotBlank
+    private String userId;
 
     @NotBlank
     private CoffeeType type;
@@ -40,8 +42,9 @@ public class CoffeeOrder {
     @Max(5)
     private int rating;
 
-    public CoffeeOrder(User creatorId, CoffeeType type, int sugarQuantity, int milkQuantity, int rating) {
-        this.creatorId = creatorId;
+    public CoffeeOrder(String userId, String eventId, CoffeeType type, int sugarQuantity, int milkQuantity, int rating) {
+        this.userId = userId;
+        this.eventId = eventId;
         this.type = type;
         this.sugarQuantity = sugarQuantity;
         this.milkQuantity = milkQuantity;

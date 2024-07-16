@@ -27,28 +27,18 @@ public class BrewEventAggregation {
     }
 
     public List<BrewEventResult> aggregateBrewEvents() {
-        LookupOperation lookupOperation = LookupOperation.newLookup()
-                .from("users")
-                .localField("creator.$id")
-                .foreignField("_id")
-                .as("creator");
-
-        UnwindOperation unwindOperation = Aggregation.unwind("creator");
 
         MatchOperation matchOperation = Aggregation.match(
-                Criteria.where("creator._id").ne(new ObjectId(id))
+                Criteria.where("userId").ne(id)
                         .and("status").is(EventStatus.PENDING)
         );
 
         ProjectionOperation projectionOperation = Aggregation.project()
                 .and("_id").as("eventId")
-                .and("creator.firstName").as("firstName")
-                .and("creator.lastName").as("lastName")
+                .and("userId").as("userId")
                 .and("status").as("status");
 
         Aggregation aggregation = Aggregation.newAggregation(
-                lookupOperation,
-                unwindOperation,
                 matchOperation,
                 projectionOperation
         );
