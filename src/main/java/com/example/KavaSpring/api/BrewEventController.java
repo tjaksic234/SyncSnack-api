@@ -10,6 +10,7 @@ import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.models.dao.User;
 import com.example.KavaSpring.repository.BrewEventRepository;
 import com.example.KavaSpring.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/events")
+@Slf4j
 public class BrewEventController {
 
     private final BrewEventRepository brewEventRepository;
@@ -64,6 +66,8 @@ public class BrewEventController {
         return new ResponseEntity<>(event.getEventId(), HttpStatus.OK);
     }
 
+
+    //* this will change the status of the event into COMPLETE and mark it finished
     @PatchMapping("complete-event")
     public ResponseEntity<String> finishBrewEvent(@RequestParam(name = "userId") String userId) {
 
@@ -94,7 +98,7 @@ public class BrewEventController {
 
     //* Retrieve all events based on their event status enums
     @GetMapping()
-    public ResponseEntity<List<GetBrewEventsResponse>> inProgress(@RequestParam(name = "status", defaultValue = "PENDING") EventStatus status) {
+    public ResponseEntity<List<GetBrewEventsResponse>> getEvents(@RequestParam(name = "status", defaultValue = "PENDING") EventStatus status) {
         List<BrewEvent> events = brewEventRepository.findByStatus(status);
 
         List<GetBrewEventsResponse> responseList = events.stream()
@@ -109,5 +113,19 @@ public class BrewEventController {
 
         return ResponseEntity.ok(responseList);
     }
+
+    //* Get a specific event by id
+    @GetMapping("{id}")
+    public ResponseEntity<BrewEvent> getEvent(@PathVariable("id") String id) {
+        try {
+            BrewEvent event = brewEventRepository.findByEventId(id);
+
+            return new ResponseEntity<>(event, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("There was an error fetching an event by ID", HttpStatus.NOT_FOUND);
+            throw new RuntimeException(e);
+        }
+    }
+
 
 }

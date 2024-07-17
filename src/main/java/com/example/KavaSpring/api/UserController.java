@@ -8,7 +8,6 @@ import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.repository.BrewEventRepository;
 import com.example.KavaSpring.repository.CoffeeOrderRepository;
 import com.example.KavaSpring.repository.UserRepository;
-import com.example.KavaSpring.service.AverageScoreAggregationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,15 +29,13 @@ public class UserController {
 
     private final BrewEventRepository brewEventRepository;
 
-    private final AverageScoreAggregationService scoreAggregationService;
 
     @Autowired
     public UserController(UserRepository userRepository, CoffeeOrderRepository coffeeOrderRepository,
-                          BrewEventRepository brewEventRepository, AverageScoreAggregationService scoreAggregationService) {
+                          BrewEventRepository brewEventRepository) {
         this.userRepository = userRepository;
         this.coffeeOrderRepository = coffeeOrderRepository;
         this.brewEventRepository = brewEventRepository;
-        this.scoreAggregationService = scoreAggregationService;
     }
 
 
@@ -122,20 +119,6 @@ public class UserController {
 
         return ResponseEntity.ok(event.getEventId());
 
-    }
-
-    //* this retrieves all the average scores of the users in the database
-    @GetMapping("rating")
-    public ResponseEntity<List<UserCoffeeStats>> getRatings() {
-
-        try {
-            List<CoffeeOrder> orders = coffeeOrderRepository.findAll();
-
-            return ResponseEntity.ok(scoreAggregationService.calculate(orders));
-        } catch (Exception e) {
-            log.error("Database error while fetching coffee orders", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while processing the request", e);
-        }
     }
 
 }

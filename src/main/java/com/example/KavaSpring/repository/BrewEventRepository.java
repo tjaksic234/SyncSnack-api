@@ -33,7 +33,4 @@ public interface BrewEventRepository extends MongoRepository<BrewEvent, String> 
     BrewEvent findByUserId(String userId);
 
     BrewEvent findByUserIdAndOrderIdsContaining(String userId, String orderId);
-
-
-
 }
