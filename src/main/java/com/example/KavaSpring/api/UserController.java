@@ -65,9 +65,7 @@ public class UserController {
 
         try {
             return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
-        } catch (HttpClientErrorException.Unauthorized | EntityNotFoundException e) {
-
-        } catch (Exception e) {
+        }  catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
