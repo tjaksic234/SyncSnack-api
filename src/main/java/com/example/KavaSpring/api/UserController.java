@@ -50,7 +50,8 @@ public class UserController {
                     response.setFirstName(user.getFirstName());
                     response.setLastName(user.getLastName());
                     response.setCoffeeCounter(user.getCoffeeNumber());
-                    response.setCoffeeRating( Float.parseFloat(String.format("%.2f", user.getScore())));
+                    //response.setCoffeeRating(Float.parseFloat(String.format("%.2f", user.getScore())));
+                    response.setCoffeeRating(user.getScore());
                     return response;
                 })
                 .toList();
