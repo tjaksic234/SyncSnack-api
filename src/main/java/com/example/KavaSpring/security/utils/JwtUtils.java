@@ -66,7 +66,7 @@ public class JwtUtils {
 
     public ResponseCookie createJwtCookie(String token) {
         ResponseCookie cookie = ResponseCookie.from(jwtCookieName, token)
-                .httpOnly(true)
+                .httpOnly(false)
                 .secure(false)
                 .sameSite("None")
                 .path("/")

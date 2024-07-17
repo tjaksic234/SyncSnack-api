@@ -1,6 +1,6 @@
 package com.example.KavaSpring.api;
 
-import com.example.KavaSpring.models.dao.User;
+import com.example.KavaSpring.exceptions.EntityNotFoundException;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.models.dao.BrewEvent;
 import com.example.KavaSpring.models.dao.CoffeeOrder;
@@ -8,23 +8,25 @@ import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.repository.BrewEventRepository;
 import com.example.KavaSpring.repository.CoffeeOrderRepository;
 import com.example.KavaSpring.repository.UserRepository;
+import com.example.KavaSpring.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
+import org.springframework.web.client.HttpClientErrorException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/users")
 @Slf4j
+@AllArgsConstructor
 public class UserController {
 
     private final UserRepository userRepository;
@@ -33,15 +35,7 @@ public class UserController {
 
     private final BrewEventRepository brewEventRepository;
 
-
-    @Autowired
-    public UserController(UserRepository userRepository, CoffeeOrderRepository coffeeOrderRepository,
-                          BrewEventRepository brewEventRepository) {
-        this.userRepository = userRepository;
-        this.coffeeOrderRepository = coffeeOrderRepository;
-        this.brewEventRepository = brewEventRepository;
-    }
-
+    private final UserService userService;
 
     @Operation(summary = "Retrieve all users", description = "Fetches all users from the repository")
     @ApiResponses(value = {
@@ -50,26 +44,15 @@ public class UserController {
     })
     @GetMapping
     public ResponseEntity<List<GetUsersResponse>> getAll() {
-
-        List<GetUsersResponse> users = userRepository.findAll()
-                .stream().map(user -> {
-                    GetUsersResponse response = new GetUsersResponse();
-                    response.setEmail(user.getEmail());
-                    response.setFirstName(user.getFirstName());
-                    response.setLastName(user.getLastName());
-                    response.setCoffeeCounter(user.getCoffeeNumber());
-                    //response.setCoffeeRating(Float.parseFloat(String.format("%.2f", user.getScore())));
-                    response.setCoffeeRating(user.getScore());
-                    return response;
-                })
-                .toList();
-
-        if (users.isEmpty()) {
-            ResponseEntity.status(HttpStatus.OK).body("The user collection is empty.");
+        try {
+            log.info("Getting all users");
+            return new ResponseEntity<>(userService.getAll(), HttpStatus.OK);
+        } catch (HttpClientErrorException.Unauthorized e) {
+            log.error(String.format(e.getMessage()));
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-
-
-        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     @Operation(summary = "Get a specific user by ID", description = "Fetches a user by their ID")
@@ -78,21 +61,15 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
     })
     @GetMapping("{id}")
-    public ResponseEntity<GetUserResponse> getUser(@PathVariable("id") String id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    public ResponseEntity<GetUserResponse> getUserById(@PathVariable("id") String id) {
 
-        GetUserResponse userResponse = new GetUserResponse();
+        try {
+            return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
+        } catch (HttpClientErrorException.Unauthorized | EntityNotFoundException e) {
 
-        userResponse.setUserId(user.getId());
-        userResponse.setFirstName(user.getFirstName());
-        userResponse.setLastName(user.getLastName());
-        userResponse.setEmail(user.getEmail());
-        userResponse.setCoffeeNumber(user.getCoffeeNumber());
-        userResponse.setScore(user.getScore());
-
-
-        return new ResponseEntity<>(userResponse, HttpStatus.OK);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Operation(summary = "Retrieve all orders for a specific user", description = "Fetches all coffee orders for a user by their ID")

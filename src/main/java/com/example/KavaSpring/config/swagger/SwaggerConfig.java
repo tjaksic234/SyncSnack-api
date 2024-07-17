@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
-import io.swagger.v3.oas.annotations.servers.Server;
 
 @OpenAPIDefinition(
         info = @Info(
@@ -21,8 +20,6 @@ import io.swagger.v3.oas.annotations.servers.Server;
                         name = "Bearer Authentication"
                 )
         }
-
-
 )
 @SecurityScheme(
         name = "Bearer Authentication",
@@ -32,5 +29,4 @@ import io.swagger.v3.oas.annotations.servers.Server;
         bearerFormat = "JWT",
         in = SecuritySchemeIn.HEADER
 )
-public class SwaggerConfig {
-}
+public class SwaggerConfig{}
