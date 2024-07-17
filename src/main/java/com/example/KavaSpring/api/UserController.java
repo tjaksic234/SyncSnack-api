@@ -1,13 +1,10 @@
 package com.example.KavaSpring.api;
 
+import com.example.KavaSpring.exceptions.EmptyContentException;
 import com.example.KavaSpring.exceptions.EntityNotFoundException;
+import com.example.KavaSpring.exceptions.UnauthorizedException;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.models.dao.BrewEvent;
-import com.example.KavaSpring.models.dao.CoffeeOrder;
-import com.example.KavaSpring.models.enums.EventStatus;
-import com.example.KavaSpring.repository.BrewEventRepository;
-import com.example.KavaSpring.repository.CoffeeOrderRepository;
-import com.example.KavaSpring.repository.UserRepository;
 import com.example.KavaSpring.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,25 +12,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/users")
 @Slf4j
 @AllArgsConstructor
 public class UserController {
-
-    private final UserRepository userRepository;
-
-    private final CoffeeOrderRepository coffeeOrderRepository;
-
-    private final BrewEventRepository brewEventRepository;
 
     private final UserService userService;
 
@@ -47,8 +35,8 @@ public class UserController {
         try {
             log.info("Getting all users");
             return new ResponseEntity<>(userService.getAll(), HttpStatus.OK);
-        } catch (HttpClientErrorException.Unauthorized e) {
-            log.error(String.format(e.getMessage()));
+        } catch (UnauthorizedException e) {
+            log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -62,10 +50,12 @@ public class UserController {
     })
     @GetMapping("{id}")
     public ResponseEntity<GetUserResponse> getUserById(@PathVariable("id") String id) {
-
         try {
             return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
-        }  catch (Exception e) {
+        } catch (UnauthorizedException | EntityNotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -76,41 +66,33 @@ public class UserController {
             @ApiResponse(responseCode = "204", description = "No orders found for the user", content = @Content)
     })
     @GetMapping("{id}/orders")
-    public ResponseEntity<List<CoffeeOrderDto>> getOrders(@PathVariable("id") String id) {
-        List<CoffeeOrder> orders = coffeeOrderRepository.findByUserId(id);
-
-        if (orders.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        } else {
-            List<CoffeeOrderDto> orderDTOs = orders.stream()
-                    .map(order -> new CoffeeOrderDto(
-                            order.getCoffeeOrderId(),
-                            order.getEventId(),
-                            order.getUserId(),
-                            order.getType(),
-                            order.getSugarQuantity(),
-                            order.getMilkQuantity(),
-                            order.getRating()
-                    ))
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok(orderDTOs);
+    public ResponseEntity<List<CoffeeOrderDto>> getOrdersForUser(@PathVariable("id") String id) {
+        try {
+            return new ResponseEntity<>(userService.getOrdersForUser(id), HttpStatus.OK);
+        } catch (EntityNotFoundException | EmptyContentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
+
     }
 
-    @Operation(summary = "Retrieve all brew events for a specific user", description = "Fetches all brew events for a user by their ID")
+    @Operation(summary = "Retrieve all brew events for a specific user that are of status IN_PROGRESS", description = "Fetches all brew events that are of status IN_PROGRESS for a user by their ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved brew events"),
             @ApiResponse(responseCode = "204", description = "No brew events found for the user", content = @Content)
     })
     @GetMapping("{userId}/events")
-    public ResponseEntity<BrewEvent> getBrewEventHistory(@PathVariable("userId") String userId) {
-        BrewEvent event = brewEventRepository.findByUserIdAndStatus(userId, EventStatus.IN_PROGRESS);
-
-        GetBrewEventHistoryResponse response = new GetBrewEventHistoryResponse();
-
-        response.setOrderIds(event.getOrderIds());
-
-        return new ResponseEntity<>(event, HttpStatus.OK);
+    public ResponseEntity<BrewEvent> getBrewEventsForUser(@PathVariable("userId") String userId) {
+        try {
+            return new ResponseEntity<>(userService.getBrewEventsForUser(userId), HttpStatus.OK);
+        } catch (NullPointerException | EntityNotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Operation(summary = "Retrieve the event associated with an order", description = "Fetches the event associated with a given coffee order ID")
@@ -121,13 +103,14 @@ public class UserController {
     @GetMapping("events")
     public ResponseEntity<String> getEventForOrder(@RequestBody GetEventsForUserRequest request) {
 
-        BrewEvent event = brewEventRepository.findByUserIdAndOrderIdsContaining(request.getUserId(), request.getCoffeeOrderId());
-
-        if (event == null) {
-            return ResponseEntity.noContent().build();
+        try {
+            return new ResponseEntity<>(userService.getEventForOrder(request), HttpStatus.OK);
+        } catch (NullPointerException | EntityNotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-
-        return ResponseEntity.ok(event.getEventId());
 
     }
 
