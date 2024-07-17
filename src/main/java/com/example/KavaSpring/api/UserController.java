@@ -8,6 +8,10 @@ import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.repository.BrewEventRepository;
 import com.example.KavaSpring.repository.CoffeeOrderRepository;
 import com.example.KavaSpring.repository.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,7 +43,11 @@ public class UserController {
     }
 
 
-    //* Retrieve all users
+    @Operation(summary = "Retrieve all users", description = "Fetches all users from the repository")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved list"),
+            @ApiResponse(responseCode = "204", description = "The user collection is empty", content = @Content)
+    })
     @GetMapping
     public ResponseEntity<List<GetUsersResponse>> getAll() {
 
@@ -64,7 +72,11 @@ public class UserController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    //* Get a specific user with his id
+    @Operation(summary = "Get a specific user by ID", description = "Fetches a user by their ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved user"),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
+    })
     @GetMapping("{id}")
     public ResponseEntity<GetUserResponse> getUser(@PathVariable("id") String id) {
         User user = userRepository.findById(id)
@@ -83,7 +95,11 @@ public class UserController {
         return new ResponseEntity<>(userResponse, HttpStatus.OK);
     }
 
-    //* This retrieves all the orders associated with the user that called this method
+    @Operation(summary = "Retrieve all orders for a specific user", description = "Fetches all coffee orders for a user by their ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved list of orders"),
+            @ApiResponse(responseCode = "204", description = "No orders found for the user", content = @Content)
+    })
     @GetMapping("{id}/orders")
     public ResponseEntity<List<CoffeeOrderDto>> getOrders(@PathVariable("id") String id) {
         List<CoffeeOrder> orders = coffeeOrderRepository.findByUserId(id);
@@ -106,7 +122,11 @@ public class UserController {
         }
     }
 
-    //* Retrieve all brew events of the specific user that called this method
+    @Operation(summary = "Retrieve all brew events for a specific user", description = "Fetches all brew events for a user by their ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved brew events"),
+            @ApiResponse(responseCode = "204", description = "No brew events found for the user", content = @Content)
+    })
     @GetMapping("{userId}/events")
     public ResponseEntity<BrewEvent> getBrewEventHistory(@PathVariable("userId") String userId) {
         BrewEvent event = brewEventRepository.findByUserIdAndStatus(userId, EventStatus.IN_PROGRESS);
@@ -118,7 +138,11 @@ public class UserController {
         return new ResponseEntity<>(event, HttpStatus.OK);
     }
 
-    //* This retrieves the event that is associated with the order id that is in the request body
+    @Operation(summary = "Retrieve the event associated with an order", description = "Fetches the event associated with a given coffee order ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved event"),
+            @ApiResponse(responseCode = "204", description = "No event found for the given order ID", content = @Content)
+    })
     @GetMapping("events")
     public ResponseEntity<String> getEventForOrder(@RequestBody GetEventsForUserRequest request) {
 

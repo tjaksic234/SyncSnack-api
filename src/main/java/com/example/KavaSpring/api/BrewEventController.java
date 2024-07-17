@@ -10,6 +10,10 @@ import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.models.dao.User;
 import com.example.KavaSpring.repository.BrewEventRepository;
 import com.example.KavaSpring.repository.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +48,13 @@ public class BrewEventController {
         this.mongoTemplate = mongoTemplate;
     }
 
+
+    @Operation(summary = "Create a brew event", description = "Creates a new brew event for a user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully created brew event"),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
+            @ApiResponse(responseCode = "409", description = "User already has a brewing event in progress", content = @Content)
+    })
     @PostMapping("create")
     public ResponseEntity<String> create(@RequestBody CreateBrewEventRequest request) {
 
@@ -67,7 +78,12 @@ public class BrewEventController {
     }
 
 
-    //* this will change the status of the event into COMPLETE and mark it finished
+    @Operation(summary = "Complete a brew event", description = "Changes the status of an in-progress brew event to completed")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully completed brew event"),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
+            @ApiResponse(responseCode = "400", description = "No active brewing events in progress", content = @Content)
+    })
     @PatchMapping("complete-event")
     public ResponseEntity<String> finishBrewEvent(@RequestParam(name = "userId") String userId) {
 
@@ -87,7 +103,10 @@ public class BrewEventController {
     }
 
 
-    //* This will aggregate data to return all the pending brew events except for the user that is calling this endpoint
+    @Operation(summary = "Get pending brew events", description = "Aggregates data to return all pending brew events except for the user making the request")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved pending brew events")
+    })
     @GetMapping("/pending/{id}")
     public ResponseEntity<List<BrewEventResult>> getPendingEvents(@PathVariable("id") String userId) {
         BrewEventAggregationServiceImpl aggregation = new BrewEventAggregationServiceImpl(mongoTemplate);
@@ -96,7 +115,10 @@ public class BrewEventController {
         return ResponseEntity.ok(results);
     }
 
-    //* Retrieve all events based on their event status enums
+    @Operation(summary = "Get brew events by status", description = "Fetches all brew events based on their status")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved list of brew events")
+    })
     @GetMapping()
     public ResponseEntity<List<GetBrewEventsResponse>> getEvents(@RequestParam(name = "status", defaultValue = "PENDING") EventStatus status) {
         List<BrewEvent> events = brewEventRepository.findByStatus(status);
@@ -114,7 +136,11 @@ public class BrewEventController {
         return ResponseEntity.ok(responseList);
     }
 
-    //* Get a specific event by id
+    @Operation(summary = "Get a specific brew event by ID", description = "Fetches a brew event by its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved brew event"),
+            @ApiResponse(responseCode = "404", description = "Brew event not found", content = @Content)
+    })
     @GetMapping("{id}")
     public ResponseEntity<BrewEvent> getEvent(@PathVariable("id") String id) {
         try {
