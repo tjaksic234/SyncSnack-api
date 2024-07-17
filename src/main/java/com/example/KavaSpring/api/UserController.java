@@ -43,7 +43,17 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<GetUsersResponse>> getAll() {
 
-        List<GetUsersResponse> users = userRepository.getAllBy();
+        List<GetUsersResponse> users = userRepository.findAll()
+                .stream().map(user -> {
+                    GetUsersResponse response = new GetUsersResponse();
+                    response.setEmail(user.getEmail());
+                    response.setFirstName(user.getFirstName());
+                    response.setLastName(user.getLastName());
+                    response.setCoffeeCounter(user.getCoffeeNumber());
+                    response.setCoffeeRating( Float.parseFloat(String.format("%.2f", user.getScore())));
+                    return response;
+                })
+                .toList();
 
         if (users.isEmpty()) {
             ResponseEntity.status(HttpStatus.OK).body("The user collection is empty.");

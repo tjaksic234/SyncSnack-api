@@ -8,5 +8,5 @@ public class GetUsersResponse {
     private String firstName;
     private String lastName;
     private int coffeeCounter;
-    private int coffeeRating;
+    private float coffeeRating;
 }
