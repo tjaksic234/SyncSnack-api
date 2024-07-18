@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -39,7 +41,7 @@ public class BrewEventController {
             return new ResponseEntity<>(brewEventService.create(request),HttpStatus.OK);
         } catch (BrewEventAlreadyExistsException | EntityNotFoundException e) {
             log.error(e.getMessage());
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -72,9 +74,12 @@ public class BrewEventController {
     public ResponseEntity<List<BrewEventResult>> getPendingEvents(@PathVariable("id") String userId) {
         try {
             return new ResponseEntity<>(brewEventService.getPendingEvents(userId), HttpStatus.OK);
-        } catch (NotFoundException | EmptyContentException e) {
+        } catch (NotFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
+        } catch (EmptyContentException e) {
+            log.error("No content found: {}", e.getMessage());
+            return ResponseEntity.ok(Collections.emptyList());
         }
     }
 

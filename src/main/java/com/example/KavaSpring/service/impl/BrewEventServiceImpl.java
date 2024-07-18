@@ -52,7 +52,6 @@ public class BrewEventServiceImpl implements BrewEventService {
         }
 
 
-
         log.warn("The pending time for the created event: {} ", request.getPendingTime());
         BrewEvent event = new BrewEvent(user.getId(), request.getPendingTime());
         brewEventRepository.save(event);
