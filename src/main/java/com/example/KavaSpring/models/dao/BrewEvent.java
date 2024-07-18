@@ -3,13 +3,11 @@ package com.example.KavaSpring.models.dao;
 import com.example.KavaSpring.models.enums.EventStatus;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -37,7 +35,6 @@ public class BrewEvent {
     @Indexed
     private EventStatus status;
 
-    @NotEmpty
     @Min(0)
     private int pendingTime;
 
@@ -50,6 +47,7 @@ public class BrewEvent {
         this.userId = userId;
         this.startTime = LocalDateTime.now().plusMinutes(pendingTime);
         this.endTime = null;
+        this.pendingTime = pendingTime;
         this.status = EventStatus.PENDING;
         this.orderIds = new ArrayList<>();
     }

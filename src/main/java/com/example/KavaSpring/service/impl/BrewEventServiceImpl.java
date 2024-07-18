@@ -11,7 +11,6 @@ import com.example.KavaSpring.models.dto.CreateBrewEventRequest;
 import com.example.KavaSpring.models.dto.GetBrewEventsResponse;
 import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.repository.BrewEventRepository;
-import com.example.KavaSpring.repository.CoffeeOrderRepository;
 import com.example.KavaSpring.repository.UserRepository;
 import com.example.KavaSpring.service.BrewEventAggregationService;
 import com.example.KavaSpring.service.BrewEventService;
@@ -19,8 +18,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,8 +32,6 @@ import java.util.stream.Collectors;
 public class BrewEventServiceImpl implements BrewEventService {
 
     private final UserRepository userRepository;
-
-    private final CoffeeOrderRepository coffeeOrderRepository;
 
     private final BrewEventRepository brewEventRepository;
 
@@ -57,6 +52,8 @@ public class BrewEventServiceImpl implements BrewEventService {
         }
 
 
+
+        log.warn("The pending time for the created event: {} ", request.getPendingTime());
         BrewEvent event = new BrewEvent(user.getId(), request.getPendingTime());
         brewEventRepository.save(event);
 
