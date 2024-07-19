@@ -52,10 +52,6 @@ public class CoffeeOrderServiceImpl implements CoffeeOrderService {
         event.getOrderIds().add(order.getCoffeeOrderId());
         brewEventRepository.save(event);
 
-        //* This will update the coffee order counter for the user in the user repository
-       /* user.setCoffeeNumber(user.getCoffeeNumber() + 1);
-        userRepository.save(user);*/
-
         return order.getCoffeeOrderId();
     }
 
@@ -84,6 +80,7 @@ public class CoffeeOrderServiceImpl implements CoffeeOrderService {
 
         GetOrderResponse response = new GetOrderResponse();
         response.setCoffeeOrderId(order.getCoffeeOrderId());
+        response.setUserId(order.getUserId());
         response.setType(order.getType());
         response.setSugarQuantity(order.getSugarQuantity());
         response.setMilkQuantity(order.getMilkQuantity());

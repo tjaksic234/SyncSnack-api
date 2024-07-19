@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 public class GetOrderResponse {
     private String coffeeOrderId;
+    private String userId;
     private CoffeeType type;
     private int sugarQuantity;
     private int milkQuantity;
