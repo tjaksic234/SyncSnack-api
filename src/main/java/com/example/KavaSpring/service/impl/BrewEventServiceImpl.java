@@ -22,6 +22,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,6 +70,7 @@ public class BrewEventServiceImpl implements BrewEventService {
         if (hasActiveEvent) {
             BrewEvent event = brewEventRepository.findByUserIdAndStatus(userId, EventStatus.IN_PROGRESS);
             event.setStatus(EventStatus.COMPLETED);
+            event.setEndTime(LocalDateTime.now());
             brewEventRepository.save(event);
         } else {
             throw new BadRequestException("The user has no active brewing events IN_PROGRESS!");

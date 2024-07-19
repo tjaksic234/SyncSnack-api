@@ -88,7 +88,7 @@ public class BrewEventController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved list of brew events")
     })
     @GetMapping()
-    public ResponseEntity<List<GetBrewEventsResponse>> getEventsByStatus(@RequestParam(name = "status", defaultValue = "COMPLETED") EventStatus status) {
+    public ResponseEntity<List<GetBrewEventsResponse>> getEventsByStatus(@RequestParam(name = "status", defaultValue = "IN_PROGRESS") EventStatus status) {
         try {
             return new ResponseEntity<>(brewEventService.getEventsByStatus(status), HttpStatus.OK);
         } catch (EmptyContentException | NotValidEnumException e) {
