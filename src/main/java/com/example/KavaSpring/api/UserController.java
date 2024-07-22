@@ -25,12 +25,8 @@ public class UserController {
 
     private final UserService userService;
 
-    @Operation(summary = "Retrieve all users", description = "Fetches all users from the repository")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved list"),
-            @ApiResponse(responseCode = "204", description = "The user collection is empty", content = @Content)
-    })
-    @GetMapping
+
+    /*@GetMapping
     public ResponseEntity<List<GetUsersResponse>> getAll() {
         try {
             log.info("Getting all users");
@@ -43,11 +39,6 @@ public class UserController {
         }
     }
 
-    @Operation(summary = "Get a specific user by ID", description = "Fetches a user by their ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved user"),
-            @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
-    })
     @GetMapping("{id}")
     public ResponseEntity<GetUserResponse> getUserById(@PathVariable("id") String id) {
         try {
@@ -60,11 +51,7 @@ public class UserController {
         }
     }
 
-    @Operation(summary = "Retrieve all orders for a specific user", description = "Fetches all coffee orders for a user by their ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved list of orders"),
-            @ApiResponse(responseCode = "204", description = "No orders found for the user", content = @Content)
-    })
+
     @GetMapping("{id}/orders")
     public ResponseEntity<List<CoffeeOrderDto>> getOrdersForUser(@PathVariable("id") String id) {
         try {
@@ -78,11 +65,7 @@ public class UserController {
 
     }
 
-    @Operation(summary = "Retrieve all brew events for a specific user that are of status IN_PROGRESS", description = "Fetches all brew events that are of status IN_PROGRESS for a user by their ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved brew events"),
-            @ApiResponse(responseCode = "204", description = "No brew events found for the user", content = @Content)
-    })
+
     @GetMapping("{userId}/events")
     public ResponseEntity<BrewEvent> getBrewEventsForUser(@PathVariable("userId") String userId) {
         try {
@@ -95,11 +78,7 @@ public class UserController {
         }
     }
 
-    @Operation(summary = "Retrieve the event associated with an order", description = "Fetches the event associated with a given coffee order ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved event"),
-            @ApiResponse(responseCode = "204", description = "No event found for the given order ID", content = @Content)
-    })
+
     @GetMapping("events")
     public ResponseEntity<String> getEventForOrder(@RequestBody GetEventsForUserRequest request) {
 
@@ -112,6 +91,6 @@ public class UserController {
             throw new RuntimeException(e);
         }
 
-    }
+    }*/
 
 }

@@ -4,7 +4,7 @@ import com.example.KavaSpring.models.dao.BrewEvent;
 import com.example.KavaSpring.models.dao.CoffeeOrder;
 import com.example.KavaSpring.models.dao.User;
 import com.example.KavaSpring.models.dto.*;
-import com.example.KavaSpring.models.enums.EventStatus;
+import com.example.KavaSpring.models.enums.OrderStatus;
 import com.example.KavaSpring.repository.BrewEventRepository;
 import com.example.KavaSpring.repository.CoffeeOrderRepository;
 import com.example.KavaSpring.repository.UserRepository;
@@ -39,11 +39,6 @@ public class UserServiceImpl implements UserService {
                 .stream().map(user -> {
                     GetUsersResponse response = new GetUsersResponse();
                     response.setEmail(user.getEmail());
-                    response.setFirstName(user.getFirstName());
-                    response.setLastName(user.getLastName());
-                    response.setCoffeeCounter(user.getCoffeeNumber());
-                    //response.setCoffeeRating(Float.parseFloat(String.format("%.2f", user.getScore())));
-                    response.setCoffeeRating(user.getScore());
                     return response;
                 })
                 .toList();
@@ -62,11 +57,7 @@ public class UserServiceImpl implements UserService {
         GetUserResponse userResponse = new GetUserResponse();
 
         userResponse.setUserId(user.getId());
-        userResponse.setFirstName(user.getFirstName());
-        userResponse.setLastName(user.getLastName());
         userResponse.setEmail(user.getEmail());
-        userResponse.setCoffeeNumber(user.getCoffeeNumber());
-        userResponse.setScore(user.getScore());
 
         return userResponse;
     }
@@ -90,16 +81,6 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    @Override
-    public BrewEvent getBrewEventsForUser(String id) {
-        BrewEvent event = brewEventRepository.findByUserIdAndStatus(id, EventStatus.IN_PROGRESS);
-
-        GetBrewEventHistoryResponse response = new GetBrewEventHistoryResponse();
-
-        response.setOrderIds(event.getOrderIds());
-
-        return event;
-    }
 
     @Override
     public String getEventForOrder(GetEventsForUserRequest request) {

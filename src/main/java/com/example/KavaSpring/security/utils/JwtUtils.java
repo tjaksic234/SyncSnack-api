@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -45,9 +44,7 @@ public class JwtUtils {
                 .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(key())
                 .addClaims(Map.of(
-                        "userId", userPrincipal.getId(),
-                        "firstName", userPrincipal.getFirstName(),
-                        "lastName", userPrincipal.getLastName()
+                        "userId", userPrincipal.getId()
                 ))
                 .compact();
     }
@@ -65,14 +62,13 @@ public class JwtUtils {
     }
 
     public ResponseCookie createJwtCookie(String token) {
-        ResponseCookie cookie = ResponseCookie.from(jwtCookieName, token)
+        return ResponseCookie.from(jwtCookieName, token)
                 .httpOnly(true)
                 .secure(false)
                 .sameSite("None")
                 .path("/")
                 .maxAge(jwtExpirationMs)
                 .build();
-        return cookie;
     }
 
     public String getJwtFromCookies(HttpServletRequest request) {

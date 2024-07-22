@@ -6,7 +6,6 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -15,17 +14,11 @@ public class UserDetailsImpl implements UserDetails {
 
     private String id;
     private String email;
-    private String firstName;
-    private String lastName;
-
     private String password;
 
-    public UserDetailsImpl(String id, String email, String firstName,
-                           String lastName, String password) {
+    public UserDetailsImpl(String id, String email, String password) {
         this.id = id;
         this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
         this.password = password;
     }
 
@@ -33,8 +26,6 @@ public class UserDetailsImpl implements UserDetails {
         return new UserDetailsImpl(
                 user.getId(),
                 user.getEmail(),
-                user.getFirstName(),
-                user.getLastName(),
                 user.getPassword()
         );
     }

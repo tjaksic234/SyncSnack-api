@@ -1,18 +1,17 @@
 package com.example.KavaSpring.models.dto;
 
-import com.example.KavaSpring.models.enums.EventStatus;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class GetBrewEventsResponse {
+public class UserProfileRequest {
 
     @NotBlank
-    private String eventId;
-
-    @NotBlank
+    @Size(max = 50)
     private String userId;
 
     @NotBlank
-    private EventStatus status;
+    @Size(max = 50)
+    private String groupId;
 }

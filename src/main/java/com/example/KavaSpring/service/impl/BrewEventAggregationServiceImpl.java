@@ -1,7 +1,6 @@
 package com.example.KavaSpring.service.impl;
 
-import com.example.KavaSpring.models.dto.BrewEventResult;
-import com.example.KavaSpring.models.enums.EventStatus;
+import com.example.KavaSpring.models.enums.OrderStatus;
 import com.example.KavaSpring.service.BrewEventAggregationService;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -30,7 +29,7 @@ public class BrewEventAggregationServiceImpl implements BrewEventAggregationServ
 
         MatchOperation matchOperation = Aggregation.match(
                 Criteria.where("userId").ne(id)
-                        .and("status").is(EventStatus.PENDING)
+                        .and("status").is(OrderStatus.PENDING)
         );
 
         ProjectionOperation projectionOperation = Aggregation.project()

@@ -1,3 +1,4 @@
+/*
 package com.example.KavaSpring.service.impl;
 
 import com.example.KavaSpring.exceptions.BadRequestException;
@@ -9,7 +10,7 @@ import com.example.KavaSpring.models.dao.User;
 import com.example.KavaSpring.models.dto.BrewEventResult;
 import com.example.KavaSpring.models.dto.CreateBrewEventRequest;
 import com.example.KavaSpring.models.dto.GetBrewEventsResponse;
-import com.example.KavaSpring.models.enums.EventStatus;
+import com.example.KavaSpring.models.enums.OrderStatus;
 import com.example.KavaSpring.repository.BrewEventRepository;
 import com.example.KavaSpring.repository.UserRepository;
 import com.example.KavaSpring.service.BrewEventAggregationService;
@@ -45,8 +46,8 @@ public class BrewEventServiceImpl implements BrewEventService {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        boolean hasActiveEvent = brewEventRepository.existsByUserIdAndStatus(user.getId(), EventStatus.PENDING)
-                || brewEventRepository.existsByUserIdAndStatus(user.getId(), EventStatus.IN_PROGRESS);
+        boolean hasActiveEvent = brewEventRepository.existsByUserIdAndStatus(user.getId(), OrderStatus.PENDING)
+                || brewEventRepository.existsByUserIdAndStatus(user.getId(), OrderStatus.IN_PROGRESS);
 
         if (hasActiveEvent) {
             throw new BrewEventAlreadyExistsException("The user already has an event PENDING or IN PROGRESS");
@@ -65,11 +66,11 @@ public class BrewEventServiceImpl implements BrewEventService {
         userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        boolean hasActiveEvent = brewEventRepository.existsByUserIdAndStatus(userId, EventStatus.IN_PROGRESS);
+        boolean hasActiveEvent = brewEventRepository.existsByUserIdAndStatus(userId, OrderStatus.IN_PROGRESS);
 
         if (hasActiveEvent) {
-            BrewEvent event = brewEventRepository.findByUserIdAndStatus(userId, EventStatus.IN_PROGRESS);
-            event.setStatus(EventStatus.COMPLETED);
+            BrewEvent event = brewEventRepository.findByUserIdAndStatus(userId, OrderStatus.IN_PROGRESS);
+            event.setStatus(OrderStatus.COMPLETED);
             event.setEndTime(LocalDateTime.now());
             brewEventRepository.save(event);
         } else {
@@ -79,7 +80,7 @@ public class BrewEventServiceImpl implements BrewEventService {
     }
 
     @Override
-    public List<GetBrewEventsResponse> getEventsByStatus(EventStatus status) {
+    public List<GetBrewEventsResponse> getEventsByStatus(OrderStatus status) {
         List<BrewEvent> events = brewEventRepository.findByStatus(status);
 
         return events.stream()
@@ -118,3 +119,4 @@ public class BrewEventServiceImpl implements BrewEventService {
         return results;
     }
 }
+*/

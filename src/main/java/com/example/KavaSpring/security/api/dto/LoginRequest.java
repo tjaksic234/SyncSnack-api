@@ -3,11 +3,9 @@ package com.example.KavaSpring.security.api.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class LoginRequest {
 
     @NotBlank
@@ -20,11 +18,4 @@ public class LoginRequest {
     @Size(min = 6, max = 40)
     private String password;
 
-    @Override
-    public String toString() {
-        return "LoginRequest{" +
-                "email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                '}';
-    }
 }

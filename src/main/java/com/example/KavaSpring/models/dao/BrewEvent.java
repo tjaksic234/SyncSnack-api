@@ -1,6 +1,6 @@
 package com.example.KavaSpring.models.dao;
 
-import com.example.KavaSpring.models.enums.EventStatus;
+import com.example.KavaSpring.models.enums.OrderStatus;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -33,7 +33,7 @@ public class BrewEvent {
 
     @NotBlank
     @Indexed
-    private EventStatus status;
+    private OrderStatus status;
 
     @Min(0)
     private int pendingTime;
@@ -48,7 +48,7 @@ public class BrewEvent {
         this.startTime = LocalDateTime.now().plusMinutes(pendingTime);
         this.endTime = null;
         this.pendingTime = pendingTime;
-        this.status = EventStatus.PENDING;
+        this.status = OrderStatus.PENDING;
         this.orderIds = new ArrayList<>();
     }
 

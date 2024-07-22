@@ -1,7 +1,8 @@
+/*
 package com.example.KavaSpring.service.impl;
 
 import com.example.KavaSpring.models.dao.BrewEvent;
-import com.example.KavaSpring.models.enums.EventStatus;
+import com.example.KavaSpring.models.enums.OrderStatus;
 import com.example.KavaSpring.repository.BrewEventRepository;
 import com.example.KavaSpring.service.BrewEventSchedulerService;
 import org.slf4j.Logger;
@@ -25,12 +26,13 @@ public class BrewEventSchedulerServiceImpl implements BrewEventSchedulerService 
     @Scheduled(fixedRate = 1, timeUnit = TimeUnit.MINUTES)
     public void updatePendingEvents() {
         LocalDateTime now = LocalDateTime.now();
-        List<BrewEvent> pendingEvents = brewEventRepository.findByStatusAndStartTimeBefore(EventStatus.PENDING, now);
+        List<BrewEvent> pendingEvents = brewEventRepository.findByStatusAndStartTimeBefore(OrderStatus.PENDING, now);
 
         for (BrewEvent event : pendingEvents) {
-            event.setStatus(EventStatus.IN_PROGRESS);
+            event.setStatus(OrderStatus.IN_PROGRESS);
             brewEventRepository.save(event);
             log.info("Updated event {} to IN_PROGRESS", event.getEventId());
         }
     }
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package com.example.KavaSpring.api;
 
 import com.example.KavaSpring.exceptions.*;
@@ -6,7 +7,7 @@ import com.example.KavaSpring.models.dto.GetBrewEventsResponse;
 import com.example.KavaSpring.service.BrewEventService;
 import com.example.KavaSpring.models.dto.BrewEventResult;
 import com.example.KavaSpring.models.dao.BrewEvent;
-import com.example.KavaSpring.models.enums.EventStatus;
+import com.example.KavaSpring.models.enums.OrderStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -88,7 +89,7 @@ public class BrewEventController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved list of brew events")
     })
     @GetMapping()
-    public ResponseEntity<List<GetBrewEventsResponse>> getEventsByStatus(@RequestParam(name = "status", defaultValue = "IN_PROGRESS") EventStatus status) {
+    public ResponseEntity<List<GetBrewEventsResponse>> getEventsByStatus(@RequestParam(name = "status", defaultValue = "IN_PROGRESS") OrderStatus status) {
         try {
             return new ResponseEntity<>(brewEventService.getEventsByStatus(status), HttpStatus.OK);
         } catch (EmptyContentException | NotValidEnumException e) {
@@ -114,3 +115,4 @@ public class BrewEventController {
 
 
 }
+*/

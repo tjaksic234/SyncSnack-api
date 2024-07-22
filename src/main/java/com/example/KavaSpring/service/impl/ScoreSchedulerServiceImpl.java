@@ -1,3 +1,4 @@
+/*
 package com.example.KavaSpring.service.impl;
 
 import com.example.KavaSpring.models.dao.BrewEvent;
@@ -42,12 +43,14 @@ public class ScoreSchedulerServiceImpl implements ScoreSchedulerService {
     public void updateScore() {
 
         //* Retrieve all the event IDs available
-        /*List<String> eventIds = brewEventRepository.findAll()
+        */
+/*List<String> eventIds = brewEventRepository.findAll()
                 .stream()
                 .map(BrewEvent::getEventId)
                 .distinct()
                 .toList();
-        */
+        *//*
+
         MatchOperation matchOperation = Aggregation.match(
                 Criteria.where("rating").gt(0));
 
@@ -103,3 +106,4 @@ public class ScoreSchedulerServiceImpl implements ScoreSchedulerService {
 
     }
 }
+*/

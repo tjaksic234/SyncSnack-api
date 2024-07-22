@@ -6,9 +6,8 @@ import com.example.KavaSpring.security.api.dto.LoginRequest;
 import com.example.KavaSpring.security.api.dto.LoginResponse;
 import com.example.KavaSpring.security.api.dto.RegisterUserRequest;
 import com.example.KavaSpring.security.utils.JwtUtils;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -21,20 +20,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping("api/auth")
 public class AuthenticationController {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private JwtUtils jwtUtils;
+    private final JwtUtils jwtUtils;
 
     @PostMapping("register")
     public ResponseEntity<String> register(@RequestBody RegisterUserRequest request) {
@@ -42,14 +38,8 @@ public class AuthenticationController {
             return new ResponseEntity<>("Email is already taken or it is not entered in correct format!", HttpStatus.BAD_REQUEST);
         }
 
-        if (request.getFirstName() == null || request.getLastName() == null) {
-            return new ResponseEntity<>("First name and last name are required fields", HttpStatus.BAD_REQUEST);
-        }
-
         User user = new User();
         user.setEmail(request.getEmail());
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         userRepository.save(user);
