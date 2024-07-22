@@ -1,11 +1,8 @@
 package com.example.KavaSpring.service;
 
-import java.util.List;
+import com.example.KavaSpring.models.dto.UserDto;
 
 public interface UserService {
 
-        List<GetUsersResponse> getAll();
-        GetUserResponse getUserById(String id);
-        List<CoffeeOrderDto> getOrdersForUser(String id);
-        String getEventForOrder(GetEventsForUserRequest request);
+    UserDto getUserById(String id);
 }

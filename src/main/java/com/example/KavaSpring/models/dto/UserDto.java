@@ -7,10 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserProfileDto {
-    private String userId;
-    private String firstName;
-    private String lastName;
-    private float score;
-    private String groupId;
+public class UserDto {
+
+    private String email;
 }

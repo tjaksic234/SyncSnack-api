@@ -1,7 +1,7 @@
 package com.example.KavaSpring.service.impl;
 
 import com.example.KavaSpring.converters.ConverterService;
-import com.example.KavaSpring.models.dao.User;
+import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.UserProfileDto;
 import com.example.KavaSpring.models.dto.UserProfileRequest;
@@ -30,17 +30,26 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     public UserProfileResponse createUserProfile(UserProfileRequest request) {
-        boolean exists = userRepository.existsById(request.getUserId());
+        userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        log.info("Creating user profile finished");
+        //! add logic that will check if the group exists
+
+        UserProfile userProfile = new UserProfile();
+        userProfile.setUserId(request.getUserId());
+        userProfile.setGroupId(request.getGroupId());
+        userProfile.setFirstName(request.getFirstName());
+        userProfile.setLastName(request.getLastName());
+        userProfileRepository.save(userProfile);
+
+        log.info("User profile created");
         return converterService.convertToUserProfileResponse(request);
-
     }
 
     @Override
     public UserProfileDto getProfileById(String id) {
         UserProfile userProfile = userProfileRepository.getUserProfileById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User profile not found"));
+                .orElseThrow(() -> new NotFoundException("User profile not found"));
 
         log.info("Get profile by id finished");
         return converterService.convertToUserProfileDto(userProfile);
