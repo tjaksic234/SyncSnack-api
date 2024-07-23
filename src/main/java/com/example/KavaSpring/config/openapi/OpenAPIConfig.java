@@ -22,8 +22,8 @@ public class OpenAPIConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Your API Title")
-                        .description("Your API Description")
+                        .title("SyncSnack")
+                        .description("OpenAPI doc")
                         .version("1.0.0"));
     }
 

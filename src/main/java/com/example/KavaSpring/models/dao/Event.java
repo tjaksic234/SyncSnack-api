@@ -1,40 +1,48 @@
 package com.example.KavaSpring.models.dao;
 
+import com.example.KavaSpring.models.enums.EventStatus;
+import com.example.KavaSpring.models.enums.EventType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.time.LocalDateTime;
 
-@Document(collection = "groups")
+@Document(collection = "events")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Group {
+public class Event {
 
     @Id
     private String id;
 
     @NotBlank
-    @Size(max = 50)
-    private String name;
+    private String creatorId; //? neznam ocu li ostaviti creatorId ili refactorat u userId
+
+    @NotBlank
+    private String title;
 
     @NotBlank
     @Size(max = 120)
     private String description;
 
     @NotBlank
-    @Size(max = 120)
-    private String password;
+    private String groupId;
+
+    private EventStatus status = EventStatus.PENDING;
+
+    private EventType eventType;
 
     @CreatedDate
     private LocalDateTime createdAt;
 
     @LastModifiedDate
-    private LocalDateTime updatedAt;
-
-    //TODO mozda bude trebalo maknuti group password za daljnji razvoj logike dodavanja usera u grupe
+    private LocalDateTime completedAt;
 }

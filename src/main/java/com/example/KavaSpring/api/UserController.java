@@ -23,6 +23,7 @@ public class UserController {
     @GetMapping("{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable("id") String id) {
         try {
+            log.info("Fetching user by id");
             return ResponseEntity.ok(userService.getUserById(id));
         } catch (UnauthorizedException | NotFoundException e) {
             log.error(e.getMessage());

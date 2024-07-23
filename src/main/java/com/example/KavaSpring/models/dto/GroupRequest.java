@@ -9,21 +9,17 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserProfileRequest {
+public class GroupRequest {
 
     @NotBlank
     @Size(max = 50)
-    private String userId;
+    private String name;
 
     @NotBlank
-    @Size(max = 50)
-    private String groupId;
+    @Size(max = 120)
+    private String description;
 
     @NotBlank
-    @Size(max = 50)
-    private String firstName;
-
-    @NotBlank
-    @Size(max = 50)
-    private String lastName;
+    @Size(max = 120)
+    private String password;
 }

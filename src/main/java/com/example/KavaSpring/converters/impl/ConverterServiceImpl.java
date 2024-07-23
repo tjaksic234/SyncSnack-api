@@ -1,12 +1,10 @@
 package com.example.KavaSpring.converters.impl;
 
 import com.example.KavaSpring.converters.ConverterService;
+import com.example.KavaSpring.models.dao.Event;
 import com.example.KavaSpring.models.dao.Group;
 import com.example.KavaSpring.models.dao.UserProfile;
-import com.example.KavaSpring.models.dto.GroupDto;
-import com.example.KavaSpring.models.dto.UserProfileDto;
-import com.example.KavaSpring.models.dto.UserProfileRequest;
-import com.example.KavaSpring.models.dto.UserProfileResponse;
+import com.example.KavaSpring.models.dto.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -42,5 +40,37 @@ public class ConverterServiceImpl implements ConverterService {
         groupDto.setName(group.getName());
         groupDto.setDescription(group.getDescription());
         return groupDto;
+    }
+
+    @Override
+    public GroupResponse convertToGroupResponse(GroupRequest request) {
+        GroupResponse response = new GroupResponse();
+        response.setName(request.getName());
+        response.setDescription(request.getDescription());
+        return response;
+    }
+
+    @Override
+    public EventDto convertToEventDto(Event event) {
+        EventDto eventDto = new EventDto();
+        eventDto.setCreatorId(event.getCreatorId());
+        eventDto.setTitle(event.getTitle());
+        eventDto.setDescription(event.getDescription());
+        eventDto.setGroupId(event.getGroupId());
+        eventDto.setStatus(event.getStatus());
+        eventDto.setEventType(event.getEventType());
+        eventDto.setCreatedAt(event.getCreatedAt());
+        return eventDto;
+    }
+
+    @Override
+    public EventResponse convertToEventResponse(EventRequest request) {
+        EventResponse response = new EventResponse();
+        response.setCreatorId(request.getCreatorId());
+        response.setTitle(request.getTitle());
+        response.setDescription(request.getDescription());
+        response.setGroupId(request.getGroupId());
+        response.setEventType(request.getEventType());
+        return response;
     }
 }

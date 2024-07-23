@@ -4,10 +4,13 @@ import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.models.dao.Group;
 import com.example.KavaSpring.models.dto.GroupDto;
+import com.example.KavaSpring.models.dto.GroupRequest;
+import com.example.KavaSpring.models.dto.GroupResponse;
 import com.example.KavaSpring.repository.GroupRepository;
 import com.example.KavaSpring.service.GroupService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,10 +25,29 @@ public class GroupServiceImpl implements GroupService {
     private final ConverterService converterService;
 
     @Override
+    public GroupResponse createGroup(GroupRequest request) {
+         /*boolean exists = groupRepository.existsById(request.getId());
+         if (exists) {
+             throw new GroupAlreadyExistsException();
+         }*/
+
+         Group group = new Group();
+         group.setName(request.getName());
+         group.setDescription(request.getDescription());
+         //! This is kind of password generation is temporary and most likely this will be changed
+         group.setPassword(new BCryptPasswordEncoder().encode(request.getPassword()));
+         groupRepository.save(group);
+
+         log.info("Group created");
+         return converterService.convertToGroupResponse(request);
+    }
+
+    @Override
     public GroupDto getGroupById(String id) {
         Group group = groupRepository.getById(id).orElseThrow(() -> new NotFoundException("No group associated with that id"));
 
         log.info("Get group by id finished");
         return converterService.convertToGroupDto(group);
     }
+
 }

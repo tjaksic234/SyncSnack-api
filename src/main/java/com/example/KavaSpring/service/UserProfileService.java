@@ -6,7 +6,6 @@ import com.example.KavaSpring.models.dto.UserProfileResponse;
 
 public interface UserProfileService {
 
-
-    UserProfileDto getProfileById(String id);
     UserProfileResponse createUserProfile(UserProfileRequest request);
+    UserProfileDto getProfileById(String id);
 }
