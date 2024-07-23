@@ -1,4 +1,4 @@
-package com.example.KavaSpring.service.impl;
+package com.example.KavaSpring.services.impl;
 
 import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.NotFoundException;
@@ -8,7 +8,7 @@ import com.example.KavaSpring.models.dto.UserProfileRequest;
 import com.example.KavaSpring.models.dto.UserProfileResponse;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.repository.UserRepository;
-import com.example.KavaSpring.service.UserProfileService;
+import com.example.KavaSpring.services.UserProfileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

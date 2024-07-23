@@ -7,7 +7,7 @@ import com.example.KavaSpring.exceptions.UnauthorizedException;
 import com.example.KavaSpring.models.dto.GroupDto;
 import com.example.KavaSpring.models.dto.GroupRequest;
 import com.example.KavaSpring.models.dto.GroupResponse;
-import com.example.KavaSpring.service.GroupService;
+import com.example.KavaSpring.services.GroupService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class GroupController {
 
     //TODO treba jos vidjeti hoce li ostati group password field
     @PostMapping
-    public ResponseEntity<GroupResponse> create(@RequestBody GroupRequest request) {
+    public ResponseEntity<GroupResponse> createGroup(@RequestBody GroupRequest request) {
         try {
             log.info("Create a group requested");
             return ResponseEntity.ok(groupService.createGroup(request));

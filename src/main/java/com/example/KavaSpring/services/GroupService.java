@@ -1,4 +1,4 @@
-package com.example.KavaSpring.service;
+package com.example.KavaSpring.services;
 
 import com.example.KavaSpring.models.dto.GroupDto;
 import com.example.KavaSpring.models.dto.GroupRequest;

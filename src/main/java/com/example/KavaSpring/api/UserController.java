@@ -4,7 +4,7 @@ import com.example.KavaSpring.config.openapi.ShowAPI;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.exceptions.UnauthorizedException;
 import com.example.KavaSpring.models.dto.UserDto;
-import com.example.KavaSpring.service.UserService;
+import com.example.KavaSpring.services.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

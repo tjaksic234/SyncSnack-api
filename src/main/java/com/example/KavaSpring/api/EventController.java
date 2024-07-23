@@ -7,7 +7,7 @@ import com.example.KavaSpring.exceptions.UnauthorizedException;
 import com.example.KavaSpring.models.dto.EventDto;
 import com.example.KavaSpring.models.dto.EventRequest;
 import com.example.KavaSpring.models.dto.EventResponse;
-import com.example.KavaSpring.service.EventService;
+import com.example.KavaSpring.services.EventService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +23,7 @@ public class EventController {
     private final EventService eventService;
 
     @PostMapping
-    public ResponseEntity<EventResponse> create(@RequestBody EventRequest request) {
+    public ResponseEntity<EventResponse> createEvent(@RequestBody EventRequest request) {
         try {
             log.info("Create a event requested");
             return ResponseEntity.ok(eventService.createEvent(request));

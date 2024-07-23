@@ -1,4 +1,4 @@
-package com.example.KavaSpring.service.impl;
+package com.example.KavaSpring.services.impl;
 
 import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.EventAlreadyExistsException;
@@ -7,16 +7,12 @@ import com.example.KavaSpring.models.dao.Event;
 import com.example.KavaSpring.models.dto.EventDto;
 import com.example.KavaSpring.models.dto.EventRequest;
 import com.example.KavaSpring.models.dto.EventResponse;
-import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.repository.EventRepository;
-import com.example.KavaSpring.service.EventService;
+import com.example.KavaSpring.services.EventService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional

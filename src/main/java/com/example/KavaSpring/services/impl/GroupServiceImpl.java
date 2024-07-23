@@ -1,4 +1,4 @@
-package com.example.KavaSpring.service.impl;
+package com.example.KavaSpring.services.impl;
 
 import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.NotFoundException;
@@ -7,7 +7,7 @@ import com.example.KavaSpring.models.dto.GroupDto;
 import com.example.KavaSpring.models.dto.GroupRequest;
 import com.example.KavaSpring.models.dto.GroupResponse;
 import com.example.KavaSpring.repository.GroupRepository;
-import com.example.KavaSpring.service.GroupService;
+import com.example.KavaSpring.services.GroupService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

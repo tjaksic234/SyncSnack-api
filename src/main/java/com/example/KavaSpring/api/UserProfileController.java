@@ -6,7 +6,7 @@ import com.example.KavaSpring.exceptions.UnauthorizedException;
 import com.example.KavaSpring.models.dto.UserProfileDto;
 import com.example.KavaSpring.models.dto.UserProfileRequest;
 import com.example.KavaSpring.models.dto.UserProfileResponse;
-import com.example.KavaSpring.service.UserProfileService;
+import com.example.KavaSpring.services.UserProfileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,7 @@ public class UserProfileController {
     private final UserProfileService userProfileService;
 
     @PostMapping
-    public ResponseEntity<UserProfileResponse> create(@RequestBody UserProfileRequest request) {
+    public ResponseEntity<UserProfileResponse> createUserProfile(@RequestBody UserProfileRequest request) {
         try {
             log.info("Create a profile requested");
             return ResponseEntity.ok(userProfileService.createUserProfile(request));

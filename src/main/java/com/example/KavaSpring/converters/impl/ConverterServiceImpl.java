@@ -3,6 +3,7 @@ package com.example.KavaSpring.converters.impl;
 import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.models.dao.Event;
 import com.example.KavaSpring.models.dao.Group;
+import com.example.KavaSpring.models.dao.Order;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.*;
 import lombok.AllArgsConstructor;
@@ -71,6 +72,19 @@ public class ConverterServiceImpl implements ConverterService {
         response.setDescription(request.getDescription());
         response.setGroupId(request.getGroupId());
         response.setEventType(request.getEventType());
+        return response;
+    }
+
+    @Override
+    public OrderDto convertToOrderDto(Order order) {
+        return null;
+    }
+
+    @Override
+    public OrderResponse convertToOrderResponse(OrderRequest request) {
+        OrderResponse response = new OrderResponse();
+        response.setOrderedBy(request.getOrderedBy());
+        response.setAdditionalOptions(request.getAdditionalOptions());
         return response;
     }
 }

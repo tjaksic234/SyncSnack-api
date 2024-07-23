@@ -1,11 +1,11 @@
 
-package com.example.KavaSpring.service.impl;
+package com.example.KavaSpring.services.impl;
 
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.models.dao.User;
 import com.example.KavaSpring.models.dto.UserDto;
 import com.example.KavaSpring.repository.UserRepository;
-import com.example.KavaSpring.service.UserService;
+import com.example.KavaSpring.services.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

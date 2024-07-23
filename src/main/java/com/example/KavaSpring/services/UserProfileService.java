@@ -1,4 +1,4 @@
-package com.example.KavaSpring.service;
+package com.example.KavaSpring.services;
 
 import com.example.KavaSpring.models.dto.UserProfileDto;
 import com.example.KavaSpring.models.dto.UserProfileRequest;
