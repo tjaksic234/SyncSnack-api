@@ -11,10 +11,8 @@ import com.example.KavaSpring.repository.UserRepository;
 import com.example.KavaSpring.services.UserProfileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Transactional
@@ -31,9 +29,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     @Override
     public UserProfileResponse createUserProfile(UserProfileRequest request) {
         userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-
-        //! add logic that will check if the group exists
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         UserProfile userProfile = new UserProfile();
         userProfile.setUserId(request.getUserId());

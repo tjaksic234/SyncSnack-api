@@ -77,7 +77,12 @@ public class ConverterServiceImpl implements ConverterService {
 
     @Override
     public OrderDto convertToOrderDto(Order order) {
-        return null;
+        OrderDto orderDto = new OrderDto();
+        orderDto.setOrderedBy(order.getOrderedBy());
+        orderDto.setStatus(order.getStatus());
+        orderDto.setAdditionalOptions(order.getAdditionalOptions());
+        orderDto.setCreatedAt(order.getCreatedAt());
+        return orderDto;
     }
 
     @Override

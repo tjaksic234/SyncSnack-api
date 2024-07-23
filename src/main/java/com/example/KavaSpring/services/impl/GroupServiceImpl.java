@@ -26,11 +26,6 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public GroupResponse createGroup(GroupRequest request) {
-         /*boolean exists = groupRepository.existsById(request.getId());
-         if (exists) {
-             throw new GroupAlreadyExistsException();
-         }*/
-
          Group group = new Group();
          group.setName(request.getName());
          group.setDescription(request.getDescription());
