@@ -7,12 +7,25 @@ import com.example.KavaSpring.models.dao.Event;
 import com.example.KavaSpring.models.dto.EventDto;
 import com.example.KavaSpring.models.dto.EventRequest;
 import com.example.KavaSpring.models.dto.EventResponse;
+import com.example.KavaSpring.models.enums.EventStatus;
+import com.example.KavaSpring.models.enums.EventType;
 import com.example.KavaSpring.repository.EventRepository;
 import com.example.KavaSpring.services.EventService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.MatchOperation;
+import org.springframework.data.mongodb.core.aggregation.SortOperation;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -24,15 +37,19 @@ public class EventServiceImpl implements EventService {
 
     private final ConverterService converterService;
 
+    private final MongoTemplate mongoTemplate;
+
     @Override
     public EventResponse createEvent(EventRequest request) {
         //? Logiku provjere eventova za usera ce trebati popraviti jer creator moze imati samo jedan event nebitno jeli completed,
         //? pending ili inprogress pa treba jos poraditi na logici
 
-        if (eventRepository.findAll().isEmpty()) {
-            log.info("There are no events associated with the creatorId: {}, so the event creation continues", request.getCreatorId());
+        List<Event> existingActiveEvents = eventRepository.findByCreatorIdAndStatus(request.getCreatorId(), EventStatus.PENDING);
+
+        if (!existingActiveEvents.isEmpty()) {
+            throw new EventAlreadyExistsException("User already has an active event (PENDING or IN_PROGRESS)");
         } else {
-            throw new EventAlreadyExistsException();
+            log.info("No active events found for creatorId: {}. Event creation continues.", request.getCreatorId());
         }
 
         Event event = new Event();
@@ -52,5 +69,40 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.getById(id).orElseThrow(() -> new NotFoundException("No event associated with the id"));
         log.info("Get event by id finished");
         return converterService.convertToEventDto(event);
+    }
+
+    @Override
+    public List<EventDto> searchEvents(EventStatus status, EventRequest request) {
+        List<Criteria> criteriaList = new ArrayList<>();
+
+        if (status != null) {
+            criteriaList.add(Criteria.where("status").is(status));
+        }
+
+        if (request.getEventType() != null) {
+            criteriaList.add(Criteria.where("eventType").is(request.getEventType()));
+        }
+
+        criteriaList.add(Criteria.where("groupId").is(request.getGroupId()));
+        criteriaList.add(Criteria.where("creatorId").ne(request.getCreatorId()));
+
+        Criteria combinedCriteria = new Criteria().andOperator(criteriaList.toArray(new Criteria[0]));
+
+        MatchOperation matchOperation = Aggregation.match(combinedCriteria);
+
+        SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                matchOperation,
+                sortOperation
+        );
+
+        AggregationResults<Event> results = mongoTemplate.aggregate(aggregation, "events", Event.class);
+
+        return results
+                .getMappedResults()
+                .stream()
+                .map(converterService::convertToEventDto)
+                .collect(Collectors.toList());
     }
 }

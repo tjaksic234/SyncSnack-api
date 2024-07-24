@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -18,13 +19,14 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@CompoundIndex(name = "event_search_index", def = "{'status': 1, 'eventType': 1, 'groupId': 1, 'creatorId': 1, 'createdAt': -1}")
 public class Event {
 
     @Id
     private String id;
 
     @NotBlank
-    private String creatorId; //? neznam ocu li ostaviti creatorId ili refactorat u userId
+    private String creatorId; 
 
     @NotBlank
     private String title;

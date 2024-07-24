@@ -47,16 +47,10 @@ public class UserProfileServiceImpl implements UserProfileService {
             throw new UserProfileExistsException("The User Profile already exists");
         }
 
-
-
-        //! obavezno dodaj provjeru jeli grupa koja se pridruzuje profilu zapravo postoji
         if (!groupRepository.existsById(request.getGroupId())) {
             log.error("groupId: {}",request.getGroupId());
             throw new NotFoundException("The group with the given id does not exist");
         }
-
-
-
 
         UserProfile userProfile = new UserProfile();
         userProfile.setUserId(request.getUserId());

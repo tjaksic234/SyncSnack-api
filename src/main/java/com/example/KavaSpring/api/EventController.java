@@ -7,11 +7,14 @@ import com.example.KavaSpring.exceptions.UnauthorizedException;
 import com.example.KavaSpring.models.dto.EventDto;
 import com.example.KavaSpring.models.dto.EventRequest;
 import com.example.KavaSpring.models.dto.EventResponse;
+import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.services.EventService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/events")
@@ -43,4 +46,18 @@ public class EventController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @GetMapping("search")
+    public ResponseEntity<List<EventDto>> searchEvents(
+            @RequestParam EventStatus status,
+            @RequestBody EventRequest request
+    ) {
+        try {
+            return ResponseEntity.ok(eventService.searchEvents(status, request));
+        } catch (NullPointerException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
 }

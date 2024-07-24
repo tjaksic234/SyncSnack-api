@@ -72,6 +72,7 @@ public class ConverterServiceImpl implements ConverterService {
         response.setDescription(request.getDescription());
         response.setGroupId(request.getGroupId());
         response.setEventType(request.getEventType());
+        response.setPendingTime(request.getPendingTime());
         return response;
     }
 
