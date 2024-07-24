@@ -58,7 +58,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         userProfile.setLastName(request.getLastName());
 
 
-        //? popravi putanju i filename bezveze si zakomplicirao
+        //? treba jos optimizirati  putanju i filename bezveze je zakomplicirano
         if (photoFile != null) {
             try {
                 String fileName = request.getUserId() + "_" + photoFile.getOriginalFilename();
@@ -66,7 +66,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
                 PutObjectResult result = s3Config.uploadToS3(path, fileName, photoFile.getInputStream());
 
-                userProfile.setPhotoUri(path + fileName);
+                userProfile.setPhotoUri(path +  "/"  + fileName);
 
                 log.info("File uploaded successfully to S3: {}", fileName);
             } catch (IOException e) {
