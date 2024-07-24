@@ -2,6 +2,7 @@ package com.example.KavaSpring.models.dto;
 
 import com.example.KavaSpring.models.enums.EventType;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,4 +31,7 @@ public class EventResponse {
 
     @NotBlank
     private EventType eventType;
+
+    @NotNull
+    private int pendingTime;
 }
