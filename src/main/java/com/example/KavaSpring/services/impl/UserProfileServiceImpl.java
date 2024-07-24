@@ -1,7 +1,10 @@
 package com.example.KavaSpring.services.impl;
 
+import com.amazonaws.services.s3.model.PutObjectResult;
+import com.example.KavaSpring.config.S3Config;
 import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.NotFoundException;
+import com.example.KavaSpring.exceptions.UserProfileExistsException;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.UserProfileDto;
 import com.example.KavaSpring.models.dto.UserProfileRequest;
@@ -13,6 +16,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -26,16 +33,48 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     private final ConverterService converterService;
 
+    private final S3Config s3Config;
+
     @Override
-    public UserProfileResponse createUserProfile(UserProfileRequest request) {
+    public UserProfileResponse createUserProfile(UserProfileRequest request, MultipartFile photoFile) {
         userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new NotFoundException("User not found"));
+
+        boolean exists = userProfileRepository.existsByUserId(request.getUserId());
+
+        if (exists) {
+            throw new UserProfileExistsException("The User Profile already exists");
+        }
+
+
+
+        //! obavezno dodaj provjeru jeli grupa koja se pridruzuje profilu zapravo postoji
+
 
         UserProfile userProfile = new UserProfile();
         userProfile.setUserId(request.getUserId());
         userProfile.setGroupId(request.getGroupId());
         userProfile.setFirstName(request.getFirstName());
         userProfile.setLastName(request.getLastName());
+
+
+        //? popravi putanju i filename bezveze si zakomplicirao
+        if (photoFile != null) {
+            try {
+                String fileName = request.getUserId() + "_" + photoFile.getOriginalFilename();
+                String path = "profilePhotos";
+
+                PutObjectResult result = s3Config.uploadToS3(path, fileName, photoFile.getInputStream());
+
+                userProfile.setPhotoUri(path + fileName);
+
+                log.info("File uploaded successfully to S3: {}", fileName);
+            } catch (IOException e) {
+                log.error("Error uploading file to S3", e);
+                throw new RuntimeException("Failed to upload file to S3", e);
+            }
+        }
+
         userProfileRepository.save(userProfile);
 
         log.info("User profile created");
@@ -49,6 +88,14 @@ public class UserProfileServiceImpl implements UserProfileService {
 
         log.info("Get profile by id finished");
         return converterService.convertToUserProfileDto(userProfile);
+    }
+
+    @Override
+    public byte[] downloadUserProfilePhoto(String id) throws IOException {
+        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(id);
+        String fileUri = userProfile.getPhotoUri();
+        log.info("fileUri: {}", fileUri);
+        return s3Config.downloadFromS3(fileUri);
     }
 
 

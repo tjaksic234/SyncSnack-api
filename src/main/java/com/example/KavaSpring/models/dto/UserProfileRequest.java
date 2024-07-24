@@ -26,4 +26,5 @@ public class UserProfileRequest {
     @NotBlank
     @Size(max = 50)
     private String lastName;
+
 }

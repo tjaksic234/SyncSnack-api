@@ -39,6 +39,8 @@ public class UserProfile {
 
     private float score;
 
+    private String photoUri;
+
     @CreatedDate
     private LocalDateTime createdAt;
 

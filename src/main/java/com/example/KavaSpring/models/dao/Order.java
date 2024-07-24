@@ -28,7 +28,7 @@ public class Order {
     private String orderedBy;
 
     @NotBlank
-    private OrderStatus status = OrderStatus.PENDING;
+    private OrderStatus status = OrderStatus.PREPARING;
 
     private HashMap<String, Object> additionalOptions;
 

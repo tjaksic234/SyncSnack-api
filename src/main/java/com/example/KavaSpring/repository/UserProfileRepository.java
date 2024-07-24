@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface UserProfileRepository extends MongoRepository<UserProfile, String> {
     Optional<UserProfile> getUserProfileById(String id);
     boolean existsByUserId(String id);
+    UserProfile getUserProfileByUserId(String id);
 }
