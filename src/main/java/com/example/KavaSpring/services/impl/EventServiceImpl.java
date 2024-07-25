@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -106,10 +107,36 @@ public class EventServiceImpl implements EventService {
     }
 
     //? Cron expression: sec min hrs day mon weekday
+    //? trenutno ce azurirati svake minute
     @Scheduled(cron = "0 */1 * * * * ")
     @Override
     public void updateEvents() {
+        LocalDateTime now = LocalDateTime.now();
+        List<Criteria> criteriaList = new ArrayList<>();
 
+        //? definiramo kriterije agregacije
+        criteriaList.add(Criteria.where("status").is(EventStatus.PENDING));
+        criteriaList.add(Criteria.where("pendingUntil").lt(now));
+
+        //? slozimo konfiguraciju kriterija koji cemo ubaciti u operacije za agregaciju
+        Criteria combinedCriteria = new Criteria().andOperator(criteriaList.toArray(new Criteria[0]));
+
+        //? primjer ubacivanja kriterija u operaciju
+        MatchOperation matchOperation = Aggregation.match(combinedCriteria);
+
+        ProjectionOperation projectionOperation = Aggregation.project("status");
+
+        SetOperation setOperation = SetOperation.set("status").toValue(EventStatus.IN_PROGRESS);
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                matchOperation,
+                projectionOperation,
+                setOperation
+        );
+
+         mongoTemplate.aggregate(aggregation, "events", Event.class);
+
+         log.info("Successfully updated the status of events at time ---> {}", LocalDateTime.now(ZoneId.of("Europe/Zagreb")));
 
     }
 
