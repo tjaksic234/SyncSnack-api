@@ -1,6 +1,7 @@
 package com.example.KavaSpring.services.impl;
 
 import com.example.KavaSpring.converters.ConverterService;
+import com.example.KavaSpring.exceptions.GroupAlreadyExistsException;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.models.dao.Group;
 import com.example.KavaSpring.models.dto.GroupDto;
@@ -13,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -28,6 +31,17 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public GroupResponse createGroup(GroupRequest request) {
+
+         Optional<Group> groupOptional = groupRepository.findByName(request.getName());
+
+         if(groupOptional.isPresent()) {
+             String existingGroupName = groupOptional.get().getName().toLowerCase();
+             String groupNameRequest = request.getName().toLowerCase();
+             if (groupNameRequest.equals(existingGroupName)) {
+                 throw new GroupAlreadyExistsException("Group name already exists: " + request.getName());
+             }
+         }
+
          Group group = new Group();
          group.setName(request.getName());
          group.setDescription(request.getDescription());

@@ -128,6 +128,7 @@ public class EventServiceImpl implements EventService {
 
         SetOperation setOperation = SetOperation.set("status").toValue(EventStatus.IN_PROGRESS);
 
+
         Aggregation aggregation = Aggregation.newAggregation(
                 matchOperation,
                 projectionOperation,

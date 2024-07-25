@@ -29,7 +29,7 @@ public class UserProfileController {
 
     private final UserProfileService userProfileService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserProfileResponse> createUserProfile(
             @Valid @RequestPart(value = "body") UserProfileRequest request,
             @RequestPart(value = "file", required = false) MultipartFile file) {
