@@ -10,7 +10,7 @@ import com.example.KavaSpring.repository.GroupRepository;
 import com.example.KavaSpring.services.GroupService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,13 +24,15 @@ public class GroupServiceImpl implements GroupService {
 
     private final ConverterService converterService;
 
+    private final PasswordEncoder passwordEncoder;
+
     @Override
     public GroupResponse createGroup(GroupRequest request) {
          Group group = new Group();
          group.setName(request.getName());
          group.setDescription(request.getDescription());
          //! This is kind of password generation is temporary and most likely this will be changed
-         group.setPassword(new BCryptPasswordEncoder().encode(request.getPassword()));
+         group.setPassword(passwordEncoder.encode(request.getPassword()));
          groupRepository.save(group);
 
          log.info("Group created");
@@ -43,6 +45,23 @@ public class GroupServiceImpl implements GroupService {
 
         log.info("Get group by id finished");
         return converterService.convertToGroupDto(group);
+    }
+
+    @Override
+    public GroupResponse joinGroup(GroupRequest request) {
+        Group group = groupRepository.findByName(request.getName())
+                .orElseThrow(() -> new NotFoundException("Group not found"));
+
+        if (!passwordEncoder.matches(request.getPassword(), group.getPassword())) {
+            throw new IllegalArgumentException("Invalid password");
+        }
+
+        GroupResponse response = new GroupResponse();
+        response.setId(group.getId());
+        response.setName(request.getName());
+
+        log.info("Group join successful");
+        return response;
     }
 
 }

@@ -43,4 +43,15 @@ public class GroupController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @PostMapping("join")
+    public ResponseEntity<GroupResponse> joinGroup(@RequestBody GroupRequest request) {
+        try {
+            log.info("Join group started");
+            return ResponseEntity.ok(groupService.joinGroup(request));
+        } catch (NotFoundException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

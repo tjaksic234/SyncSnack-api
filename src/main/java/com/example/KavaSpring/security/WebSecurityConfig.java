@@ -48,6 +48,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("v3/**").permitAll()
                         .requestMatchers("api/auth/fetchMe").authenticated()
                         .anyRequest().authenticated());
 

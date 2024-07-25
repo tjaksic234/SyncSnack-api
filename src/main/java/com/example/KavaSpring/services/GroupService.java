@@ -8,4 +8,5 @@ public interface GroupService {
 
     GroupResponse createGroup(GroupRequest request);
     GroupDto getGroupById(String id);
+    GroupResponse joinGroup(GroupRequest request);
 }

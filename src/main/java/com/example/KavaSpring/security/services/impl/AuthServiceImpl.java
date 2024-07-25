@@ -56,7 +56,7 @@ public class AuthServiceImpl implements AuthService {
             log.info("The user id -----> {}", ((UserDetailsImpl) authentication.getPrincipal()).getId());
             userDto.setEmail(((UserDetailsImpl) authentication.getPrincipal()).getEmail());
 
-            log.info("User successfully \"{}\" fetched.", userDto.getEmail());
+            log.info("User successfully \"{}\" fetched.", userDto);
 
             return userDto;
         }
