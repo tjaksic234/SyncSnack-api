@@ -2,7 +2,9 @@ package com.example.KavaSpring.security.services.impl;
 
 import com.example.KavaSpring.exceptions.UserAlreadyExistsException;
 import com.example.KavaSpring.models.dao.User;
+import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.UserDto;
+import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.repository.UserRepository;
 import com.example.KavaSpring.security.api.dto.LoginRequest;
 import com.example.KavaSpring.security.api.dto.LoginResponse;
@@ -34,6 +36,8 @@ public class AuthServiceImpl implements AuthService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final UserProfileRepository userProfileRepository;
+
     @Override
     public UserDto fetchMe() {
         log.info("Fetch me started");
@@ -41,6 +45,15 @@ public class AuthServiceImpl implements AuthService {
         UserDto userDto = new UserDto();
 
         if (authentication != null && authentication.getPrincipal() != null && authentication.getPrincipal() instanceof UserDetailsImpl) {
+             UserProfile userProfile = userProfileRepository.getUserProfileByUserId(((UserDetailsImpl) authentication.getPrincipal()).getId());
+            if (userProfile != null) {
+                userDto.setFirstName(userProfile.getFirstName());
+                userDto.setLastName(userProfile.getLastName());
+                userDto.setProfileUri(userProfile.getPhotoUri());
+            } else  {
+                log.error("The user does not have a setup profile");
+            }
+            log.info("The user id -----> {}", ((UserDetailsImpl) authentication.getPrincipal()).getId());
             userDto.setEmail(((UserDetailsImpl) authentication.getPrincipal()).getEmail());
 
             log.info("User successfully \"{}\" fetched.", userDto.getEmail());
