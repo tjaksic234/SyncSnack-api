@@ -1,6 +1,6 @@
 package com.example.KavaSpring.security.utils;
 
-import com.example.KavaSpring.security.services.UserDetailsImpl;
+import com.example.KavaSpring.security.services.impl.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

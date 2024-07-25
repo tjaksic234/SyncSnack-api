@@ -1,4 +1,4 @@
-package com.example.KavaSpring.security.services;
+package com.example.KavaSpring.security.services.impl;
 
 import com.example.KavaSpring.models.dao.User;
 import com.example.KavaSpring.repository.UserRepository;

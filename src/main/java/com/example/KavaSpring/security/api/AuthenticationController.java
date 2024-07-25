@@ -1,13 +1,16 @@
 package com.example.KavaSpring.security.api;
 
 import com.example.KavaSpring.models.dao.User;
+import com.example.KavaSpring.models.dto.UserDto;
 import com.example.KavaSpring.repository.UserRepository;
 import com.example.KavaSpring.security.api.dto.LoginRequest;
 import com.example.KavaSpring.security.api.dto.LoginResponse;
 import com.example.KavaSpring.security.api.dto.RegisterUserRequest;
+import com.example.KavaSpring.security.services.AuthService;
 import com.example.KavaSpring.security.utils.JwtUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
+@Slf4j
 @RequestMapping("api/auth")
 public class AuthenticationController {
 
@@ -31,6 +35,8 @@ public class AuthenticationController {
     private final AuthenticationManager authenticationManager;
 
     private final JwtUtils jwtUtils;
+
+    private final AuthService authService;
 
     @PostMapping("register")
     public ResponseEntity<String> register(@RequestBody RegisterUserRequest request) {
@@ -65,6 +71,17 @@ public class AuthenticationController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(new LoginResponse(token));
+    }
+
+    @GetMapping("fetchMe")
+    public ResponseEntity<UserDto> fetchMe() {
+        try {
+            log.info("Fetch me started.");
+            return ResponseEntity.ok(authService.fetchMe());
+        } catch (Exception exception) {
+            log.error("Error on fetch me: {}!", exception.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
     }
 
 

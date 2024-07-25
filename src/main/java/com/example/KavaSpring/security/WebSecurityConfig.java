@@ -1,8 +1,8 @@
 package com.example.KavaSpring.security;
 
 import com.example.KavaSpring.security.filters.AuthTokenFilter;
-import com.example.KavaSpring.security.services.UserDetailsServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.KavaSpring.security.services.impl.UserDetailsServiceImpl;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,17 +23,13 @@ import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
+@AllArgsConstructor
 public class WebSecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
 
     private final AuthTokenFilter authTokenFilter;
 
-    @Autowired
-    public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, AuthTokenFilter authTokenFilter) {
-        this.userDetailsService = userDetailsService;
-        this.authTokenFilter = authTokenFilter;
-    }
 
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
@@ -52,8 +48,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers("/v3/**").permitAll()
-                        .requestMatchers("springkava-api").permitAll()
+                        .requestMatchers("api/auth/fetchMe").authenticated()
                         .anyRequest().authenticated());
 
         http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);

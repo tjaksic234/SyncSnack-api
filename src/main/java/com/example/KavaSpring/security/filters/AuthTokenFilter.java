@@ -1,6 +1,6 @@
 package com.example.KavaSpring.security.filters;
 
-import com.example.KavaSpring.security.services.UserDetailsServiceImpl;
+import com.example.KavaSpring.security.services.impl.UserDetailsServiceImpl;
 import com.example.KavaSpring.security.utils.JwtUtils;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;

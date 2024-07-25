@@ -42,11 +42,11 @@ public class Event {
 
     private EventType eventType;
 
-    private int pendingTime;
 
     @CreatedDate
     private LocalDateTime createdAt;
 
-    @LastModifiedDate
+    private LocalDateTime pendingUntil;
+
     private LocalDateTime completedAt;
 }

@@ -14,14 +14,13 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.aggregation.MatchOperation;
-import org.springframework.data.mongodb.core.aggregation.SortOperation;
+import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -57,6 +56,7 @@ public class EventServiceImpl implements EventService {
         event.setDescription(request.getDescription());
         event.setGroupId(request.getGroupId());
         event.setEventType(request.getEventType());
+        event.setPendingUntil(LocalDateTime.now().plusMinutes(request.getPendingTime()));
         eventRepository.save(event);
 
         log.info("Event created");
@@ -103,6 +103,14 @@ public class EventServiceImpl implements EventService {
                 .stream()
                 .map(converterService::convertToEventDto)
                 .collect(Collectors.toList());
+    }
+
+    //? Cron expression: sec min hrs day mon weekday
+    @Scheduled(cron = "0 */1 * * * * ")
+    @Override
+    public void updateEvents() {
+
+
     }
 
 }
