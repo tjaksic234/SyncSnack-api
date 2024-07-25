@@ -53,6 +53,7 @@ public class EventController {
             @RequestBody EventRequest request
     ) {
         try {
+            log.info("Search for events started");
             return ResponseEntity.ok(eventService.searchEvents(status, request));
         } catch (NullPointerException e) {
             log.error(e.getMessage());

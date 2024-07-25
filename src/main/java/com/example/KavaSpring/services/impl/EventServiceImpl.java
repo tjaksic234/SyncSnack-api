@@ -8,7 +8,6 @@ import com.example.KavaSpring.models.dto.EventDto;
 import com.example.KavaSpring.models.dto.EventRequest;
 import com.example.KavaSpring.models.dto.EventResponse;
 import com.example.KavaSpring.models.enums.EventStatus;
-import com.example.KavaSpring.models.enums.EventType;
 import com.example.KavaSpring.repository.EventRepository;
 import com.example.KavaSpring.services.EventService;
 import lombok.AllArgsConstructor;
@@ -105,4 +104,5 @@ public class EventServiceImpl implements EventService {
                 .map(converterService::convertToEventDto)
                 .collect(Collectors.toList());
     }
+
 }

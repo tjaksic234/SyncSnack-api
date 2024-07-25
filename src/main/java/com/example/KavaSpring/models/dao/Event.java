@@ -26,7 +26,7 @@ public class Event {
     private String id;
 
     @NotBlank
-    private String creatorId; 
+    private String creatorId;
 
     @NotBlank
     private String title;
