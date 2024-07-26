@@ -9,6 +9,7 @@ import com.example.KavaSpring.repository.UserRepository;
 import com.example.KavaSpring.security.api.dto.LoginRequest;
 import com.example.KavaSpring.security.api.dto.LoginResponse;
 import com.example.KavaSpring.security.api.dto.RegisterUserRequest;
+import com.example.KavaSpring.security.api.dto.RegisterUserResponse;
 import com.example.KavaSpring.security.services.AuthService;
 import com.example.KavaSpring.security.utils.JwtUtils;
 import lombok.AllArgsConstructor;
@@ -85,7 +86,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String register(RegisterUserRequest request) {
+    public RegisterUserResponse register(RegisterUserRequest request) {
         if (userRepository.existsByEmail(request.getEmail()) || request.getEmail() == null) {
             throw new UserAlreadyExistsException("Email is already taken or it is not entered in correct format!");
         }
@@ -96,6 +97,9 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.save(user);
 
-        return "User successfully registered: " + user.getId();
+        RegisterUserResponse response = new RegisterUserResponse();
+        response.setUserId(user.getId());
+
+        return response;
     }
 }

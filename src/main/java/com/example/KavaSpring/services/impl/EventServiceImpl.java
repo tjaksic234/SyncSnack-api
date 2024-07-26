@@ -113,7 +113,7 @@ public class EventServiceImpl implements EventService {
 
     //? Cron expression: sec min hrs day mon weekday
     //? trenutno ce azurirati svake minute
-    @Scheduled(cron = "0 */1 * * * * ")
+    @Scheduled(cron = "0 */20 * * * * ")
     @Override
     public void updateEvents() {
         LocalDateTime now = LocalDateTime.now();

@@ -6,6 +6,7 @@ import com.example.KavaSpring.models.dto.UserDto;
 import com.example.KavaSpring.security.api.dto.LoginRequest;
 import com.example.KavaSpring.security.api.dto.LoginResponse;
 import com.example.KavaSpring.security.api.dto.RegisterUserRequest;
+import com.example.KavaSpring.security.api.dto.RegisterUserResponse;
 import com.example.KavaSpring.security.services.AuthService;
 import com.example.KavaSpring.security.utils.JwtUtils;
 import lombok.AllArgsConstructor;
@@ -26,7 +27,7 @@ public class AuthenticationController {
     private final JwtUtils jwtUtils;
 
     @PostMapping("register")
-    public ResponseEntity<String> register(@RequestBody RegisterUserRequest request) {
+    public ResponseEntity<RegisterUserResponse> register(@RequestBody RegisterUserRequest request) {
       try {
           log.info("Register user started");
           return ResponseEntity.ok(authService.register(request));

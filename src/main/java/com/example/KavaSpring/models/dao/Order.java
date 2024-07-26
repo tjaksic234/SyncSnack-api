@@ -30,6 +30,9 @@ public class Order {
     @NotBlank
     private OrderStatus status = OrderStatus.PREPARING;
 
+    @NotBlank
+    private String eventId;
+
     private HashMap<String, Object> additionalOptions;
 
     @CreatedDate

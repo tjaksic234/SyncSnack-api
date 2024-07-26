@@ -6,6 +6,7 @@ import com.example.KavaSpring.models.dao.Order;
 import com.example.KavaSpring.models.dto.OrderDto;
 import com.example.KavaSpring.models.dto.OrderRequest;
 import com.example.KavaSpring.models.dto.OrderResponse;
+import com.example.KavaSpring.repository.EventRepository;
 import com.example.KavaSpring.repository.OrderRepository;
 import com.example.KavaSpring.repository.UserRepository;
 import com.example.KavaSpring.services.OrderService;
@@ -24,15 +25,23 @@ public class OrderServiceImpl implements OrderService {
 
     private final UserRepository userRepository;
 
+    private final EventRepository eventRepository;
+
     private final ConverterService converterService;
 
     @Override
     public OrderResponse createOrder(OrderRequest request) {
 
-        boolean exists = userRepository.existsById(request.getOrderedBy());
+        boolean existsOrder = userRepository.existsById(request.getOrderedBy());
+        boolean existsEvent = eventRepository.existsById(request.getEventId());
 
-        if (!exists) {
+
+        if (!existsOrder) {
             throw new NotFoundException("No user associated with id");
+        }
+
+        if (!existsEvent) {
+            throw new NotFoundException("No event associated with eventId in the order");
         }
 
         log.info("the order request is: {}", request);
