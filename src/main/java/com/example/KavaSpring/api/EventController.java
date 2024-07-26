@@ -47,7 +47,7 @@ public class EventController {
         }
     }
 
-    @GetMapping("search")
+    @PostMapping("search")
     public ResponseEntity<List<EventDto>> searchEvents(@RequestBody EventSearchRequest request) {
         try {
             log.info("Search for events started");

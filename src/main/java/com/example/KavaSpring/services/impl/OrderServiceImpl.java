@@ -47,6 +47,7 @@ public class OrderServiceImpl implements OrderService {
         log.info("the order request is: {}", request);
         Order order = new Order();
         order.setOrderedBy(request.getOrderedBy());
+        order.setEventId(request.getEventId());
         order.setAdditionalOptions(request.getAdditionalOptions());
         orderRepository.save(order);
 

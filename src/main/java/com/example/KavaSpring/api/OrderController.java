@@ -26,7 +26,7 @@ public class OrderController {
         try {
             log.info("Creating order");
             return ResponseEntity.ok(orderService.createOrder(request));
-        } catch (UnauthorizedException e) {
+        } catch (UnauthorizedException | NotFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
         }
