@@ -30,7 +30,7 @@ public class EventController {
         try {
             log.info("Create a event requested");
             return ResponseEntity.ok(eventService.createEvent(request));
-        } catch (EventAlreadyExistsException | NullPointerException e) {
+        } catch (EventAlreadyExistsException | NullPointerException | NotFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
         }
@@ -57,5 +57,4 @@ public class EventController {
             return ResponseEntity.badRequest().build();
         }
     }
-
 }

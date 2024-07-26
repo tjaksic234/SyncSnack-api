@@ -1,9 +1,6 @@
 package com.example.KavaSpring.services;
 
-import com.example.KavaSpring.models.dto.EventDto;
-import com.example.KavaSpring.models.dto.EventRequest;
-import com.example.KavaSpring.models.dto.EventResponse;
-import com.example.KavaSpring.models.dto.EventSearchRequest;
+import com.example.KavaSpring.models.dto.*;
 
 import java.util.List;
 
@@ -12,4 +9,5 @@ public interface EventService {
     EventDto getEventById(String id);
     List<EventDto> searchEvents(EventSearchRequest request);
     void updateEvents();
+    List<EventDto> activeEvents(EventActiveRequest request);
 }

@@ -5,4 +5,5 @@ import com.example.KavaSpring.models.dto.UserDto;
 public interface UserService {
 
     UserDto getUserById(String id);
+    boolean checkEmail(String email);
 }

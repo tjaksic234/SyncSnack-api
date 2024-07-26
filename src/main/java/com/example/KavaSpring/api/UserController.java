@@ -31,6 +31,19 @@ public class UserController {
         }
     }
 
+    @PostMapping("check")
+    public ResponseEntity<Boolean> checkEmail(@RequestPart String email) {
+
+        try {
+            log.info("Check email started");
+            return ResponseEntity.ok(userService.checkEmail(email));
+        } catch (RuntimeException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+
 
 
 
