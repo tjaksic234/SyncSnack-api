@@ -11,6 +11,7 @@ import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.services.OrderService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -38,6 +39,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderResponse createOrder(OrderRequest request) {
+
+        //TODO dodaj check da user nemoze napraviti vise od 1 order za event,
+        // samo usporedi kad radi order postoji li vec order vezan za taj event
 
         boolean existsUserProfile = userProfileRepository.existsById(request.getOrderedBy());
         boolean existsEvent = eventRepository.existsById(request.getEventId());
@@ -103,13 +107,16 @@ public class OrderServiceImpl implements OrderService {
                 .and("event.eventType").as("eventType")
                 .and("event.createdAt").as("createdAt");
 
+        SortOperation sortOperation = new SortOperation(Sort.by(Sort.Direction.DESC, "event.createdAt"));
+
         Aggregation aggregation = Aggregation.newAggregation(
                 matchUserOrders,
                 convertEventIdToObjectId,
                 lookupOperation,
                 unwindOperation,
                 matchEventStatus,
-                projectionOperation
+                projectionOperation,
+                sortOperation
         );
 
         AggregationResults<OrderActiveResponse> results = mongoTemplate.aggregate(aggregation, "orders", OrderActiveResponse.class);

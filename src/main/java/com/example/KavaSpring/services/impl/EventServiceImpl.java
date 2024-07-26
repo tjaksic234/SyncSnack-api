@@ -43,7 +43,6 @@ public class EventServiceImpl implements EventService {
 
     private final MongoTemplate mongoTemplate;
 
-    //? creatorId je sada userProfileId da se sprijeci slanje nepotrebnih informacija o samom useru
     @Override
     public EventResponse createEvent(EventRequest request) {
         //? Logiku provjere eventova za usera ce trebati popraviti jer creator moze imati samo jedan event nebitno jeli completed,

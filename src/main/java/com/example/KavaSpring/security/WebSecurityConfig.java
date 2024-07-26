@@ -50,6 +50,8 @@ public class WebSecurityConfig {
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("v3/**").permitAll()
                         .requestMatchers("api/profiles/create").permitAll()
+                        .requestMatchers("api/orders/create").permitAll()
+                        .requestMatchers("api/events/create").permitAll()
                         .requestMatchers("api/groups/create").permitAll()
                         .requestMatchers("api/groups/join").permitAll()
                         .requestMatchers("api/auth/fetchMe").authenticated()

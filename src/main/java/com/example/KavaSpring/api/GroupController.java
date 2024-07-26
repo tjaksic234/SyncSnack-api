@@ -22,7 +22,6 @@ public class GroupController {
 
     private final GroupService groupService;
 
-    //TODO treba jos vidjeti hoce li ostati group password field
     @PostMapping("create")
     public ResponseEntity<GroupResponse> createGroup(@RequestBody GroupRequest request) {
         try {

@@ -25,7 +25,7 @@ public class EventController {
 
     private final EventService eventService;
 
-    @PostMapping
+    @PostMapping("create")
     public ResponseEntity<EventResponse> createEvent(@RequestBody EventRequest request) {
         try {
             log.info("Create a event requested");
