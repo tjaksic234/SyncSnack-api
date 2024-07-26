@@ -21,7 +21,7 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @PostMapping
+    @PostMapping("create")
     public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest request) {
         try {
             log.info("Creating order");

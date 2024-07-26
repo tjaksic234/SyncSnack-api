@@ -7,7 +7,7 @@ import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.repository.EventRepository;
 import com.example.KavaSpring.repository.OrderRepository;
-import com.example.KavaSpring.repository.UserRepository;
+import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.services.OrderService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,22 +28,23 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
 
-    private final UserRepository userRepository;
+    private final UserProfileRepository userProfileRepository;
 
     private final EventRepository eventRepository;
 
     private final ConverterService converterService;
+
     private final MongoTemplate mongoTemplate;
 
     @Override
     public OrderResponse createOrder(OrderRequest request) {
 
-        boolean existsOrder = userRepository.existsById(request.getOrderedBy());
+        boolean existsUserProfile = userProfileRepository.existsById(request.getOrderedBy());
         boolean existsEvent = eventRepository.existsById(request.getEventId());
 
 
-        if (!existsOrder) {
-            throw new NotFoundException("No user associated with id");
+        if (!existsUserProfile) {
+            throw new NotFoundException("No userProfile associated with id");
         }
 
         if (!existsEvent) {
@@ -77,10 +78,10 @@ public class OrderServiceImpl implements OrderService {
             throw new NullPointerException("Bad UserProfileId value");
         }
 
-        MatchOperation matchOperation1 = Aggregation.match(Criteria.where("orderedBy").is(request.getUserProfileId()));
+        MatchOperation matchUserOrders  = Aggregation.match(Criteria.where("orderedBy").is(request.getUserProfileId()));
 
 
-        AddFieldsOperation setOperation = Aggregation.addFields()
+        AddFieldsOperation convertEventIdToObjectId  = Aggregation.addFields()
                 .addField("eventId")
                 .withValueOf(ConvertOperators.ToObjectId.toObjectId("$eventId"))
                 .build();
@@ -89,7 +90,7 @@ public class OrderServiceImpl implements OrderService {
 
         UnwindOperation unwindOperation = Aggregation.unwind("event");
 
-        MatchOperation matchOperation2 = Aggregation.match(Criteria.where("event.status").in( EventStatus.IN_PROGRESS));
+        MatchOperation matchEventStatus  = Aggregation.match(Criteria.where("event.status").in( EventStatus.IN_PROGRESS));
 
         ProjectionOperation projectionOperation = Aggregation.project()
                 .and("event._id").as("eventId")
@@ -103,11 +104,11 @@ public class OrderServiceImpl implements OrderService {
                 .and("event.createdAt").as("createdAt");
 
         Aggregation aggregation = Aggregation.newAggregation(
-                matchOperation1,
-                setOperation,
+                matchUserOrders,
+                convertEventIdToObjectId,
                 lookupOperation,
                 unwindOperation,
-                matchOperation2,
+                matchEventStatus,
                 projectionOperation
         );
 

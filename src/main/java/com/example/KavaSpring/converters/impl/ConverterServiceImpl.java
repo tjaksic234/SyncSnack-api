@@ -90,6 +90,7 @@ public class ConverterServiceImpl implements ConverterService {
     public OrderResponse convertToOrderResponse(OrderRequest request) {
         OrderResponse response = new OrderResponse();
         response.setOrderedBy(request.getOrderedBy());
+        response.setEventId(request.getEventId());
         response.setAdditionalOptions(request.getAdditionalOptions());
         return response;
     }
