@@ -1,7 +1,6 @@
 package com.example.KavaSpring.models.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,10 +8,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EventActiveRequest {
+public class OrderActiveRequest {
 
     @NotBlank
-    @Size(max = 50)
     private String userProfileId;
-
 }

@@ -3,17 +3,22 @@ package com.example.KavaSpring.services.impl;
 import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.models.dao.Order;
-import com.example.KavaSpring.models.dto.OrderDto;
-import com.example.KavaSpring.models.dto.OrderRequest;
-import com.example.KavaSpring.models.dto.OrderResponse;
+import com.example.KavaSpring.models.dto.*;
+import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.repository.EventRepository;
 import com.example.KavaSpring.repository.OrderRepository;
 import com.example.KavaSpring.repository.UserRepository;
 import com.example.KavaSpring.services.OrderService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.*;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -28,6 +33,7 @@ public class OrderServiceImpl implements OrderService {
     private final EventRepository eventRepository;
 
     private final ConverterService converterService;
+    private final MongoTemplate mongoTemplate;
 
     @Override
     public OrderResponse createOrder(OrderRequest request) {
@@ -62,5 +68,56 @@ public class OrderServiceImpl implements OrderService {
 
         log.info("Get order by id finished");
         return converterService.convertToOrderDto(order);
+    }
+
+    @Override
+    public List<OrderActiveResponse> activeOrders(OrderActiveRequest request) {
+
+        if (request.getUserProfileId() == null) {
+            throw new NullPointerException("Bad UserProfileId value");
+        }
+
+        MatchOperation matchOperation1 = Aggregation.match(Criteria.where("orderedBy").is(request.getUserProfileId()));
+
+
+        AddFieldsOperation setOperation = Aggregation.addFields()
+                .addField("eventId")
+                .withValueOf(ConvertOperators.ToObjectId.toObjectId("$eventId"))
+                .build();
+
+        LookupOperation lookupOperation = Aggregation.lookup("events", "eventId", "_id", "event");
+
+        UnwindOperation unwindOperation = Aggregation.unwind("event");
+
+        MatchOperation matchOperation2 = Aggregation.match(Criteria.where("event.status").in( EventStatus.IN_PROGRESS));
+
+        ProjectionOperation projectionOperation = Aggregation.project()
+                .and("event._id").as("eventId")
+                .and("_id").as("orderId")
+                .and("event.creatorId").as("creatorId")
+                .and("event.title").as("title")
+                .and("event.description").as("description")
+                .and("event.groupId").as("groupId")
+                .and("event.status").as("status")
+                .and("event.eventType").as("eventType")
+                .and("event.createdAt").as("createdAt");
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                matchOperation1,
+                setOperation,
+                lookupOperation,
+                unwindOperation,
+                matchOperation2,
+                projectionOperation
+        );
+
+        AggregationResults<OrderActiveResponse> results = mongoTemplate.aggregate(aggregation, "orders", OrderActiveResponse.class);
+
+        return results
+                .getMappedResults()
+                .stream()
+                .map(converterService::convertToOrderActiveResponse)
+                .collect(Collectors.toList());
+
     }
 }

@@ -93,4 +93,19 @@ public class ConverterServiceImpl implements ConverterService {
         response.setAdditionalOptions(request.getAdditionalOptions());
         return response;
     }
+
+    @Override
+    public OrderActiveResponse convertToOrderActiveResponse(OrderActiveResponse order) {
+        OrderActiveResponse response = new OrderActiveResponse();
+        response.setEventId(order.getEventId());
+        response.setOrderId(order.getOrderId());
+        response.setCreatorId(order.getCreatorId());
+        response.setTitle(order.getTitle());
+        response.setDescription(order.getDescription());
+        response.setGroupId(order.getGroupId());
+        response.setStatus(order.getStatus());
+        response.setEventType(order.getEventType());
+        response.setCreatedAt(order.getCreatedAt());
+        return response;
+    }
 }

@@ -143,8 +143,5 @@ public class EventServiceImpl implements EventService {
 
     }
 
-    @Override
-    public List<EventDto> activeEvents(EventActiveRequest request) {
-        return List.of();
-    }
+
 }

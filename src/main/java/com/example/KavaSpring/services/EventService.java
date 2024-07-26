@@ -9,5 +9,4 @@ public interface EventService {
     EventDto getEventById(String id);
     List<EventDto> searchEvents(EventSearchRequest request);
     void updateEvents();
-    List<EventDto> activeEvents(EventActiveRequest request);
 }

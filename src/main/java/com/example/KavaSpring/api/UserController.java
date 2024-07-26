@@ -32,12 +32,12 @@ public class UserController {
     }
 
     @PostMapping("check")
-    public ResponseEntity<Boolean> checkEmail(@RequestPart String email) {
+    public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
 
         try {
-            log.info("Check email started");
+            log.info("Checking email: {}", email);
             return ResponseEntity.ok(userService.checkEmail(email));
-        } catch (RuntimeException e) {
+        } catch (NotFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
         }

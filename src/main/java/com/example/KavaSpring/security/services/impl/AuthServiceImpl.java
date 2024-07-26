@@ -51,6 +51,7 @@ public class AuthServiceImpl implements AuthService {
                 userDto.setFirstName(userProfile.getFirstName());
                 userDto.setLastName(userProfile.getLastName());
                 userDto.setProfileUri(userProfile.getPhotoUri());
+                userDto.setGroupId(userProfile.getGroupId());
             } else  {
                 log.error("The user does not have a setup profile");
             }
