@@ -126,20 +126,14 @@ public class EventServiceImpl implements EventService {
 
         ProjectionOperation projectionOperation = Aggregation.project("status");
 
-        SetOperation setOperation = SetOperation.set("status").toValue(EventStatus.IN_PROGRESS);
 
-        AggregationUpdate aggregationUpdate = AggregationUpdate.update().set(setOperation);
 
-        /*Aggregation aggregation = Aggregation.newAggregation(
+        Aggregation aggregation = Aggregation.newAggregation(
                 matchOperation,
-                projectionOperation,
-                setOperation
-        );*/
+                projectionOperation
+        );
 
-         mongoTemplate.update(Event.class)
-                 .matching(combinedCriteria)
-                 .apply(aggregationUpdate)
-                 .all();
+
 
          log.info("Successfully updated the status of events at time ---> {}", LocalDateTime.now(ZoneId.of("Europe/Zagreb")));
 
