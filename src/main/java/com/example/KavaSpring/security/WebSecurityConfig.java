@@ -51,6 +51,7 @@ public class WebSecurityConfig {
                         .requestMatchers("v3/**").permitAll()
                         .requestMatchers("api/profiles/create").permitAll()
                         .requestMatchers("api/groups/create").permitAll()
+                        .requestMatchers("api/groups/join").permitAll()
                         .requestMatchers("api/auth/fetchMe").authenticated()
                         .anyRequest().authenticated());
 
