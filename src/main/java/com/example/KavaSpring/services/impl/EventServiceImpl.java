@@ -7,6 +7,7 @@ import com.example.KavaSpring.models.dao.Event;
 import com.example.KavaSpring.models.dto.EventDto;
 import com.example.KavaSpring.models.dto.EventRequest;
 import com.example.KavaSpring.models.dto.EventResponse;
+import com.example.KavaSpring.models.dto.EventSearchRequest;
 import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.repository.EventRepository;
 import com.example.KavaSpring.services.EventService;
@@ -16,6 +17,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,12 +74,14 @@ public class EventServiceImpl implements EventService {
         return converterService.convertToEventDto(event);
     }
 
+    //? mozda da ovo bolje rascjepkamo mogao bi napraviti zasebni poziv za sve eventove te grupe kojoj user pripada
+
     @Override
-    public List<EventDto> searchEvents(EventStatus status, EventRequest request) {
+    public List<EventDto> searchEvents(EventSearchRequest request) {
         List<Criteria> criteriaList = new ArrayList<>();
 
-        if (status != null) {
-            criteriaList.add(Criteria.where("status").is(status));
+        if (request.getStatus() != null) {
+            criteriaList.add(Criteria.where("status").is(request.getStatus()));
         }
 
         if (request.getEventType() != null) {
@@ -114,29 +119,18 @@ public class EventServiceImpl implements EventService {
         LocalDateTime now = LocalDateTime.now();
         List<Criteria> criteriaList = new ArrayList<>();
 
-        //? definiramo kriterije agregacije
         criteriaList.add(Criteria.where("status").is(EventStatus.PENDING));
         criteriaList.add(Criteria.where("pendingUntil").lt(now));
 
-        //? slozimo konfiguraciju kriterija koji cemo ubaciti u operacije za agregaciju
         Criteria combinedCriteria = new Criteria().andOperator(criteriaList.toArray(new Criteria[0]));
 
-        //? primjer ubacivanja kriterija u operaciju
-        MatchOperation matchOperation = Aggregation.match(combinedCriteria);
 
-        ProjectionOperation projectionOperation = Aggregation.project("status");
+        Update update = new Update().set("status", EventStatus.IN_PROGRESS);
 
-
-
-        Aggregation aggregation = Aggregation.newAggregation(
-                matchOperation,
-                projectionOperation
-        );
-
+        mongoTemplate.updateMulti(new Query(combinedCriteria), update, Event.class);
 
 
          log.info("Successfully updated the status of events at time ---> {}", LocalDateTime.now(ZoneId.of("Europe/Zagreb")));
 
     }
-
 }

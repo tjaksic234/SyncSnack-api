@@ -7,7 +7,7 @@ import com.example.KavaSpring.exceptions.UnauthorizedException;
 import com.example.KavaSpring.models.dto.EventDto;
 import com.example.KavaSpring.models.dto.EventRequest;
 import com.example.KavaSpring.models.dto.EventResponse;
-import com.example.KavaSpring.models.enums.EventStatus;
+import com.example.KavaSpring.models.dto.EventSearchRequest;
 import com.example.KavaSpring.services.EventService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,13 +48,10 @@ public class EventController {
     }
 
     @GetMapping("search")
-    public ResponseEntity<List<EventDto>> searchEvents(
-            @RequestParam EventStatus status,
-            @RequestBody EventRequest request
-    ) {
+    public ResponseEntity<List<EventDto>> searchEvents(@RequestBody EventSearchRequest request) {
         try {
             log.info("Search for events started");
-            return ResponseEntity.ok(eventService.searchEvents(status, request));
+            return ResponseEntity.ok(eventService.searchEvents(request));
         } catch (NullPointerException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
