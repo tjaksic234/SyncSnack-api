@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,6 +41,8 @@ public class OrderServiceImpl implements OrderService {
     private final ConverterService converterService;
 
     private final MongoTemplate mongoTemplate;
+
+    private final Helper helper;
 
     @Override
     public OrderResponse createOrder(OrderRequest request) {
@@ -81,23 +84,24 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDto> getAllOrdersFromUserProfile() {
-        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
-        if (userProfile == null) {
+        MetaDto metaDto = helper.getLoggedInUserProfile();
+        Optional<UserProfile> userProfile = userProfileRepository.getUserProfileById(metaDto.getUserProfileId());
+        if (userProfile.isEmpty()) {
             throw new NotFoundException("Bad user profile id provided");
         }
-        return orderRepository.findByUserProfileId(userProfile.getId());
+        return orderRepository.findByUserProfileId(userProfile.get().getId());
     }
 
     @Override
     public List<OrderActivityResponse> activeOrders(boolean isActive) {
+        MetaDto metaDto = helper.getLoggedInUserProfile();
+        Optional<UserProfile> userProfile = userProfileRepository.getUserProfileById(metaDto.getUserProfileId());
 
-        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
-
-        if (userProfile == null || userProfile.getId() == null) {
+        if (userProfile.isEmpty()) {
             throw new NullPointerException("Bad user profile id value");
         }
 
-        MatchOperation matchUserOrders  = Aggregation.match(Criteria.where("orderedBy").is(userProfile.getId()));
+        MatchOperation matchUserOrders  = Aggregation.match(Criteria.where("orderedBy").is(userProfile.get().getId()));
 
 
         AddFieldsOperation convertEventIdToObjectId  = Aggregation.addFields()

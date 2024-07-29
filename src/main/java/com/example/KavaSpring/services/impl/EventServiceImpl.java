@@ -9,6 +9,7 @@ import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.repository.EventRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
+import com.example.KavaSpring.security.utils.Helper;
 import com.example.KavaSpring.services.EventService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +43,8 @@ public class EventServiceImpl implements EventService {
     private final ConverterService converterService;
 
     private final MongoTemplate mongoTemplate;
+
+    private final Helper helper;
 
     @Override
     public EventResponse createEvent(EventRequest request) {
@@ -85,6 +88,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventDto> searchEvents(EventSearchRequest request) {
+        MetaDto metaDto = helper.getLoggedInUserProfile();
         List<Criteria> criteriaList = new ArrayList<>();
 
         if (request.getStatus() != null) {
@@ -95,8 +99,8 @@ public class EventServiceImpl implements EventService {
             criteriaList.add(Criteria.where("eventType").is(request.getEventType()));
         }
 
-        criteriaList.add(Criteria.where("groupId").is(request.getGroupId()));
-        criteriaList.add(Criteria.where("userProfileId").ne(request.getUserProfileId()));
+        criteriaList.add(Criteria.where("groupId").is(metaDto.getGroupId()));
+        criteriaList.add(Criteria.where("userProfileId").ne(metaDto.getUserProfileId()));
 
         Criteria combinedCriteria = new Criteria().andOperator(criteriaList.toArray(new Criteria[0]));
 

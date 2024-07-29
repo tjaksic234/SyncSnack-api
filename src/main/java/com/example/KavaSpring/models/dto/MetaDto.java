@@ -1,14 +1,13 @@
-package com.example.KavaSpring.security.utils;
+package com.example.KavaSpring.models.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class Meta {
-    private String userId;
+@NoArgsConstructor
+public class MetaDto {
     private String userProfileId;
     private String groupId;
 }
