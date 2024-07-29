@@ -42,12 +42,29 @@ public class OrderController {
         }
     }
 
+    @GetMapping("all")
+    public ResponseEntity<List<OrderDto>> getAllOrdersFromUserProfile(@RequestParam String userProfileId) {
+        try {
+            log.info("Fetching all orders from user profile");
+            List<OrderDto> orders = orderService.getAllOrdersFromUserProfile(userProfileId);
 
-    @PostMapping("active")
-    public ResponseEntity<List<OrderActiveResponse>> activeOrders() {
+            if (orders.isEmpty()) {
+                log.info("No orders found for user profile id: {}", userProfileId);
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(orders);
+        } catch (NotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
+    @PostMapping("activity")
+    public ResponseEntity<List<OrderActivityResponse>> activeOrders(@RequestParam boolean isActive) {
         try {
             log.info("Fetching active orders for user profile");
-            List<OrderActiveResponse> activeOrders = orderService.activeOrders();
+            List<OrderActivityResponse> activeOrders = orderService.activeOrders(isActive);
             if (activeOrders == null || activeOrders.isEmpty()) {
                 log.info("No active orders found for user profile");
                 return ResponseEntity.noContent().build();
@@ -59,17 +76,4 @@ public class OrderController {
             return ResponseEntity.internalServerError().build();
         }
     }
-
-  /*  @PostMapping("completed")
-    public ResponseEntity<List<OrderCompletedRequest>> completedOrders() {
-        try {
-            log.info("Fetching completed orders for user profile");
-            return ResponseEntity.ok();
-        } catch (UnauthorizedException e) {
-            log.error(e.getMessage());
-            return ResponseEntity.badRequest().build();
-        }
-    }
-*/
-
 }

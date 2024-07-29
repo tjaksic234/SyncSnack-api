@@ -16,5 +16,5 @@ public interface ConverterService {
     EventResponse convertToEventResponse(EventRequest request);
     OrderDto convertToOrderDto(Order order);
     OrderResponse convertToOrderResponse(OrderRequest request);
-    OrderActiveResponse convertToOrderActiveResponse(OrderActiveResponse response);
+    OrderActivityResponse convertToOrderActiveResponse(OrderActivityResponse response);
 }

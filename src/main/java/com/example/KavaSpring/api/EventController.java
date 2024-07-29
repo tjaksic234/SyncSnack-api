@@ -3,6 +3,7 @@ package com.example.KavaSpring.api;
 import com.example.KavaSpring.config.openapi.ShowAPI;
 import com.example.KavaSpring.exceptions.EventAlreadyExistsException;
 import com.example.KavaSpring.exceptions.NotFoundException;
+import com.example.KavaSpring.exceptions.NotValidEnumException;
 import com.example.KavaSpring.exceptions.UnauthorizedException;
 import com.example.KavaSpring.models.dto.EventDto;
 import com.example.KavaSpring.models.dto.EventRequest;
@@ -58,7 +59,7 @@ public class EventController {
         try {
             log.info("Search for events started");
             return ResponseEntity.ok(eventService.searchEvents(request));
-        } catch (UnauthorizedException e) {
+        } catch (NotValidEnumException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
         }

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderActiveResponse {
+public class OrderActivityResponse {
     private String eventId;
     private String orderId;
     private String userProfileId;

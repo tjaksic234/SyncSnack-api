@@ -11,4 +11,5 @@ public interface UserProfileRepository extends MongoRepository<UserProfile, Stri
     Optional<UserProfile> getUserProfileById(String id);
     boolean existsByUserId(String id);
     UserProfile getUserProfileByUserId(String id);
+    boolean existsById(String id);
 }

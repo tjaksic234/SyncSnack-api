@@ -20,6 +20,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -78,9 +80,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderActiveResponse> activeOrders() {
+    public List<OrderDto> getAllOrdersFromUserProfile(String id) {
+        if (!userProfileRepository.existsById(id)) {
+            throw new NotFoundException("Bad user profile id provided");
+        }
+        return orderRepository.findByUserProfileId(id);
+    }
 
-        //? popravi ovo kako je tomislav rekao dodaj helper klasu u utils package da provjerava da li je request null
+    @Override
+    public List<OrderActivityResponse> activeOrders(boolean isActive) {
 
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
 
@@ -100,7 +108,12 @@ public class OrderServiceImpl implements OrderService {
 
         UnwindOperation unwindOperation = Aggregation.unwind("event");
 
-        MatchOperation matchEventStatus  = Aggregation.match(Criteria.where("event.status").in( EventStatus.IN_PROGRESS));
+        //! Determine which statuses to include based on isActive parameter
+        List<EventStatus> statusesToInclude = isActive
+                ? Arrays.asList(EventStatus.PENDING, EventStatus.IN_PROGRESS)
+                : Collections.singletonList(EventStatus.COMPLETED);
+
+        MatchOperation matchEventStatus  = Aggregation.match(Criteria.where("event.status").in(statusesToInclude));
 
         ProjectionOperation projectionOperation = Aggregation.project()
                 .and("event._id").as("eventId")
@@ -125,7 +138,7 @@ public class OrderServiceImpl implements OrderService {
                 sortOperation
         );
 
-        AggregationResults<OrderActiveResponse> results = mongoTemplate.aggregate(aggregation, "orders", OrderActiveResponse.class);
+        AggregationResults<OrderActivityResponse> results = mongoTemplate.aggregate(aggregation, "orders", OrderActivityResponse.class);
 
         return results
                 .getMappedResults()
@@ -135,9 +148,4 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
-    @Override
-    public List<OrderCompleteResponse> completeOrders(OrderCompleteRequest request) {
-
-        return List.of();
-    }
 }

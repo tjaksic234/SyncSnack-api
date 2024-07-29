@@ -15,5 +15,6 @@ public class OrderDto {
     private String userProfileId;
     private OrderStatus status;
     private HashMap<String, Object> additionalOptions;
+    private int rating;
     private LocalDateTime createdAt;
 }

@@ -96,8 +96,8 @@ public class ConverterServiceImpl implements ConverterService {
     }
 
     @Override
-    public OrderActiveResponse convertToOrderActiveResponse(OrderActiveResponse order) {
-        OrderActiveResponse response = new OrderActiveResponse();
+    public OrderActivityResponse convertToOrderActiveResponse(OrderActivityResponse order) {
+        OrderActivityResponse response = new OrderActivityResponse();
         response.setEventId(order.getEventId());
         response.setOrderId(order.getOrderId());
         response.setUserProfileId(order.getUserProfileId());
