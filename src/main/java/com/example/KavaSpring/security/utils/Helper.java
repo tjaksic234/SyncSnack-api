@@ -22,13 +22,9 @@ public class Helper {
     }
 
     public static String getLoggedInUserId() {
-        SimpleIdEmailDto dto = getLoggedSimpleUserIdEmail();
-        if (dto != null && dto.getUserId() != null) {
-            try {
-                return dto.getUserId();
-            } catch (Exception e) {
-                log.error("Failed to get user ID: {}", dto.getUserId(), e);
-            }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() != null && authentication.getPrincipal() instanceof UserDetailsImpl) {
+            return ((UserDetailsImpl) authentication.getPrincipal()).getId();
         }
         return null;
     }

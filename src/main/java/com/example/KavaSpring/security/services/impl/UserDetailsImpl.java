@@ -1,7 +1,9 @@
 package com.example.KavaSpring.security.services.impl;
 
 import com.example.KavaSpring.models.dao.User;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,17 +12,13 @@ import java.util.Collection;
 import java.util.List;
 
 @Getter @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserDetailsImpl implements UserDetails {
 
     private String id;
     private String email;
     private String password;
-
-    public UserDetailsImpl(String id, String email, String password) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-    }
 
     public static UserDetailsImpl build(User user) {
         return new UserDetailsImpl(
