@@ -14,20 +14,12 @@ import lombok.NoArgsConstructor;
 public class EventRequest {
 
     @NotBlank
-    @Size(max = 50)
-    private String userProfileId;
-
-    @NotBlank
     @Size(max = 120)
     private String title;
 
     @NotBlank
     @Size(max = 120)
     private String description;
-
-    @NotBlank
-    @Size(max = 50)
-    private String groupId;
 
     @NotBlank
     private EventType eventType;
