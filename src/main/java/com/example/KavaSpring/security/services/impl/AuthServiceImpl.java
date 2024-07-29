@@ -48,6 +48,7 @@ public class AuthServiceImpl implements AuthService {
         if (authentication != null && authentication.getPrincipal() != null && authentication.getPrincipal() instanceof UserDetailsImpl) {
              UserProfile userProfile = userProfileRepository.getUserProfileByUserId(((UserDetailsImpl) authentication.getPrincipal()).getId());
             if (userProfile != null) {
+                userDto.setUserProfileId(userProfile.getId());
                 userDto.setFirstName(userProfile.getFirstName());
                 userDto.setLastName(userProfile.getLastName());
                 userDto.setProfileUri(userProfile.getPhotoUri());

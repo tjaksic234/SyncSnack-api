@@ -82,7 +82,6 @@ public class EventServiceImpl implements EventService {
         return converterService.convertToEventDto(event);
     }
 
-    //? mozda da ovo bolje rascjepkamo mogao bi napraviti zasebni poziv za sve eventove te grupe kojoj user pripada
 
     @Override
     public List<EventDto> searchEvents(EventSearchRequest request) {
