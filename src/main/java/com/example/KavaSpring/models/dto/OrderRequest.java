@@ -12,7 +12,7 @@ import java.util.HashMap;
 @NoArgsConstructor
 public class OrderRequest {
     @NotBlank
-    private String orderedBy;
+    private String userProfileId;
 
     @NotBlank
     private String eventId;

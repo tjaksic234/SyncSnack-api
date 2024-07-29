@@ -48,22 +48,22 @@ public class EventServiceImpl implements EventService {
         //? Logiku provjere eventova za usera ce trebati popraviti jer creator moze imati samo jedan event nebitno jeli completed,
         //? pending ili inprogress pa treba jos poraditi na logici
 
-        Optional<UserProfile> existingProfile = userProfileRepository.getUserProfileById(request.getCreatorId());
+        Optional<UserProfile> existingProfile = userProfileRepository.getUserProfileById(request.getUserProfileId());
 
         if (existingProfile.isEmpty()) {
             throw new NotFoundException("No UserProfile associated with the id");
         }
 
-        List<Event> existingActiveEvents = eventRepository.findByCreatorIdAndStatus(request.getCreatorId(), EventStatus.PENDING);
+        List<Event> existingActiveEvents = eventRepository.findByUserProfileIdAndStatus(request.getUserProfileId(), EventStatus.PENDING);
 
         if (!existingActiveEvents.isEmpty()) {
             throw new EventAlreadyExistsException("User already has an active event (PENDING or IN_PROGRESS)");
         } else {
-            log.info("No active events found for creatorId: {}. Event creation continues.", request.getCreatorId());
+            log.info("No active events found for creatorId: {}. Event creation continues.", request.getUserProfileId());
         }
 
         Event event = new Event();
-        event.setCreatorId(request.getCreatorId());
+        event.setUserProfileId(request.getUserProfileId());
         event.setTitle(request.getTitle());
         event.setDescription(request.getDescription());
         event.setGroupId(request.getGroupId());
@@ -97,7 +97,7 @@ public class EventServiceImpl implements EventService {
         }
 
         criteriaList.add(Criteria.where("groupId").is(request.getGroupId()));
-        criteriaList.add(Criteria.where("creatorId").ne(request.getCreatorId()));
+        criteriaList.add(Criteria.where("userProfileId").ne(request.getUserProfileId()));
 
         Criteria combinedCriteria = new Criteria().andOperator(criteriaList.toArray(new Criteria[0]));
 
@@ -123,7 +123,7 @@ public class EventServiceImpl implements EventService {
     //? trenutno ce azurirati svake minute
     @Scheduled(cron = "0 */20 * * * * ")
     @Override
-    public void updateEvents() {
+    public void updateEventsJob() {
         LocalDateTime now = LocalDateTime.now();
         List<Criteria> criteriaList = new ArrayList<>();
 

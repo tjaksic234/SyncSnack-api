@@ -30,9 +30,12 @@ public class EventController {
         try {
             log.info("Create a event requested");
             return ResponseEntity.ok(eventService.createEvent(request));
-        } catch (EventAlreadyExistsException | NullPointerException | NotFoundException e) {
+        } catch (EventAlreadyExistsException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
+        } catch (NotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -41,9 +44,12 @@ public class EventController {
         try {
             log.info("Fetching event by id");
             return ResponseEntity.ok(eventService.getEventById(id));
-        } catch (UnauthorizedException | NotFoundException e) {
+        } catch (UnauthorizedException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
+        } catch (NotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -52,7 +58,7 @@ public class EventController {
         try {
             log.info("Search for events started");
             return ResponseEntity.ok(eventService.searchEvents(request));
-        } catch (NullPointerException e) {
+        } catch (UnauthorizedException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
         }

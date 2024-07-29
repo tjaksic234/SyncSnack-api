@@ -2,7 +2,6 @@ package com.example.KavaSpring.api;
 
 import com.example.KavaSpring.config.openapi.ShowAPI;
 import com.example.KavaSpring.exceptions.NotFoundException;
-import com.example.KavaSpring.exceptions.UnauthorizedException;
 import com.example.KavaSpring.exceptions.UserProfileExistsException;
 import com.example.KavaSpring.models.dto.UserProfileDto;
 import com.example.KavaSpring.models.dto.UserProfileRequest;
@@ -36,7 +35,13 @@ public class UserProfileController {
         try {
             log.info("Create a profile requested");
             return ResponseEntity.ok(userProfileService.createUserProfile(request, file));
-        } catch (NotFoundException | UnauthorizedException | IOException | UserProfileExistsException e) {
+        } catch (NotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (UserProfileExistsException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } catch (IOException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
         }
@@ -47,9 +52,9 @@ public class UserProfileController {
         try {
             log.info("Fetching profile by id");
             return ResponseEntity.ok(userProfileService.getProfileById(id));
-        } catch (NotFoundException | UnauthorizedException e) {
+        } catch (NotFoundException e) {
             log.error(e.getMessage());
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.notFound().build();
         }
     }
 

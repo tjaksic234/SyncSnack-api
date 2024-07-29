@@ -15,7 +15,7 @@ public class EventSearchRequest {
 
     @NotBlank
     @Size(max = 50)
-    private String creatorId;
+    private String userProfileId;
 
     @NotBlank
     @Size(max = 50)

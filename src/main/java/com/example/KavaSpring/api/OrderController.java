@@ -26,9 +26,9 @@ public class OrderController {
         try {
             log.info("Creating order");
             return ResponseEntity.ok(orderService.createOrder(request));
-        } catch (UnauthorizedException | NotFoundException e) {
+        } catch (NotFoundException e) {
             log.error(e.getMessage());
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -39,7 +39,7 @@ public class OrderController {
             return ResponseEntity.ok(orderService.getOrderById(id));
         } catch (NotFoundException e) {
             log.error(e.getMessage());
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -48,11 +48,29 @@ public class OrderController {
     public ResponseEntity<List<OrderActiveResponse>> activeOrders(@RequestBody OrderActiveRequest request) {
         try {
             log.info("Fetching active orders for user profile");
-            return ResponseEntity.ok(orderService.activeOrders(request));
-        } catch (NullPointerException e) {
+            List<OrderActiveResponse> activeOrders = orderService.activeOrders(request);
+            if (activeOrders == null || activeOrders.isEmpty()) {
+                log.info("No active orders found for user profile");
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.ok(activeOrders);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+  /*  @PostMapping("completed")
+    public ResponseEntity<List<OrderCompletedRequest>> completedOrders() {
+        try {
+            log.info("Fetching completed orders for user profile");
+            return ResponseEntity.ok();
+        } catch (UnauthorizedException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
+*/
 
 }

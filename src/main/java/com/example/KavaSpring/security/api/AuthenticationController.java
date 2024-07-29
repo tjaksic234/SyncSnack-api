@@ -1,5 +1,6 @@
 package com.example.KavaSpring.security.api;
 
+import com.example.KavaSpring.config.openapi.ShowAPI;
 import com.example.KavaSpring.exceptions.UnauthorizedException;
 import com.example.KavaSpring.exceptions.UserAlreadyExistsException;
 import com.example.KavaSpring.models.dto.UserDto;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @AllArgsConstructor
 @Slf4j
+@ShowAPI
 @RequestMapping("api/auth")
 public class AuthenticationController {
 

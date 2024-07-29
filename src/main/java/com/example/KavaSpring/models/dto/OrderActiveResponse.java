@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class OrderActiveResponse {
     private String eventId;
     private String orderId;
-    private String creatorId;
+    private String userProfileId;
     private String title;
     private String description;
     private String groupId;

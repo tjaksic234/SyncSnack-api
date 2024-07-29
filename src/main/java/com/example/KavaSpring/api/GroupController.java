@@ -3,7 +3,6 @@ package com.example.KavaSpring.api;
 import com.example.KavaSpring.config.openapi.ShowAPI;
 import com.example.KavaSpring.exceptions.GroupAlreadyExistsException;
 import com.example.KavaSpring.exceptions.NotFoundException;
-import com.example.KavaSpring.exceptions.UnauthorizedException;
 import com.example.KavaSpring.models.dto.GroupDto;
 import com.example.KavaSpring.models.dto.GroupRequest;
 import com.example.KavaSpring.models.dto.GroupResponse;
@@ -27,7 +26,7 @@ public class GroupController {
         try {
             log.info("Create a group requested");
             return ResponseEntity.ok(groupService.createGroup(request));
-        } catch (GroupAlreadyExistsException | UnauthorizedException e) {
+        } catch (GroupAlreadyExistsException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
         }
@@ -37,9 +36,9 @@ public class GroupController {
         try {
             log.info("Fetching group by id");
             return ResponseEntity.ok(groupService.getGroupById(id));
-        } catch (UnauthorizedException | NotFoundException e) {
+        } catch (NotFoundException e) {
             log.error(e.getMessage());
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -48,9 +47,12 @@ public class GroupController {
         try {
             log.info("Join group started");
             return ResponseEntity.ok(groupService.joinGroup(request));
-        } catch (NotFoundException | IllegalArgumentException e) {
+        } catch (NotFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
+        } catch (IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 }

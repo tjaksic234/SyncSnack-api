@@ -2,7 +2,6 @@ package com.example.KavaSpring.api;
 
 import com.example.KavaSpring.config.openapi.ShowAPI;
 import com.example.KavaSpring.exceptions.NotFoundException;
-import com.example.KavaSpring.exceptions.UnauthorizedException;
 import com.example.KavaSpring.models.dto.UserDto;
 import com.example.KavaSpring.services.UserService;
 import lombok.AllArgsConstructor;
@@ -25,9 +24,9 @@ public class UserController {
         try {
             log.info("Fetching user by id");
             return ResponseEntity.ok(userService.getUserById(id));
-        } catch (UnauthorizedException | NotFoundException e) {
+        } catch (NotFoundException e) {
             log.error(e.getMessage());
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -39,7 +38,7 @@ public class UserController {
             return ResponseEntity.ok(userService.checkEmail(email));
         } catch (NotFoundException e) {
             log.error(e.getMessage());
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.notFound().build();
         }
     }
 

@@ -33,7 +33,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean checkEmail(String email) {
-        return userRepository.existsByEmail(email);
+        boolean exists = userRepository.existsByEmail(email);
+
+        if (!exists) {
+            throw new NotFoundException("The provided email is not correct");
+        }
+        return true;
     }
 
 

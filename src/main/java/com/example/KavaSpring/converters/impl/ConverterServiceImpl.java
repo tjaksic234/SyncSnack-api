@@ -54,7 +54,7 @@ public class ConverterServiceImpl implements ConverterService {
     @Override
     public EventDto convertToEventDto(Event event) {
         EventDto eventDto = new EventDto();
-        eventDto.setCreatorId(event.getCreatorId());
+        eventDto.setUserProfileId(event.getUserProfileId());
         eventDto.setTitle(event.getTitle());
         eventDto.setDescription(event.getDescription());
         eventDto.setGroupId(event.getGroupId());
@@ -67,7 +67,7 @@ public class ConverterServiceImpl implements ConverterService {
     @Override
     public EventResponse convertToEventResponse(EventRequest request) {
         EventResponse response = new EventResponse();
-        response.setCreatorId(request.getCreatorId());
+        response.setUserProfileId(request.getUserProfileId());
         response.setTitle(request.getTitle());
         response.setDescription(request.getDescription());
         response.setGroupId(request.getGroupId());
@@ -79,7 +79,7 @@ public class ConverterServiceImpl implements ConverterService {
     @Override
     public OrderDto convertToOrderDto(Order order) {
         OrderDto orderDto = new OrderDto();
-        orderDto.setOrderedBy(order.getOrderedBy());
+        orderDto.setUserProfileId(order.getUserProfileId());
         orderDto.setStatus(order.getStatus());
         orderDto.setAdditionalOptions(order.getAdditionalOptions());
         orderDto.setCreatedAt(order.getCreatedAt());
@@ -89,7 +89,7 @@ public class ConverterServiceImpl implements ConverterService {
     @Override
     public OrderResponse convertToOrderResponse(OrderRequest request) {
         OrderResponse response = new OrderResponse();
-        response.setOrderedBy(request.getOrderedBy());
+        response.setUserProfileId(request.getUserProfileId());
         response.setEventId(request.getEventId());
         response.setAdditionalOptions(request.getAdditionalOptions());
         return response;
@@ -100,7 +100,7 @@ public class ConverterServiceImpl implements ConverterService {
         OrderActiveResponse response = new OrderActiveResponse();
         response.setEventId(order.getEventId());
         response.setOrderId(order.getOrderId());
-        response.setCreatorId(order.getCreatorId());
+        response.setUserProfileId(order.getUserProfileId());
         response.setTitle(order.getTitle());
         response.setDescription(order.getDescription());
         response.setGroupId(order.getGroupId());

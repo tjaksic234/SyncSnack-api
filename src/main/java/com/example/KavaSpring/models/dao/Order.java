@@ -25,7 +25,7 @@ public class Order {
 
     @NotBlank
     @Size(max = 120)
-    private String orderedBy;
+    private String userProfileId;
 
     @NotBlank
     private OrderStatus status = OrderStatus.PREPARING;

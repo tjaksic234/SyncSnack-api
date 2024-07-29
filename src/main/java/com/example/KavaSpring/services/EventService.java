@@ -8,5 +8,5 @@ public interface EventService {
     EventResponse createEvent(EventRequest request);
     EventDto getEventById(String id);
     List<EventDto> searchEvents(EventSearchRequest request);
-    void updateEvents();
+    void updateEventsJob();
 }

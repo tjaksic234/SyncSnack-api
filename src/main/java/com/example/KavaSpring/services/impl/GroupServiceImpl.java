@@ -45,7 +45,6 @@ public class GroupServiceImpl implements GroupService {
          Group group = new Group();
          group.setName(request.getName());
          group.setDescription(request.getDescription());
-         //! This is kind of password generation is temporary and most likely this will be changed
          group.setPassword(passwordEncoder.encode(request.getPassword()));
          groupRepository.save(group);
 

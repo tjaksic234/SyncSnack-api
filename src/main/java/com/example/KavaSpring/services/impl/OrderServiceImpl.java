@@ -43,7 +43,7 @@ public class OrderServiceImpl implements OrderService {
         //TODO dodaj check da user nemoze napraviti vise od 1 order za event,
         // samo usporedi kad radi order postoji li vec order vezan za taj event
 
-        boolean existsUserProfile = userProfileRepository.existsById(request.getOrderedBy());
+        boolean existsUserProfile = userProfileRepository.existsById(request.getUserProfileId());
         boolean existsEvent = eventRepository.existsById(request.getEventId());
 
 
@@ -57,7 +57,7 @@ public class OrderServiceImpl implements OrderService {
 
         log.info("the order request is: {}", request);
         Order order = new Order();
-        order.setOrderedBy(request.getOrderedBy());
+        order.setUserProfileId(request.getUserProfileId());
         order.setEventId(request.getEventId());
         order.setAdditionalOptions(request.getAdditionalOptions());
         orderRepository.save(order);
@@ -78,6 +78,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderActiveResponse> activeOrders(OrderActiveRequest request) {
 
+        //? popravi ovo kako je tomislav rekao dodaj helper klasu u utils package da provjerava da li je request null
         if (request.getUserProfileId() == null) {
             throw new NullPointerException("Bad UserProfileId value");
         }

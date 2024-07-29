@@ -10,7 +10,7 @@ import java.util.HashMap;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderResponse {
-    private String orderedBy;
+    private String userProfileId;
     private String eventId;
     private HashMap<String, Object> additionalOptions;
 }
