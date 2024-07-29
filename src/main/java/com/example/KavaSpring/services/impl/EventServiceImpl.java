@@ -50,26 +50,28 @@ public class EventServiceImpl implements EventService {
     public EventResponse createEvent(EventRequest request) {
         //? Logiku provjere eventova za usera ce trebati popraviti jer creator moze imati samo jedan event nebitno jeli completed,
         //? pending ili inprogress pa treba jos poraditi na logici
-
-        Optional<UserProfile> existingProfile = userProfileRepository.getUserProfileById(request.getUserProfileId());
-
+        //* Ovakav nacin rada sa helper klasom mi je malo cudan za sada treba viditi koliko je ovo pametno za raditi
+        String loggedInUserProfileId = helper.getLoggedInUserProfileId();
+        String loggedInUserGroupId = helper.getLoggedInUserGroupId();
+        Optional<UserProfile> existingProfile = userProfileRepository.getUserProfileById(loggedInUserProfileId);
+        log.warn("The logged in user profile id --> {}", loggedInUserProfileId);
         if (existingProfile.isEmpty()) {
             throw new NotFoundException("No UserProfile associated with the id");
         }
 
-        List<Event> existingActiveEvents = eventRepository.findByUserProfileIdAndStatus(request.getUserProfileId(), EventStatus.PENDING);
+        List<Event> existingActiveEvents = eventRepository.findByUserProfileIdAndStatus(loggedInUserProfileId, EventStatus.PENDING);
 
         if (!existingActiveEvents.isEmpty()) {
             throw new EventAlreadyExistsException("User already has an active event (PENDING or IN_PROGRESS)");
         } else {
-            log.info("No active events found for creatorId: {}. Event creation continues.", request.getUserProfileId());
+            log.info("No active events found for creatorId: {}. Event creation continues.", loggedInUserProfileId);
         }
 
         Event event = new Event();
-        event.setUserProfileId(request.getUserProfileId());
+        event.setUserProfileId(loggedInUserProfileId);
         event.setTitle(request.getTitle());
         event.setDescription(request.getDescription());
-        event.setGroupId(request.getGroupId());
+        event.setGroupId(loggedInUserGroupId);
         event.setEventType(request.getEventType());
         event.setPendingUntil(LocalDateTime.now().plusMinutes(request.getPendingTime()));
         eventRepository.save(event);
@@ -88,7 +90,6 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventDto> searchEvents(EventSearchRequest request) {
-        MetaDto metaDto = helper.getLoggedInUserProfile();
         List<Criteria> criteriaList = new ArrayList<>();
 
         if (request.getStatus() != null) {
@@ -99,8 +100,8 @@ public class EventServiceImpl implements EventService {
             criteriaList.add(Criteria.where("eventType").is(request.getEventType()));
         }
 
-        criteriaList.add(Criteria.where("groupId").is(metaDto.getGroupId()));
-        criteriaList.add(Criteria.where("userProfileId").ne(metaDto.getUserProfileId()));
+        criteriaList.add(Criteria.where("groupId").is(helper.getLoggedInUserGroupId()));
+        criteriaList.add(Criteria.where("userProfileId").ne(helper.getLoggedInUserGroupId()));
 
         Criteria combinedCriteria = new Criteria().andOperator(criteriaList.toArray(new Criteria[0]));
 

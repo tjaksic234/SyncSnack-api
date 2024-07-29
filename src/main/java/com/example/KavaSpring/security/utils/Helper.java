@@ -1,7 +1,6 @@
 package com.example.KavaSpring.security.utils;
 
 import com.example.KavaSpring.models.dao.UserProfile;
-import com.example.KavaSpring.models.dto.MetaDto;
 import com.example.KavaSpring.models.dto.SimpleIdEmailDto;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.security.services.impl.UserDetailsImpl;
@@ -38,15 +37,27 @@ public class Helper {
         return null;
     }
 
-    public MetaDto getLoggedInUserProfile() {
+    public String getLoggedInUserProfileId() {
         String userId = getLoggedInUserId();
-        MetaDto dto = new MetaDto();
         if (userId != null) {
             UserProfile userProfile = userProfileRepository.getUserProfileByUserId(userId);
             if (userProfile != null) {
-                dto.setUserProfileId(userProfile.getId());
-                dto.setGroupId(userProfile.getGroupId());
-                return dto;
+                return userProfile.getId();
+            } else {
+                log.error("No UserProfile found for userId: {}", userId);
+            }
+        } else {
+            log.error("Failed to get logged-in userId.");
+        }
+        return null;
+    }
+
+    public String getLoggedInUserGroupId() {
+        String userId = getLoggedInUserId();
+        if (userId != null) {
+            UserProfile userProfile = userProfileRepository.getUserProfileByUserId(userId);
+            if (userProfile != null) {
+                return userProfile.getGroupId();
             } else {
                 log.error("No UserProfile found for userId: {}", userId);
             }

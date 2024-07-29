@@ -84,8 +84,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDto> getAllOrdersFromUserProfile() {
-        MetaDto metaDto = helper.getLoggedInUserProfile();
-        Optional<UserProfile> userProfile = userProfileRepository.getUserProfileById(metaDto.getUserProfileId());
+        Optional<UserProfile> userProfile = userProfileRepository.getUserProfileById(helper.getLoggedInUserProfileId());
         if (userProfile.isEmpty()) {
             throw new NotFoundException("Bad user profile id provided");
         }
@@ -94,8 +93,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderActivityResponse> activeOrders(boolean isActive) {
-        MetaDto metaDto = helper.getLoggedInUserProfile();
-        Optional<UserProfile> userProfile = userProfileRepository.getUserProfileById(metaDto.getUserProfileId());
+        Optional<UserProfile> userProfile = userProfileRepository.getUserProfileById(helper.getLoggedInUserProfileId());
 
         if (userProfile.isEmpty()) {
             throw new NullPointerException("Bad user profile id value");

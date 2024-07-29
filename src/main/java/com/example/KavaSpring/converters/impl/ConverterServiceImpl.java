@@ -67,10 +67,8 @@ public class ConverterServiceImpl implements ConverterService {
     @Override
     public EventResponse convertToEventResponse(EventRequest request) {
         EventResponse response = new EventResponse();
-        response.setUserProfileId(request.getUserProfileId());
         response.setTitle(request.getTitle());
         response.setDescription(request.getDescription());
-        response.setGroupId(request.getGroupId());
         response.setEventType(request.getEventType());
         response.setPendingTime(request.getPendingTime());
         return response;
