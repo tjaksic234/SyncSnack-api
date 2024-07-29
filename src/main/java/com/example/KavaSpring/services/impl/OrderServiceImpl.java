@@ -80,11 +80,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDto> getAllOrdersFromUserProfile(String id) {
-        if (!userProfileRepository.existsById(id)) {
+    public List<OrderDto> getAllOrdersFromUserProfile() {
+        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+        if (userProfile == null) {
             throw new NotFoundException("Bad user profile id provided");
         }
-        return orderRepository.findByUserProfileId(id);
+        return orderRepository.findByUserProfileId(userProfile.getId());
     }
 
     @Override

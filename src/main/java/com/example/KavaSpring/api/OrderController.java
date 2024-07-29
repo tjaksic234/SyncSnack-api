@@ -43,13 +43,13 @@ public class OrderController {
     }
 
     @GetMapping("all")
-    public ResponseEntity<List<OrderDto>> getAllOrdersFromUserProfile(@RequestParam String userProfileId) {
+    public ResponseEntity<List<OrderDto>> getAllOrdersFromUserProfile() {
         try {
             log.info("Fetching all orders from user profile");
-            List<OrderDto> orders = orderService.getAllOrdersFromUserProfile(userProfileId);
+            List<OrderDto> orders = orderService.getAllOrdersFromUserProfile();
 
             if (orders.isEmpty()) {
-                log.info("No orders found for user profile id: {}", userProfileId);
+                log.info("No orders found for user profile id");
                 return ResponseEntity.noContent().build();
             }
             return ResponseEntity.ok(orders);
