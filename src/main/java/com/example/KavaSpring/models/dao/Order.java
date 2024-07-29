@@ -35,6 +35,8 @@ public class Order {
 
     private HashMap<String, Object> additionalOptions;
 
+    private int rating;
+
     @CreatedDate
     private LocalDateTime createdAt;
 
