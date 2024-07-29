@@ -3,11 +3,13 @@ package com.example.KavaSpring.services.impl;
 import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.models.dao.Order;
+import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.repository.EventRepository;
 import com.example.KavaSpring.repository.OrderRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
+import com.example.KavaSpring.security.utils.Helper;
 import com.example.KavaSpring.services.OrderService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,14 +78,17 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderActiveResponse> activeOrders(OrderActiveRequest request) {
+    public List<OrderActiveResponse> activeOrders() {
 
         //? popravi ovo kako je tomislav rekao dodaj helper klasu u utils package da provjerava da li je request null
-        if (request.getUserProfileId() == null) {
-            throw new NullPointerException("Bad UserProfileId value");
+
+        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+
+        if (userProfile == null || userProfile.getId() == null) {
+            throw new NullPointerException("Bad user profile id value");
         }
 
-        MatchOperation matchUserOrders  = Aggregation.match(Criteria.where("orderedBy").is(request.getUserProfileId()));
+        MatchOperation matchUserOrders  = Aggregation.match(Criteria.where("orderedBy").is(userProfile.getId()));
 
 
         AddFieldsOperation convertEventIdToObjectId  = Aggregation.addFields()
@@ -128,5 +133,11 @@ public class OrderServiceImpl implements OrderService {
                 .map(converterService::convertToOrderActiveResponse)
                 .collect(Collectors.toList());
 
+    }
+
+    @Override
+    public List<OrderCompleteResponse> completeOrders(OrderCompleteRequest request) {
+
+        return List.of();
     }
 }

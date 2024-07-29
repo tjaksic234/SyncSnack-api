@@ -7,5 +7,6 @@ import java.util.List;
 public interface OrderService {
     OrderResponse createOrder(OrderRequest request);
     OrderDto getOrderById(String id);
-    List<OrderActiveResponse> activeOrders(OrderActiveRequest request);
+    List<OrderActiveResponse> activeOrders();
+    List<OrderCompleteResponse> completeOrders(OrderCompleteRequest request);
 }

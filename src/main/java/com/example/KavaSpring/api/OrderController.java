@@ -2,7 +2,6 @@ package com.example.KavaSpring.api;
 
 import com.example.KavaSpring.config.openapi.ShowAPI;
 import com.example.KavaSpring.exceptions.NotFoundException;
-import com.example.KavaSpring.exceptions.UnauthorizedException;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.services.OrderService;
 import lombok.AllArgsConstructor;
@@ -45,10 +44,10 @@ public class OrderController {
 
 
     @PostMapping("active")
-    public ResponseEntity<List<OrderActiveResponse>> activeOrders(@RequestBody OrderActiveRequest request) {
+    public ResponseEntity<List<OrderActiveResponse>> activeOrders() {
         try {
             log.info("Fetching active orders for user profile");
-            List<OrderActiveResponse> activeOrders = orderService.activeOrders(request);
+            List<OrderActiveResponse> activeOrders = orderService.activeOrders();
             if (activeOrders == null || activeOrders.isEmpty()) {
                 log.info("No active orders found for user profile");
                 return ResponseEntity.noContent().build();

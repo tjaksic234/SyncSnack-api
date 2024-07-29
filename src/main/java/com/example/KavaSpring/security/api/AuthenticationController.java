@@ -61,8 +61,8 @@ public class AuthenticationController {
         try {
             log.info("Fetch me started.");
             return ResponseEntity.ok(authService.fetchMe());
-        } catch (Exception exception) {
-            log.error("Error on fetch me: {}!", exception.getMessage());
+        } catch (Exception e) {
+            log.error("Error on fetch me: {}!", e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
