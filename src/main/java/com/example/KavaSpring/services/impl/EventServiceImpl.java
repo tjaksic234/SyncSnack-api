@@ -48,7 +48,9 @@ public class EventServiceImpl implements EventService {
         //? Logiku provjere eventova za usera ce trebati popraviti jer creator moze imati samo jedan event nebitno jeli completed,
         //? pending ili inprogress pa treba jos poraditi na logici
         //* Ovakav nacin rada sa helper klasom mi je malo cudan za sada treba viditi koliko je ovo pametno za raditi
+        log.info("The user id which will be used for searching the user profile --> {}", Helper.getLoggedInUserId());
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+        log.info("The user profile that was found with the userId --> {}", userProfile);
         if (userProfile == null) {
             throw new NotFoundException("No UserProfile associated with the id");
         }
