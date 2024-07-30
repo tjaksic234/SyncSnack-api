@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EventDto {
+    private String eventId;
     private String userProfileId;
     private String title;
     private String description;

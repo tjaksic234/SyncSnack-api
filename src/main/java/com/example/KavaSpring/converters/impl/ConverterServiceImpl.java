@@ -54,6 +54,7 @@ public class ConverterServiceImpl implements ConverterService {
     @Override
     public EventDto convertToEventDto(Event event) {
         EventDto eventDto = new EventDto();
+        eventDto.setEventId(event.getId());
         eventDto.setUserProfileId(event.getUserProfileId());
         eventDto.setTitle(event.getTitle());
         eventDto.setDescription(event.getDescription());
