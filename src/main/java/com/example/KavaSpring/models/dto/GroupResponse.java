@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class GroupResponse {
     @NotBlank
     @Size(max = 120)
-    private String id;
+    private String groupId;
 
     @NotBlank
     @Size(max = 50)

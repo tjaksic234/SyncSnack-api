@@ -84,8 +84,7 @@ public class EventServiceImpl implements EventService {
     }
 
 
-    //? prije nego smo uveli Helper klasu EventSearchRequest objekt je imao dodatne userProfileId i groupId varijable,
-    //? treba vidjeti koji je bolji pristup, sa ili bez te dvije varijable u objektu.
+
     @Override
     public List<EventDto> searchEvents(EventSearchRequest request) {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());

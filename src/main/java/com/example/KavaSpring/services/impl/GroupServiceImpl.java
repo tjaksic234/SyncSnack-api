@@ -42,14 +42,21 @@ public class GroupServiceImpl implements GroupService {
              }
          }
 
+         //? Kreiranje group objekta koji se sprema u bazu
          Group group = new Group();
          group.setName(request.getName());
          group.setDescription(request.getDescription());
          group.setPassword(passwordEncoder.encode(request.getPassword()));
          groupRepository.save(group);
 
+         //? Kreiranje group response objekta
+        GroupResponse response = new GroupResponse();
+        response.setGroupId(group.getId());
+        response.setName(request.getName());
+        response.setDescription(request.getDescription());
+
          log.info("Group created");
-         return converterService.convertToGroupResponse(request);
+         return response;
     }
 
     @Override
@@ -70,7 +77,7 @@ public class GroupServiceImpl implements GroupService {
         }
 
         GroupResponse response = new GroupResponse();
-        response.setId(group.getId());
+        response.setGroupId(group.getId());
         response.setName(request.getName());
 
         log.info("Group join successful");

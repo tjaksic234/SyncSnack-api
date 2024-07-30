@@ -19,4 +19,5 @@ public class EventDto {
     private EventStatus status;
     private EventType eventType;
     private LocalDateTime createdAt;
+    private LocalDateTime pendingUntil;
 }

@@ -61,6 +61,7 @@ public class ConverterServiceImpl implements ConverterService {
         eventDto.setStatus(event.getStatus());
         eventDto.setEventType(event.getEventType());
         eventDto.setCreatedAt(event.getCreatedAt());
+        eventDto.setPendingUntil(event.getPendingUntil());
         return eventDto;
     }
 
