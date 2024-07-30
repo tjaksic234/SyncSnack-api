@@ -7,6 +7,6 @@ import java.util.List;
 public interface OrderService {
     OrderResponse createOrder(OrderRequest request);
     OrderDto getOrderById(String id);
-    List<OrderDto> getAllOrdersFromUserProfile();
+    List<OrderEventInfoDto> getAllOrdersFromUserProfile();
     List<OrderActivityResponse> getOrdersByActivityStatus(boolean isActive);
 }

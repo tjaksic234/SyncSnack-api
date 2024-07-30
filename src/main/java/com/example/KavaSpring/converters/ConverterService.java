@@ -6,6 +6,8 @@ import com.example.KavaSpring.models.dao.Order;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.*;
 
+import java.util.List;
+
 public interface ConverterService {
 
     UserProfileDto convertToUserProfileDto(UserProfile userProfile);
@@ -17,4 +19,5 @@ public interface ConverterService {
     OrderDto convertToOrderDto(Order order);
     OrderResponse convertToOrderResponse(OrderRequest request);
     OrderActivityResponse convertToOrderActiveResponse(OrderActivityResponse response);
+    OrderEventInfoDto convertToOrderEventInfoDto(OrderEventInfoDto dto);
 }

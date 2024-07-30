@@ -107,4 +107,16 @@ public class ConverterServiceImpl implements ConverterService {
         response.setCreatedAt(order.getCreatedAt());
         return response;
     }
+
+    @Override
+    public OrderEventInfoDto convertToOrderEventInfoDto(OrderEventInfoDto dto) {
+        OrderEventInfoDto orderEventInfoDto = new OrderEventInfoDto();
+        orderEventInfoDto.setEventId(dto.getEventId());
+        orderEventInfoDto.setEventType(dto.getEventType());
+        orderEventInfoDto.setStatus(dto.getStatus());
+        orderEventInfoDto.setAdditionalOptions(dto.getAdditionalOptions());
+        orderEventInfoDto.setRating(dto.getRating());
+        orderEventInfoDto.setCreatedAt(dto.getCreatedAt());
+        return orderEventInfoDto;
+    }
 }

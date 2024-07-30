@@ -80,12 +80,50 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDto> getAllOrdersFromUserProfile() {
+    public List<OrderEventInfoDto> getAllOrdersFromUserProfile() {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+
         if (userProfile == null) {
             throw new NotFoundException("Bad user profile id provided");
         }
-        return orderRepository.findByUserProfileId(userProfile.getId());
+
+        MatchOperation matchOperation = Aggregation.match(Criteria.where("userProfileId").is(userProfile.getId()));
+
+        AddFieldsOperation convertEventIdToObjectId  = Aggregation.addFields()
+                .addField("eventId")
+                .withValueOf(ConvertOperators.ToObjectId.toObjectId("$eventId"))
+                .build();
+
+        LookupOperation lookupOperation = Aggregation.lookup("events", "eventId", "_id", "eventDetails");
+
+        UnwindOperation unwindOperation = Aggregation.unwind("eventDetails");
+
+        ProjectionOperation projectionOperation = Aggregation.project()
+                .and("eventId").as("eventId")
+                .and("eventDetails.eventType").as("eventType")
+                .and("status").as("status")
+                .and("additionalOptions").as("additionalOptions")
+                .and("rating").as("rating")
+                .and("createdAt").as("createdAt");
+
+        SortOperation sortOperation = new SortOperation(Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                matchOperation,
+                convertEventIdToObjectId,
+                lookupOperation,
+                unwindOperation,
+                projectionOperation,
+                sortOperation
+        );
+
+        AggregationResults<OrderEventInfoDto> results = mongoTemplate.aggregate(aggregation, "orders", OrderEventInfoDto.class);
+
+        return results
+                .getMappedResults()
+                .stream()
+                .map(converterService::convertToOrderEventInfoDto)
+                .collect(Collectors.toList());
     }
 
     @Override
