@@ -138,7 +138,7 @@ public class OrderServiceImpl implements OrderService {
             throw new IllegalStateException("User profile id is null");
         }
 
-        MatchOperation matchUserOrders  = Aggregation.match(Criteria.where("orderedBy").is(userProfile.getId()));
+        MatchOperation matchUserOrders  = Aggregation.match(Criteria.where("userProfileId").is(userProfile.getId()));
 
 
         AddFieldsOperation convertEventIdToObjectId  = Aggregation.addFields()

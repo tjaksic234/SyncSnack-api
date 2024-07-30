@@ -105,10 +105,33 @@ public class EventServiceImpl implements EventService {
 
         MatchOperation matchOperation = Aggregation.match(combinedCriteria);
 
+        LookupOperation lookupOperation = Aggregation.lookup("userProfiles", "userProfileId", "_id", "userProfiles");
+
+        UnwindOperation unwindOperation = Aggregation.unwind("userProfiles");
+
+        ProjectionOperation projectionOperation = Aggregation.project()
+                .and("eventId").as("eventId")
+                .and("userProfileId").as("userProfileId")
+                .and("userProfiles.firstName").as("userProfileFirstName")
+                .and("userProfiles.lastName").as("userProfileLastName")
+                .and("title").as("title")
+                .and("description").as("description")
+                .and("groupId").as("groupId")
+                .and("status").as("status")
+                .and("eventType").as("eventType")
+                .and("createdAt").as("createdAt")
+                .and("pendingUntil").as("pendingUntil");
+
+
+
         SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "createdAt"));
 
         Aggregation aggregation = Aggregation.newAggregation(
                 matchOperation,
+               /* lookupOperation,
+                unwindOperation,
+                projectOperation,
+                */
                 sortOperation
         );
 
