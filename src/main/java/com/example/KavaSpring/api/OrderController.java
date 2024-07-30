@@ -61,19 +61,22 @@ public class OrderController {
 
 
     @PostMapping("activity")
-    public ResponseEntity<List<OrderActivityResponse>> activeOrders(@RequestParam boolean isActive) {
+    public ResponseEntity<List<OrderActivityResponse>> getOrdersByActivityStatus(@RequestParam boolean isActive) {
         try {
             log.info("Fetching active orders for user profile");
-            List<OrderActivityResponse> activeOrders = orderService.activeOrders(isActive);
+            List<OrderActivityResponse> activeOrders = orderService.getOrdersByActivityStatus(isActive);
             if (activeOrders == null || activeOrders.isEmpty()) {
                 log.info("No active orders found for user profile");
                 return ResponseEntity.noContent().build();
             } else {
                 return ResponseEntity.ok(activeOrders);
             }
-        } catch (Exception e) {
+        } catch (IllegalStateException e) {
             log.error(e.getMessage());
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.badRequest().build();
+        } catch (NotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 }

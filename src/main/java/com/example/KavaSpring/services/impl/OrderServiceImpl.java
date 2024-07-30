@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,8 +40,6 @@ public class OrderServiceImpl implements OrderService {
     private final ConverterService converterService;
 
     private final MongoTemplate mongoTemplate;
-
-    private final Helper helper;
 
     @Override
     public OrderResponse createOrder(OrderRequest request) {
@@ -84,22 +81,26 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDto> getAllOrdersFromUserProfile() {
-        Optional<UserProfile> userProfile = userProfileRepository.getUserProfileById(helper.getLoggedInUserProfileId());
-        if (userProfile.isEmpty()) {
+        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+        if (userProfile == null) {
             throw new NotFoundException("Bad user profile id provided");
         }
-        return orderRepository.findByUserProfileId(userProfile.get().getId());
+        return orderRepository.findByUserProfileId(userProfile.getId());
     }
 
     @Override
-    public List<OrderActivityResponse> activeOrders(boolean isActive) {
-        Optional<UserProfile> userProfile = userProfileRepository.getUserProfileById(helper.getLoggedInUserProfileId());
+    public List<OrderActivityResponse> getOrdersByActivityStatus(boolean isActive) {
+        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
 
-        if (userProfile.isEmpty()) {
-            throw new NullPointerException("Bad user profile id value");
+        if (userProfile == null) {
+            throw new NotFoundException("User profile is null");
         }
 
-        MatchOperation matchUserOrders  = Aggregation.match(Criteria.where("orderedBy").is(userProfile.get().getId()));
+        if (userProfile.getId() == null) {
+            throw new IllegalStateException("User profile id is null");
+        }
+
+        MatchOperation matchUserOrders  = Aggregation.match(Criteria.where("orderedBy").is(userProfile.getId()));
 
 
         AddFieldsOperation convertEventIdToObjectId  = Aggregation.addFields()

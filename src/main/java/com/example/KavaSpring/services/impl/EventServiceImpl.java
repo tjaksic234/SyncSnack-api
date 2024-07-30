@@ -27,7 +27,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,34 +43,29 @@ public class EventServiceImpl implements EventService {
 
     private final MongoTemplate mongoTemplate;
 
-    private final Helper helper;
-
     @Override
     public EventResponse createEvent(EventRequest request) {
         //? Logiku provjere eventova za usera ce trebati popraviti jer creator moze imati samo jedan event nebitno jeli completed,
         //? pending ili inprogress pa treba jos poraditi na logici
         //* Ovakav nacin rada sa helper klasom mi je malo cudan za sada treba viditi koliko je ovo pametno za raditi
-        String loggedInUserProfileId = helper.getLoggedInUserProfileId();
-        String loggedInUserGroupId = helper.getLoggedInUserGroupId();
-        Optional<UserProfile> existingProfile = userProfileRepository.getUserProfileById(loggedInUserProfileId);
-        log.warn("The logged in user profile id --> {}", loggedInUserProfileId);
-        if (existingProfile.isEmpty()) {
+        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+        if (userProfile == null) {
             throw new NotFoundException("No UserProfile associated with the id");
         }
 
-        List<Event> existingActiveEvents = eventRepository.findByUserProfileIdAndStatus(loggedInUserProfileId, EventStatus.PENDING);
+        List<Event> existingActiveEvents = eventRepository.findByUserProfileIdAndStatus(userProfile.getId(), EventStatus.PENDING);
 
         if (!existingActiveEvents.isEmpty()) {
             throw new EventAlreadyExistsException("User already has an active event (PENDING or IN_PROGRESS)");
         } else {
-            log.info("No active events found for creatorId: {}. Event creation continues.", loggedInUserProfileId);
+            log.info("No active events found for userProfileId: {}. Event creation continues.", userProfile.getId());
         }
 
         Event event = new Event();
-        event.setUserProfileId(loggedInUserProfileId);
+        event.setUserProfileId(userProfile.getId());
         event.setTitle(request.getTitle());
         event.setDescription(request.getDescription());
-        event.setGroupId(loggedInUserGroupId);
+        event.setGroupId(userProfile.getGroupId());
         event.setEventType(request.getEventType());
         event.setPendingUntil(LocalDateTime.now().plusMinutes(request.getPendingTime()));
         eventRepository.save(event);
@@ -88,8 +82,11 @@ public class EventServiceImpl implements EventService {
     }
 
 
+    //? prije nego smo uveli Helper klasu EventSearchRequest objekt je imao dodatne userProfileId i groupId varijable,
+    //? treba vidjeti koji je bolji pristup, sa ili bez te dvije varijable u objektu.
     @Override
     public List<EventDto> searchEvents(EventSearchRequest request) {
+        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
         List<Criteria> criteriaList = new ArrayList<>();
 
         if (request.getStatus() != null) {
@@ -100,8 +97,8 @@ public class EventServiceImpl implements EventService {
             criteriaList.add(Criteria.where("eventType").is(request.getEventType()));
         }
 
-        criteriaList.add(Criteria.where("groupId").is(helper.getLoggedInUserGroupId()));
-        criteriaList.add(Criteria.where("userProfileId").ne(helper.getLoggedInUserGroupId()));
+        criteriaList.add(Criteria.where("groupId").is(userProfile.getGroupId()));
+        criteriaList.add(Criteria.where("userProfileId").ne(userProfile.getId()));
 
         Criteria combinedCriteria = new Criteria().andOperator(criteriaList.toArray(new Criteria[0]));
 

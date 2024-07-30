@@ -8,5 +8,5 @@ public interface OrderService {
     OrderResponse createOrder(OrderRequest request);
     OrderDto getOrderById(String id);
     List<OrderDto> getAllOrdersFromUserProfile();
-    List<OrderActivityResponse> activeOrders(boolean isActive);
+    List<OrderActivityResponse> getOrdersByActivityStatus(boolean isActive);
 }
