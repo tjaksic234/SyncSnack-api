@@ -11,8 +11,6 @@ import java.util.HashMap;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderRequest {
-    @NotBlank
-    private String userProfileId;
 
     @NotBlank
     private String eventId;

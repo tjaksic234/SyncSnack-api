@@ -43,15 +43,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderResponse createOrder(OrderRequest request) {
-
-        //TODO dodaj check da user nemoze napraviti vise od 1 order za event,
-        // samo usporedi kad radi order postoji li vec order vezan za taj event
-
-        boolean existsUserProfile = userProfileRepository.existsById(request.getUserProfileId());
+        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
         boolean existsEvent = eventRepository.existsById(request.getEventId());
 
 
-        if (!existsUserProfile) {
+        if (userProfile == null) {
             throw new NotFoundException("No userProfile associated with id");
         }
 
@@ -59,9 +55,14 @@ public class OrderServiceImpl implements OrderService {
             throw new NotFoundException("No event associated with eventId in the order");
         }
 
+        boolean existingOrder = orderRepository.existsByUserProfileIdAndEventId(userProfile.getId(), request.getEventId());
+        if (existingOrder) {
+            throw new IllegalStateException("User already has an order for this event");
+        }
+
         log.info("the order request is: {}", request);
         Order order = new Order();
-        order.setUserProfileId(request.getUserProfileId());
+        order.setUserProfileId(userProfile.getId());
         order.setEventId(request.getEventId());
         order.setAdditionalOptions(request.getAdditionalOptions());
         orderRepository.save(order);
@@ -160,13 +161,13 @@ public class OrderServiceImpl implements OrderService {
         ProjectionOperation projectionOperation = Aggregation.project()
                 .and("event._id").as("eventId")
                 .and("_id").as("orderId")
-                .and("event.creatorId").as("creatorId")
                 .and("event.title").as("title")
                 .and("event.description").as("description")
                 .and("event.groupId").as("groupId")
                 .and("event.status").as("status")
                 .and("event.eventType").as("eventType")
-                .and("event.createdAt").as("createdAt");
+                .and("event.createdAt").as("createdAt")
+                .and("event.pendingUntil").as("pendingUntil");
 
         SortOperation sortOperation = new SortOperation(Sort.by(Sort.Direction.DESC, "event.createdAt"));
 

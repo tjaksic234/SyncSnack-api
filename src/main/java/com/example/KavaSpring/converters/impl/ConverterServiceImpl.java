@@ -89,7 +89,6 @@ public class ConverterServiceImpl implements ConverterService {
     @Override
     public OrderResponse convertToOrderResponse(OrderRequest request) {
         OrderResponse response = new OrderResponse();
-        response.setUserProfileId(request.getUserProfileId());
         response.setEventId(request.getEventId());
         response.setAdditionalOptions(request.getAdditionalOptions());
         return response;
@@ -100,13 +99,13 @@ public class ConverterServiceImpl implements ConverterService {
         OrderActivityResponse response = new OrderActivityResponse();
         response.setEventId(order.getEventId());
         response.setOrderId(order.getOrderId());
-        response.setUserProfileId(order.getUserProfileId());
         response.setTitle(order.getTitle());
         response.setDescription(order.getDescription());
         response.setGroupId(order.getGroupId());
         response.setStatus(order.getStatus());
         response.setEventType(order.getEventType());
         response.setCreatedAt(order.getCreatedAt());
+        response.setPendingUntil(order.getPendingUntil());
         return response;
     }
 

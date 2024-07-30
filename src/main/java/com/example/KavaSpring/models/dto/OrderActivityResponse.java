@@ -14,11 +14,11 @@ import java.time.LocalDateTime;
 public class OrderActivityResponse {
     private String eventId;
     private String orderId;
-    private String userProfileId;
     private String title;
     private String description;
     private String groupId;
     private EventStatus status;
     private EventType eventType;
     private LocalDateTime createdAt;
+    private LocalDateTime pendingUntil;
 }

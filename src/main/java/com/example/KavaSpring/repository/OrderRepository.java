@@ -12,5 +12,5 @@ import java.util.Optional;
 public interface OrderRepository extends MongoRepository<Order, String> {
     Optional<Order> getById(String id);
     List<OrderDto> findByUserProfileId(String id);
-
+    boolean existsByUserProfileIdAndEventId(String userProfileId, String eventId);
 }
