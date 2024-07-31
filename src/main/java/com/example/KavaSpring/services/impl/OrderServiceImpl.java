@@ -109,7 +109,7 @@ public class OrderServiceImpl implements OrderService {
                 .and("rating").as("rating")
                 .and("createdAt").as("createdAt");
 
-        SortOperation sortOperation = new SortOperation(Sort.by(Sort.Direction.DESC, "createdAt"));
+        SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "createdAt"));
 
         Aggregation aggregation = Aggregation.newAggregation(
                 matchOperation,
@@ -171,7 +171,7 @@ public class OrderServiceImpl implements OrderService {
                 .and("event.createdAt").as("createdAt")
                 .and("event.pendingUntil").as("pendingUntil");
 
-        SortOperation sortOperation = new SortOperation(Sort.by(Sort.Direction.DESC, "event.createdAt"));
+        SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "event.createdAt"));
 
         Aggregation aggregation = Aggregation.newAggregation(
                 matchUserOrders,
@@ -205,5 +205,49 @@ public class OrderServiceImpl implements OrderService {
         log.info("Order status successfully updated");
         return "Order status successfully updated";
     }
-//* the user profile id 66a8d8bb63299e081b6e3e30
+
+    @Override
+    public List<OrderExpandedResponse> getOrdersByEventId(String id) {
+
+        eventRepository.findById(id).orElseThrow(() -> new NotFoundException("No event associated with the given eventId"));
+
+        MatchOperation matchOrdersByEventId = Aggregation.match(Criteria.where("eventId").is(id));
+
+        AddFieldsOperation convertUserProfileIdToObjectId  = Aggregation.addFields()
+                .addField("userProfileId")
+                .withValueOf(ConvertOperators.ToObjectId.toObjectId("$userProfileId"))
+                .build();
+
+        LookupOperation lookupOperation = Aggregation.lookup("userProfiles", "userProfileId", "_id", "userProfile");
+
+        UnwindOperation unwindOperation = Aggregation.unwind("userProfile");
+
+        ProjectionOperation projectionOperation = Aggregation.project()
+                .andExclude("_id")
+                .and("$_id").as("orderId")
+                .and("$userProfileId").as("userProfileId")
+                .and("$userProfile.firstName").as("firstName")
+                .and("$userProfile.lastName").as("lastName")
+                .and("$additionalOptions").as("additionalOptions")
+                .and("$status").as("status")
+                .and("$createdAt").as("createdAt");
+
+        SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Aggregation aggregation = Aggregation.newAggregation(
+              matchOrdersByEventId,
+              convertUserProfileIdToObjectId,
+              lookupOperation,
+              unwindOperation,
+              projectionOperation,
+              sortOperation
+        );
+
+        AggregationResults<OrderExpandedResponse> results = mongoTemplate.aggregate(aggregation, "orders", OrderExpandedResponse.class);
+
+        log.info("Fetched the orders successfully");
+        return results.getMappedResults();
+    }
+
+
 }

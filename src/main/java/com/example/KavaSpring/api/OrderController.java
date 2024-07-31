@@ -96,6 +96,16 @@ public class OrderController {
         }
     }
 
+    @GetMapping("event/{eventId}")
+    public ResponseEntity<List<OrderExpandedResponse>> getOrdersByEventId(@PathVariable String eventId) {
+        try {
+            log.info("Fetching orders by eventId");
+            return ResponseEntity.ok(orderService.getOrdersByEventId(eventId));
+        } catch (NotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
     //TODO dodaj endpoint koji ce azurirat ocjenu od ordera
 }

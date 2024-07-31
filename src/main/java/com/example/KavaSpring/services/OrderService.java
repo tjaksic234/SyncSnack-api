@@ -11,4 +11,5 @@ public interface OrderService {
     List<OrderEventInfoDto> getAllOrdersFromUserProfile();
     List<OrderActivityResponse> getOrdersByActivityStatus(boolean isActive);
     String updateOrderStatus(String id, OrderStatus status);
+    List<OrderExpandedResponse> getOrdersByEventId(String id);
 }
