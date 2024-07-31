@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface EventService {
     EventResponse createEvent(EventRequest request);
-    EventDto getEventById(String id);
+    EventExpandedResponse getEventById(String id);
     List<EventExpandedResponse> searchEvents(EventSearchRequest request);
     void updateEventsJob();
     String updateEventStatus(String id, EventStatus status);

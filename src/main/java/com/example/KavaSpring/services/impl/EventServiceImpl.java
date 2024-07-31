@@ -47,9 +47,8 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventResponse createEvent(EventRequest request) {
-        //? Logiku provjere eventova za usera ce trebati popraviti jer creator moze imati samo jedan event nebitno jeli completed,
-        //? pending ili inprogress pa treba jos poraditi na logici
-        //* Ovakav nacin rada sa helper klasom mi je malo cudan za sada treba viditi koliko je ovo pametno za raditi
+        //? Logiku provjere eventova za usera ce trebati popraviti jer creator moze imati samo jedan event nebitno jeli
+        //? pending ili in_progress pa treba jos poraditi na logici
         log.info("The user id which will be used for searching the user profile --> {}", Helper.getLoggedInUserId());
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
         log.info("The user profile that was found with the userId --> {}", userProfile);
@@ -79,10 +78,10 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventDto getEventById(String id) {
+    public EventExpandedResponse getEventById(String id) {
         Event event = eventRepository.getById(id).orElseThrow(() -> new NotFoundException("No event associated with the id"));
         log.info("Get event by id finished");
-        return converterService.convertToEventDto(event);
+        return converterService.convertToEventExpandedResponse(event);
     }
 
 

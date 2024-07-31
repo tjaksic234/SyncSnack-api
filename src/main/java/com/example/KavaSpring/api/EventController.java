@@ -39,7 +39,7 @@ public class EventController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<EventDto> getEventById(@PathVariable("id") String id) {
+    public ResponseEntity<EventExpandedResponse> getEventById(@PathVariable("id") String id) {
         try {
             log.info("Fetching event by id");
             return ResponseEntity.ok(eventService.getEventById(id));
