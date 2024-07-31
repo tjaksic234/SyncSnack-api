@@ -138,7 +138,7 @@ public class EventServiceImpl implements EventService {
 
     //? Cron expression: sec min hrs day mon weekday
     //? trenutno ce azurirati svake minute
-    @Scheduled(cron = "0 */20 * * * * ")
+    @Scheduled(cron = "*/5 * * * * * ")
     @Override
     public void updateEventsJob() {
         LocalDateTime now = LocalDateTime.now();
@@ -167,6 +167,8 @@ public class EventServiceImpl implements EventService {
         }
         event.get().setStatus(status);
         eventRepository.save(event.get());
+        log.info("Event status updated successfully");
+
         return "Event status updated successfully";
     }
 

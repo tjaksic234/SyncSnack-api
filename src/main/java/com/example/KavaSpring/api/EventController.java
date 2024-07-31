@@ -73,4 +73,7 @@ public class EventController {
             return ResponseEntity.notFound().build();
         }
     }
+
+
+
 }
