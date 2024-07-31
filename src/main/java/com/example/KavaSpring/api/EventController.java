@@ -74,6 +74,15 @@ public class EventController {
         }
     }
 
-
+    @GetMapping("active")
+    public ResponseEntity<EventDto> getActiveEvent() {
+        try {
+            log.info("Fetching active event from UserProfile");
+            return ResponseEntity.ok(eventService.getActiveEvent());
+        } catch (NotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
 
 }

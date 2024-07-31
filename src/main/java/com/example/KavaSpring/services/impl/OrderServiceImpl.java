@@ -6,6 +6,7 @@ import com.example.KavaSpring.models.dao.Order;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.models.enums.EventStatus;
+import com.example.KavaSpring.models.enums.OrderStatus;
 import com.example.KavaSpring.repository.EventRepository;
 import com.example.KavaSpring.repository.OrderRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -191,4 +193,17 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
+    @Override
+    public String updateOrderStatus(String id, OrderStatus status) {
+        Optional<Order> order = orderRepository.getById(id);
+        if (order.isEmpty()) {
+            throw new NotFoundException("The order status update was not successful");
+        }
+        order.get().setStatus(status);
+        orderRepository.save(order.get());
+
+        log.info("Order status successfully updated");
+        return "Order status successfully updated";
+    }
+//* the user profile id 66a8d8bb63299e081b6e3e30
 }

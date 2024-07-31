@@ -11,5 +11,5 @@ public interface EventService {
     List<EventExpandedResponse> searchEvents(EventSearchRequest request);
     void updateEventsJob();
     String updateEventStatus(String id, EventStatus status);
-
+    EventDto getActiveEvent();
 }

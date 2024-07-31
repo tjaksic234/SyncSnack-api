@@ -138,7 +138,7 @@ public class EventServiceImpl implements EventService {
 
     //? Cron expression: sec min hrs day mon weekday
     //? trenutno ce azurirati svake minute
-    @Scheduled(cron = "*/5 * * * * * ")
+    @Scheduled(cron = "* */30 * * * * ")
     @Override
     public void updateEventsJob() {
         LocalDateTime now = LocalDateTime.now();
@@ -170,6 +170,23 @@ public class EventServiceImpl implements EventService {
         log.info("Event status updated successfully");
 
         return "Event status updated successfully";
+    }
+
+    @Override
+    public EventDto getActiveEvent() {
+        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+        List<EventStatus> statuses = new ArrayList<>();
+        statuses.add(EventStatus.PENDING);
+        statuses.add(EventStatus.IN_PROGRESS);
+
+        Event event = eventRepository.getEventByUserProfileIdAndStatusIn(userProfile.getId(), statuses);
+
+        if (event == null) {
+            throw new NotFoundException("No active event found");
+        }
+
+        log.info("The retrieved active event: {}", event);
+        return converterService.convertToEventDto(event);
     }
 
 

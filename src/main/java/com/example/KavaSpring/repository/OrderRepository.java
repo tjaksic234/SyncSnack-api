@@ -2,6 +2,7 @@ package com.example.KavaSpring.repository;
 
 import com.example.KavaSpring.models.dao.Order;
 import com.example.KavaSpring.models.dto.OrderDto;
+import com.example.KavaSpring.models.enums.OrderStatus;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

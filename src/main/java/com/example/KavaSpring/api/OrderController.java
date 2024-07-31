@@ -3,6 +3,7 @@ package com.example.KavaSpring.api;
 import com.example.KavaSpring.config.openapi.ShowAPI;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.models.dto.*;
+import com.example.KavaSpring.models.enums.OrderStatus;
 import com.example.KavaSpring.services.OrderService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -83,6 +84,18 @@ public class OrderController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @PatchMapping("update")
+    public ResponseEntity<String> updateOrdersStatus(@RequestParam String orderId, @RequestParam OrderStatus status) {
+        try {
+            log.info("Order status update started");
+            return ResponseEntity.ok(orderService.updateOrderStatus(orderId, status));
+        } catch (NotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 
     //TODO dodaj endpoint koji ce azurirat ocjenu od ordera
 }
