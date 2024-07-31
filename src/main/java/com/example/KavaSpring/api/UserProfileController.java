@@ -1,6 +1,7 @@
 package com.example.KavaSpring.api;
 
 import com.example.KavaSpring.config.openapi.ShowAPI;
+import com.example.KavaSpring.exceptions.EntityNotFoundException;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.exceptions.UserProfileExistsException;
 import com.example.KavaSpring.models.dto.UserProfileDto;
@@ -58,15 +59,36 @@ public class UserProfileController {
         }
     }
 
-    @GetMapping("/profile-photo/{id}")
-    public ResponseEntity<byte[]> getUserProfilePhoto(@PathVariable String id) {
+    @GetMapping("/profile-photo/download")
+    public ResponseEntity<byte[]> getUserProfilePhoto() {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.IMAGE_JPEG);
-            return new ResponseEntity(userProfileService.downloadUserProfilePhoto(id), headers, HttpStatus.OK);
+            return new ResponseEntity(userProfileService.downloadUserProfilePhoto(), headers, HttpStatus.OK);
         } catch (IOException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
+        } catch (EntityNotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping(value = "edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> editUserProfile(
+            @RequestPart(value = "firstName", required = false) String firstName,
+            @RequestPart(value = "lastName", required = false) String lastName,
+            @RequestPart(value = "file", required = false) MultipartFile file
+    ) {
+        try {
+            log.info("UserProfile update edit started");
+            return ResponseEntity.ok(userProfileService.editUserProfile(firstName, lastName, file));
+        } catch (IllegalStateException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        } catch (RuntimeException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

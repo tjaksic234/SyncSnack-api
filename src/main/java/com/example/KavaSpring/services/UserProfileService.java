@@ -11,5 +11,6 @@ public interface UserProfileService {
 
     UserProfileResponse createUserProfile(UserProfileRequest request, MultipartFile photoFile) throws IOException;
     UserProfileDto getProfileById(String id);
-    byte[] downloadUserProfilePhoto(String id) throws IOException;
+    byte[] downloadUserProfilePhoto() throws IOException;
+    String editUserProfile(String firstName, String lastName, MultipartFile photoFile);
 }

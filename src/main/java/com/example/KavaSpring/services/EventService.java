@@ -1,6 +1,7 @@
 package com.example.KavaSpring.services;
 
 import com.example.KavaSpring.models.dto.*;
+import com.example.KavaSpring.models.enums.EventStatus;
 
 import java.util.List;
 
@@ -9,4 +10,6 @@ public interface EventService {
     EventDto getEventById(String id);
     List<EventExpandedResponse> searchEvents(EventSearchRequest request);
     void updateEventsJob();
+    String updateEventStatus(String id, EventStatus status);
+
 }

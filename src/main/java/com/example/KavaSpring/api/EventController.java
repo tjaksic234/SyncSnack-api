@@ -6,6 +6,7 @@ import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.exceptions.NotValidEnumException;
 import com.example.KavaSpring.exceptions.UnauthorizedException;
 import com.example.KavaSpring.models.dto.*;
+import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.services.EventService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,6 +60,17 @@ public class EventController {
         } catch (NotValidEnumException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PatchMapping("update")
+    public ResponseEntity<String> updateEventStatus(@RequestParam String eventId, @RequestParam EventStatus status) {
+        try {
+            log.info("Event status update started");
+            return ResponseEntity.ok(eventService.updateEventStatus(eventId, status));
+        } catch (NotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 }

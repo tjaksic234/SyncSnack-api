@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -95,6 +96,7 @@ public class EventServiceImpl implements EventService {
             criteriaList.add(Criteria.where("status").is(request.getStatus()));
         }
 
+        //? u slucaju da je MIX eventType vratiti ce sve eventove sa bilo kojim EventTypom (FOOD, COFFEE......)
         if (request.getEventType() != null && request.getEventType() != EventType.MIX) {
             criteriaList.add(Criteria.where("eventType").is(request.getEventType()));
         }
@@ -155,6 +157,17 @@ public class EventServiceImpl implements EventService {
 
          log.info("Successfully updated the status of events at time ---> {}", LocalDateTime.now(ZoneId.of("Europe/Zagreb")));
 
+    }
+
+    @Override
+    public String updateEventStatus(String id, EventStatus status) {
+        Optional<Event> event = eventRepository.getById(id);
+        if (event.isEmpty()) {
+            throw new NotFoundException("The event with the given id was not found");
+        }
+        event.get().setStatus(status);
+        eventRepository.save(event.get());
+        return "Event status updated successfully";
     }
 
 

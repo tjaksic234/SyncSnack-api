@@ -11,6 +11,7 @@ import com.example.KavaSpring.models.dto.UserProfileResponse;
 import com.example.KavaSpring.repository.GroupRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.repository.UserRepository;
+import com.example.KavaSpring.security.utils.Helper;
 import com.example.KavaSpring.services.UserProfileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -92,11 +93,46 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
-    public byte[] downloadUserProfilePhoto(String id) throws IOException {
-        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(id);
+    public byte[] downloadUserProfilePhoto() throws IOException {
+        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+        if (userProfile == null) {
+            throw new NotFoundException("The UserProfile was not retrieved successfully");
+        }
         String fileUri = userProfile.getPhotoUri();
         log.info("fileUri: {}", fileUri);
         return s3Config.downloadFromS3(fileUri);
+    }
+
+    @Override
+    public String editUserProfile(String firstName, String lastName, MultipartFile photoFile) {
+        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+
+        if (userProfile == null) {
+            throw new IllegalStateException("UserProfile is null");
+        }
+
+        if (photoFile != null) {
+            try {
+                String fileName = userProfile.getId() + "_" + photoFile.getOriginalFilename();
+                String path = "profilePhotos";
+
+                s3Config.uploadToS3(path, fileName, photoFile.getInputStream());
+
+                userProfile.setPhotoUri(path +  "/"  + fileName);
+
+                log.info("UserProfile photo updated successfully");
+            } catch (IOException e) {
+                log.error("Error updating the profile photo", e);
+                throw new RuntimeException("Failed to update the UserProfile photo", e);
+            }
+        }
+
+        userProfile.setFirstName(firstName);
+        userProfile.setLastName(lastName);
+        userProfileRepository.save(userProfile);
+
+        log.info("UserProfile successfully updated");
+        return "UserProfile successfully updated";
     }
 
 
