@@ -6,13 +6,17 @@ import com.example.KavaSpring.models.dao.Group;
 import com.example.KavaSpring.models.dao.Order;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.*;
+import com.example.KavaSpring.repository.UserProfileRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class ConverterServiceImpl implements ConverterService {
 
+    private final UserProfileRepository userProfileRepository;
 
     @Override
     public UserProfileDto convertToUserProfileDto(UserProfile userProfile) {
@@ -73,6 +77,26 @@ public class ConverterServiceImpl implements ConverterService {
         response.setDescription(request.getDescription());
         response.setEventType(request.getEventType());
         response.setPendingTime(request.getPendingTime());
+        return response;
+    }
+
+    @Override
+    public EventExpandedResponse convertToEventExpandedResponse(Event event) {
+        EventExpandedResponse response = new EventExpandedResponse();
+        Optional<UserProfile> userProfile = userProfileRepository.findById(event.getUserProfileId());
+        if (userProfile.isPresent()) {
+            response.setUserProfileFirstName(userProfile.get().getFirstName());
+            response.setUserProfileLastName(userProfile.get().getLastName());
+        }
+        response.setEventId(event.getId());
+        response.setUserProfileId(event.getUserProfileId());
+        response.setTitle(event.getTitle());
+        response.setDescription(event.getDescription());
+        response.setGroupId(event.getGroupId());
+        response.setStatus(event.getStatus());
+        response.setEventType(event.getEventType());
+        response.setCreatedAt(event.getCreatedAt());
+        response.setPendingUntil(event.getPendingUntil());
         return response;
     }
 

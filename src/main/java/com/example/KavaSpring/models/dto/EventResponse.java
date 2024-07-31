@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EventResponse {
 
+
     @NotBlank
     @Size(max = 120)
     private String title;

@@ -7,6 +7,7 @@ import com.example.KavaSpring.models.dao.Event;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.models.enums.EventStatus;
+import com.example.KavaSpring.models.enums.EventType;
 import com.example.KavaSpring.repository.EventRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.security.utils.Helper;
@@ -86,7 +87,7 @@ public class EventServiceImpl implements EventService {
 
 
     @Override
-    public List<EventDto> searchEvents(EventSearchRequest request) {
+    public List<EventExpandedResponse> searchEvents(EventSearchRequest request) {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
         List<Criteria> criteriaList = new ArrayList<>();
 
@@ -94,7 +95,7 @@ public class EventServiceImpl implements EventService {
             criteriaList.add(Criteria.where("status").is(request.getStatus()));
         }
 
-        if (request.getEventType() != null) {
+        if (request.getEventType() != null && request.getEventType() != EventType.MIX) {
             criteriaList.add(Criteria.where("eventType").is(request.getEventType()));
         }
 
@@ -105,15 +106,9 @@ public class EventServiceImpl implements EventService {
 
         MatchOperation matchOperation = Aggregation.match(combinedCriteria);
 
-        LookupOperation lookupOperation = Aggregation.lookup("userProfiles", "userProfileId", "_id", "userProfiles");
-
-        UnwindOperation unwindOperation = Aggregation.unwind("userProfiles");
-
-        ProjectionOperation projectionOperation = Aggregation.project()
+        ProjectionOperation projectOperation = Aggregation.project()
                 .and("eventId").as("eventId")
                 .and("userProfileId").as("userProfileId")
-                .and("userProfiles.firstName").as("userProfileFirstName")
-                .and("userProfiles.lastName").as("userProfileLastName")
                 .and("title").as("title")
                 .and("description").as("description")
                 .and("groupId").as("groupId")
@@ -122,16 +117,11 @@ public class EventServiceImpl implements EventService {
                 .and("createdAt").as("createdAt")
                 .and("pendingUntil").as("pendingUntil");
 
-
-
         SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "createdAt"));
 
         Aggregation aggregation = Aggregation.newAggregation(
                 matchOperation,
-               /* lookupOperation,
-                unwindOperation,
                 projectOperation,
-                */
                 sortOperation
         );
 
@@ -140,7 +130,7 @@ public class EventServiceImpl implements EventService {
         return results
                 .getMappedResults()
                 .stream()
-                .map(converterService::convertToEventDto)
+                .map(converterService::convertToEventExpandedResponse)
                 .collect(Collectors.toList());
     }
 

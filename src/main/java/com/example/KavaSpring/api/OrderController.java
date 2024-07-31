@@ -83,4 +83,7 @@ public class OrderController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    //TODO dodaj endpoint koji ce azurirat ocjenu od ordera
+    //TODO mozda ce dodati ratedStatus koja ce sprijeciti korisnika da ocjeni vise puta order
 }

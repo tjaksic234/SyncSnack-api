@@ -5,10 +5,7 @@ import com.example.KavaSpring.exceptions.EventAlreadyExistsException;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.exceptions.NotValidEnumException;
 import com.example.KavaSpring.exceptions.UnauthorizedException;
-import com.example.KavaSpring.models.dto.EventDto;
-import com.example.KavaSpring.models.dto.EventRequest;
-import com.example.KavaSpring.models.dto.EventResponse;
-import com.example.KavaSpring.models.dto.EventSearchRequest;
+import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.services.EventService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +52,7 @@ public class EventController {
     }
 
     @PostMapping("search")
-    public ResponseEntity<List<EventDto>> searchEvents(@RequestBody EventSearchRequest request) {
+    public ResponseEntity<List<EventExpandedResponse>> searchEvents(@RequestBody EventSearchRequest request) {
         try {
             log.info("Search for events started");
             return ResponseEntity.ok(eventService.searchEvents(request));
