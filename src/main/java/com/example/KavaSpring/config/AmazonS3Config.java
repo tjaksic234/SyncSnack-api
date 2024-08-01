@@ -23,7 +23,7 @@ import java.io.InputStream;
 @Component
 @Slf4j
 @Data
-public class S3Config {
+public class AmazonS3Config {
     @Value("${S3_ACCESS_KEY}")
     private String accessKey;
 

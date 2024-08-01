@@ -1,6 +1,6 @@
 package com.example.KavaSpring.services.impl;
 
-import com.example.KavaSpring.config.S3Config;
+import com.example.KavaSpring.config.AmazonS3Config;
 import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.exceptions.UserProfileExistsException;
@@ -35,7 +35,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     private final ConverterService converterService;
 
-    private final S3Config s3Config;
+    private final AmazonS3Config amazonS3Config;
 
     @Override
     public UserProfileResponse createUserProfile(UserProfileRequest request, MultipartFile photoFile) {
@@ -66,7 +66,7 @@ public class UserProfileServiceImpl implements UserProfileService {
                 String fileName = request.getUserId() + "_" + photoFile.getOriginalFilename();
                 String path = "profilePhotos";
 
-                s3Config.uploadToS3(path, fileName, photoFile.getInputStream());
+                amazonS3Config.uploadToS3(path, fileName, photoFile.getInputStream());
 
                 userProfile.setPhotoUri(path +  "/"  + fileName);
 
@@ -100,7 +100,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         }
         String fileUri = userProfile.getPhotoUri();
         log.info("fileUri: {}", fileUri);
-        return s3Config.downloadFromS3(fileUri);
+        return amazonS3Config.downloadFromS3(fileUri);
     }
 
     @Override
@@ -116,7 +116,7 @@ public class UserProfileServiceImpl implements UserProfileService {
                 String fileName = userProfile.getId() + "_" + photoFile.getOriginalFilename();
                 String path = "profilePhotos";
 
-                s3Config.uploadToS3(path, fileName, photoFile.getInputStream());
+                amazonS3Config.uploadToS3(path, fileName, photoFile.getInputStream());
 
                 userProfile.setPhotoUri(path +  "/"  + fileName);
 
