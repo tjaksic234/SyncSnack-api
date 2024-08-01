@@ -110,10 +110,10 @@ public class OrderController {
     }
 
     @GetMapping("event/{eventId}")
-    public ResponseEntity<List<OrderExpandedResponse>> getOrdersByEventId(@PathVariable String eventId) {
+    public ResponseEntity<List<OrderExpandedResponse>> getActiveOrdersByEventId(@PathVariable String eventId) {
         try {
             log.info("Fetching orders by eventId");
-            return ResponseEntity.ok(orderService.getOrdersByEventId(eventId));
+            return ResponseEntity.ok(orderService.getActiveOrdersByEventId(eventId));
         } catch (NotFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();

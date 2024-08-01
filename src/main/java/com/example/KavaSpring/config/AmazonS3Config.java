@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 @Component
 @Slf4j
@@ -70,7 +71,6 @@ public class AmazonS3Config {
     public void updateFileInS3(String path, String fileName, InputStream newFile) {
         AmazonS3 s3client = S3client();
         String fullPath = path + "/" + fileName;
-
         try {
             if (s3client.doesObjectExist(bucket, fullPath)) {
                 s3client.deleteObject(bucket, fullPath);

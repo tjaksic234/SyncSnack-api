@@ -223,11 +223,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderExpandedResponse> getOrdersByEventId(String id) {
+    public List<OrderExpandedResponse> getActiveOrdersByEventId(String id) {
 
         eventRepository.findById(id).orElseThrow(() -> new NotFoundException("No event associated with the given eventId"));
 
         MatchOperation matchOrdersByEventId = Aggregation.match(Criteria.where("eventId").is(id));
+
+        //? By active orders we mean the orders that have the status IN_PROGRESS
+        MatchOperation matchOrdersByOrderStatus = Aggregation.match(Criteria.where("status").is(OrderStatus.IN_PROGRESS));
 
         AddFieldsOperation convertUserProfileIdToObjectId  = Aggregation.addFields()
                 .addField("userProfileId")
@@ -252,6 +255,7 @@ public class OrderServiceImpl implements OrderService {
 
         Aggregation aggregation = Aggregation.newAggregation(
               matchOrdersByEventId,
+              matchOrdersByOrderStatus,
               convertUserProfileIdToObjectId,
               lookupOperation,
               unwindOperation,
