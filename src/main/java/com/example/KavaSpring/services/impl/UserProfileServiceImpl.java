@@ -63,7 +63,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         //? treba jos optimizirati  putanju i filename bezveze je zakomplicirano
         if (photoFile != null) {
             try {
-                String fileName = request.getUserId() + "_" + photoFile.getOriginalFilename();
+                String fileName = request.getUserId();
                 String path = "profilePhotos";
 
                 amazonS3Config.uploadToS3(path, fileName, photoFile.getInputStream());
@@ -113,10 +113,10 @@ public class UserProfileServiceImpl implements UserProfileService {
 
         if (photoFile != null) {
             try {
-                String fileName = userProfile.getId() + "_" + photoFile.getOriginalFilename();
+                String fileName = userProfile.getId();
                 String path = "profilePhotos";
 
-                amazonS3Config.uploadToS3(path, fileName, photoFile.getInputStream());
+                amazonS3Config.updateFileInS3(path, fileName, photoFile.getInputStream());
 
                 userProfile.setPhotoUri(path +  "/"  + fileName);
 

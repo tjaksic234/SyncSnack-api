@@ -45,7 +45,8 @@ public class AmazonS3Config {
 
     public PutObjectResult uploadToS3(String path, String fileName, InputStream file) {
         AmazonS3 s3client = S3client();
-        return s3client.putObject(bucket, path + "/" + fileName, file, new ObjectMetadata());
+        String fullPath = path + "/" + fileName;
+        return s3client.putObject(bucket, fullPath, file, new ObjectMetadata());
     }
 
     public byte[] downloadFromS3(String fileUri) throws IOException {
@@ -63,6 +64,24 @@ public class AmazonS3Config {
         } catch (AmazonServiceException e) {
             log.info("Error occurred while deleting file");
             log.error(e.getMessage());
+        }
+    }
+
+    public void updateFileInS3(String path, String fileName, InputStream newFile) {
+        AmazonS3 s3client = S3client();
+        String fullPath = path + "/" + fileName;
+
+        try {
+            if (s3client.doesObjectExist(bucket, fullPath)) {
+                s3client.deleteObject(bucket, fullPath);
+                log.info("Existing file deleted successfully");
+            }
+
+            s3client.putObject(bucket, fullPath, newFile, new ObjectMetadata());
+            log.info("New file uploaded successfully");
+        } catch (AmazonServiceException e) {
+            log.error("Error occurred while updating file in S3", e);
+            throw new RuntimeException("Failed to update file in S3", e);
         }
     }
 
