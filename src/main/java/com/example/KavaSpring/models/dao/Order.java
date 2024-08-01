@@ -28,7 +28,7 @@ public class Order {
     private String userProfileId;
 
     @NotBlank
-    private OrderStatus status = OrderStatus.PREPARING;
+    private OrderStatus status = OrderStatus.IN_PROGRESS;
 
     @NotBlank
     private String eventId;

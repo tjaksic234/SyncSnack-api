@@ -207,7 +207,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public String updateAllOrdersStatus(String id, OrderStatus status) {
-        List<Order> orders = orderRepository.findAllByEventIdAndStatus(id, OrderStatus.PREPARING);
+        List<Order> orders = orderRepository.findAllByEventIdAndStatus(id, OrderStatus.IN_PROGRESS);
 
         if (!EnumSet.allOf(OrderStatus.class).contains(status)) {
             throw new NotValidEnumException("Bad enum value provided");
