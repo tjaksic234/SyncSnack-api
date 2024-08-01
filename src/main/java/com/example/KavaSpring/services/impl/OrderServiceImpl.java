@@ -1,6 +1,7 @@
 package com.example.KavaSpring.services.impl;
 
 import com.example.KavaSpring.converters.ConverterService;
+import com.example.KavaSpring.exceptions.OrderAlreadyRatedException;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.models.dao.Order;
 import com.example.KavaSpring.models.dao.UserProfile;
@@ -247,6 +248,25 @@ public class OrderServiceImpl implements OrderService {
 
         log.info("Fetched the orders successfully");
         return results.getMappedResults();
+    }
+
+    @Override
+    public String rateOrder(String id, int rating) {
+        Optional<Order> order = orderRepository.getById(id);
+
+        if (order.isEmpty()) {
+            throw new IllegalStateException("Bad order object value state");
+        }
+
+        if (order.get().getRating() > 0) {
+            throw new OrderAlreadyRatedException("The order is already rated");
+        }
+
+        order.get().setRating(rating);
+        orderRepository.save(order.get());
+        log.info("Order successfully rated");
+
+        return "Order successfully rated";
     }
 
 

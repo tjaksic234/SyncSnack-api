@@ -2,6 +2,7 @@ package com.example.KavaSpring.api;
 
 import com.example.KavaSpring.config.openapi.ShowAPI;
 import com.example.KavaSpring.exceptions.NotFoundException;
+import com.example.KavaSpring.exceptions.OrderAlreadyRatedException;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.models.enums.OrderStatus;
 import com.example.KavaSpring.services.OrderService;
@@ -107,5 +108,17 @@ public class OrderController {
         }
     }
 
-    //TODO dodaj endpoint koji ce azurirat ocjenu od ordera
+    @PatchMapping("rate")
+    public ResponseEntity<String> rateOrder(@RequestParam String orderId, @RequestParam int rating) {
+        try {
+            log.info("Order rating started");
+            return ResponseEntity.ok(orderService.rateOrder(orderId, rating));
+        } catch (IllegalStateException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        } catch (OrderAlreadyRatedException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+    }
 }
