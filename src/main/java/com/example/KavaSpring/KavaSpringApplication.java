@@ -14,4 +14,5 @@ public class KavaSpringApplication {
 		SpringApplication.run(KavaSpringApplication.class, args);
 	}
 
+
 }

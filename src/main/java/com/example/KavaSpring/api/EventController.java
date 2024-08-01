@@ -29,7 +29,7 @@ public class EventController {
         try {
             log.info("Create a event requested");
             return ResponseEntity.ok(eventService.createEvent(request));
-        } catch (EventAlreadyExistsException e) {
+        } catch (EventAlreadyExistsException | IllegalStateException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
         } catch (NotFoundException e) {

@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -47,22 +48,17 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventResponse createEvent(EventRequest request) {
-        //? Logiku provjere eventova za usera ce trebati popraviti jer creator moze imati samo jedan event nebitno jeli
-        //? pending ili in_progress pa treba jos poraditi na logici
-        log.info("The user id which will be used for searching the user profile --> {}", Helper.getLoggedInUserId());
+        List<EventStatus> activeStatuses = Arrays.asList(EventStatus.PENDING, EventStatus.IN_PROGRESS);
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
-        log.info("The user profile that was found with the userId --> {}", userProfile);
+
         if (userProfile == null) {
             throw new NotFoundException("No UserProfile associated with the id");
         }
 
-        List<Event> existingActiveEvents = eventRepository.findByUserProfileIdAndStatus(userProfile.getId(), EventStatus.PENDING);
-
-        if (!existingActiveEvents.isEmpty()) {
-            throw new EventAlreadyExistsException("User already has an active event (PENDING or IN_PROGRESS)");
-        } else {
-            log.info("No active events found for userProfileId: {}. Event creation continues.", userProfile.getId());
+        if (eventRepository.existsByUserProfileIdAndStatusIn(userProfile.getId(), activeStatuses)) {
+            throw new IllegalStateException("User already has an active event (PENDING or IN_PROGRESS)");
         }
+
 
         Event event = new Event();
         event.setUserProfileId(userProfile.getId());
