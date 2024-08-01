@@ -1,6 +1,7 @@
 package com.example.KavaSpring.services.impl;
 
 import com.example.KavaSpring.converters.ConverterService;
+import com.example.KavaSpring.exceptions.NotValidEnumException;
 import com.example.KavaSpring.exceptions.OrderAlreadyRatedException;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.models.dao.Order;
@@ -22,10 +23,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -205,6 +203,23 @@ public class OrderServiceImpl implements OrderService {
 
         log.info("Order status successfully updated");
         return "Order status successfully updated";
+    }
+
+    @Override
+    public String updateAllOrdersStatus(String id, OrderStatus status) {
+        List<Order> orders = orderRepository.findAllByEventIdAndStatus(id, OrderStatus.PREPARING);
+
+        if (!EnumSet.allOf(OrderStatus.class).contains(status)) {
+            throw new NotValidEnumException("Bad enum value provided");
+        }
+
+        orders.forEach(order -> {
+                            order.setStatus(status);
+                            orderRepository.save(order);
+                        });
+
+        log.info("Updated {} orders for event: {} to status: {}", orders.size(), id, status);
+        return String.format("Successfully updated %d orders", orders.size());
     }
 
     @Override

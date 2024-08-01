@@ -2,6 +2,7 @@ package com.example.KavaSpring.api;
 
 import com.example.KavaSpring.config.openapi.ShowAPI;
 import com.example.KavaSpring.exceptions.NotFoundException;
+import com.example.KavaSpring.exceptions.NotValidEnumException;
 import com.example.KavaSpring.exceptions.OrderAlreadyRatedException;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.models.enums.OrderStatus;
@@ -94,6 +95,17 @@ public class OrderController {
         } catch (NotFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PatchMapping("update/all")
+    public ResponseEntity<String> updateAllOrdersStatus(@RequestParam String eventId, @RequestParam OrderStatus status) {
+        try {
+            log.info("All orders status update started");
+            return ResponseEntity.ok(orderService.updateAllOrdersStatus(eventId, status));
+        } catch (NotValidEnumException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 
