@@ -127,8 +127,15 @@ public class UserProfileServiceImpl implements UserProfileService {
             }
         }
 
-        userProfile.setFirstName(firstName);
-        userProfile.setLastName(lastName);
+
+        if (firstName != null && !firstName.trim().isEmpty()) {
+            userProfile.setFirstName(firstName);
+        }
+
+        if (lastName != null && !lastName.trim().isEmpty()) {
+            userProfile.setLastName(lastName);
+        }
+
         userProfileRepository.save(userProfile);
 
         log.info("UserProfile successfully updated");
