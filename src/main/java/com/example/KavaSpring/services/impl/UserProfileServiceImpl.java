@@ -194,7 +194,6 @@ public class UserProfileServiceImpl implements UserProfileService {
             int orderCount = (result != null) ? result.getInteger("orderCount") : 0;
 
             GroupMemberResponse groupMember  = new GroupMemberResponse();
-            //groupMember.setPhotoUri(userProfileDoc.getString("profilePhoto"));
             groupMember.setFirstName(userProfileDoc.getString("firstName"));
             groupMember.setLastName(userProfileDoc.getString("lastName"));
             groupMember.setScore(userProfileDoc.getDouble("score").floatValue());
