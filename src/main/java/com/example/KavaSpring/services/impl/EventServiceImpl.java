@@ -1,7 +1,6 @@
 package com.example.KavaSpring.services.impl;
 
 import com.example.KavaSpring.converters.ConverterService;
-import com.example.KavaSpring.exceptions.EventAlreadyExistsException;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.models.dao.Event;
 import com.example.KavaSpring.models.dao.UserProfile;

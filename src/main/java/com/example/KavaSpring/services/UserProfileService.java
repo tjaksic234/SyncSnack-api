@@ -16,4 +16,5 @@ public interface UserProfileService {
     byte[] downloadUserProfilePhoto() throws IOException;
     String editUserProfile(String firstName, String lastName, MultipartFile photoFile);
     List<GroupMemberResponse> getGroupMembers();
+    void calculateScore();
 }

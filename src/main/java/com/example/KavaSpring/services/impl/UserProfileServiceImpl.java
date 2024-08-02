@@ -1,6 +1,5 @@
 package com.example.KavaSpring.services.impl;
 
-import com.example.KavaSpring.config.AmazonS3Config;
 import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.exceptions.UserProfileExistsException;
@@ -13,6 +12,7 @@ import com.example.KavaSpring.repository.GroupRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.repository.UserRepository;
 import com.example.KavaSpring.security.utils.Helper;
+import com.example.KavaSpring.services.AmazonS3Service;
 import com.example.KavaSpring.services.UserProfileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,9 +43,10 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     private final ConverterService converterService;
 
-    private final AmazonS3Config amazonS3Config;
+    private final AmazonS3Service amazonS3Service;
 
     private final MongoTemplate mongoTemplate;
+
 
     @Override
     public UserProfileResponse createUserProfile(UserProfileRequest request, MultipartFile photoFile) {
@@ -70,13 +71,12 @@ public class UserProfileServiceImpl implements UserProfileService {
         userProfile.setLastName(request.getLastName());
 
 
-        //? treba jos optimizirati  putanju i filename bezveze je zakomplicirano
         if (photoFile != null) {
             try {
                 String fileName = request.getUserId();
                 String path = "profilePhotos";
 
-                amazonS3Config.uploadToS3(path, fileName, photoFile.getInputStream());
+                amazonS3Service.uploadToS3(path, fileName, photoFile.getInputStream());
 
                 userProfile.setPhotoUri(path +  "/"  + fileName);
 
@@ -110,7 +110,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         }
         String fileUri = userProfile.getPhotoUri();
         log.info("fileUri: {}", fileUri);
-        return amazonS3Config.downloadFromS3(fileUri);
+        return amazonS3Service.downloadFromS3(fileUri);
     }
 
     @Override
@@ -126,7 +126,7 @@ public class UserProfileServiceImpl implements UserProfileService {
                 String fileName = userProfile.getId();
                 String path = "profilePhotos";
 
-                amazonS3Config.updateFileInS3(path, fileName, photoFile.getInputStream());
+                amazonS3Service.updateFileInS3(path, fileName, photoFile.getInputStream());
 
                 userProfile.setPhotoUri(path +  "/"  + fileName);
 
@@ -201,7 +201,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
             String photoUri = userProfileDoc.getString("profilePhoto");
             if (photoUri != null && !photoUri.isEmpty()) {
-                URL presignedUrl = amazonS3Config.generatePresignedUrl(photoUri);
+                URL presignedUrl = amazonS3Service.generatePresignedUrl(photoUri);
                 groupMember.setPhotoUrl(presignedUrl.toString());
             }
 
@@ -209,6 +209,35 @@ public class UserProfileServiceImpl implements UserProfileService {
             groupMembers.add(groupMember);
         }
         return groupMembers;
+    }
+
+    @Override
+    public void calculateScore() {
+        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+
+
+        //? retrieve all the userProfileIds that made an event
+        MatchOperation matchGroup = Aggregation.match(Criteria.where("groupId").is(userProfile.getGroupId()));
+
+        GroupOperation groupByUserProfile = Aggregation.group("userProfileId");
+
+        ProjectionOperation projectionOperation = Aggregation.project()
+                .and("_id").as("userProfileId")
+                .andExclude("_id");
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                matchGroup,
+                groupByUserProfile,
+                projectionOperation
+        );
+
+        AggregationResults<Document> results = mongoTemplate.aggregate(aggregation, "events", Document.class);
+
+        List<String> userProfileIds = results.getMappedResults().stream()
+                .map(doc -> doc.getString("userProfileId"))
+                .toList();
+
+        
     }
 
 

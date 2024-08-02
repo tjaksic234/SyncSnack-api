@@ -26,6 +26,7 @@ public class ConverterServiceImpl implements ConverterService {
         userProfileDto.setGroupId(userProfile.getGroupId());
         userProfileDto.setFirstName(userProfile.getFirstName());
         userProfileDto.setLastName(userProfile.getLastName());
+        userProfileDto.setPhotoUri(userProfile.getPhotoUri());
         return userProfileDto;
     }
 
