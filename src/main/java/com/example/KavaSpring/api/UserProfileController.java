@@ -4,6 +4,7 @@ import com.example.KavaSpring.config.openapi.ShowAPI;
 import com.example.KavaSpring.exceptions.EntityNotFoundException;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.exceptions.UserProfileExistsException;
+import com.example.KavaSpring.models.dto.GroupMemberResponse;
 import com.example.KavaSpring.models.dto.UserProfileDto;
 import com.example.KavaSpring.models.dto.UserProfileRequest;
 import com.example.KavaSpring.models.dto.UserProfileResponse;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/profiles")
@@ -89,6 +91,17 @@ public class UserProfileController {
         } catch (RuntimeException e) {
             log.error(e.getMessage());
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("group")
+    public ResponseEntity<List<GroupMemberResponse>> getGroupMembers() {
+        try {
+            log.info("Fetching group members");
+            return ResponseEntity.ok(userProfileService.getGroupMembers());
+        } catch (IllegalStateException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 }

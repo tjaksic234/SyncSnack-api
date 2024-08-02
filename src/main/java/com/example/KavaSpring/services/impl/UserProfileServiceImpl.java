@@ -5,6 +5,7 @@ import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.exceptions.UserProfileExistsException;
 import com.example.KavaSpring.models.dao.UserProfile;
+import com.example.KavaSpring.models.dto.GroupMemberResponse;
 import com.example.KavaSpring.models.dto.UserProfileDto;
 import com.example.KavaSpring.models.dto.UserProfileRequest;
 import com.example.KavaSpring.models.dto.UserProfileResponse;
@@ -15,11 +16,17 @@ import com.example.KavaSpring.security.utils.Helper;
 import com.example.KavaSpring.services.UserProfileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.Document;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.*;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -36,6 +43,8 @@ public class UserProfileServiceImpl implements UserProfileService {
     private final ConverterService converterService;
 
     private final AmazonS3Config amazonS3Config;
+
+    private final MongoTemplate mongoTemplate;
 
     @Override
     public UserProfileResponse createUserProfile(UserProfileRequest request, MultipartFile photoFile) {
@@ -140,6 +149,59 @@ public class UserProfileServiceImpl implements UserProfileService {
 
         log.info("UserProfile successfully updated");
         return "UserProfile successfully updated";
+    }
+
+    @Override
+    public List<GroupMemberResponse> getGroupMembers() {
+        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+        String groupId = userProfile.getGroupId();
+        List<GroupMemberResponse> groupMembers = new ArrayList<>();
+
+        if (groupId.isEmpty()) {
+            throw new IllegalStateException("Bad groupId value present in the user profile");
+        }
+
+        MatchOperation matchUserProfilesByGroupId = Aggregation.match(Criteria.where("groupId").is(groupId));
+
+        ProjectionOperation projectionOperation = Aggregation.project()
+                .and("photoUri").as("profilePhoto")
+                .andInclude("firstName")
+                .andInclude("lastName")
+                .andInclude("groupId")
+                .andInclude("score");
+
+        Aggregation userProfileAggregation = Aggregation.newAggregation(
+                matchUserProfilesByGroupId,
+                projectionOperation
+        );
+
+        List<Document> userProfiles = mongoTemplate.aggregate(userProfileAggregation, "userProfiles", Document.class).getMappedResults();
+
+        for (Document userProfileDoc: userProfiles) {
+            String userProfileId = userProfileDoc.getObjectId("_id").toString();
+
+            MatchOperation matchOperation = Aggregation.match(Criteria.where("userProfileId").is(userProfileId));
+            CountOperation countOperation = Aggregation.count().as("orderCount");
+
+            Aggregation orderCountAggregation = Aggregation.newAggregation(
+                    matchOperation,
+                    countOperation
+            );
+
+            Document result = mongoTemplate.aggregate(orderCountAggregation, "orders", Document.class).getUniqueMappedResult();
+
+            int orderCount = (result != null) ? result.getInteger("orderCount") : 0;
+
+            GroupMemberResponse groupMember  = new GroupMemberResponse();
+            groupMember.setPhotoUri(userProfileDoc.getString("profilePhoto"));
+            groupMember.setFirstName(userProfileDoc.getString("firstName"));
+            groupMember.setLastName(userProfileDoc.getString("lastName"));
+            groupMember.setScore(userProfileDoc.getDouble("score").floatValue());
+            groupMember.setOrderCount(orderCount);
+
+            groupMembers.add(groupMember);
+        }
+        return groupMembers;
     }
 
 
