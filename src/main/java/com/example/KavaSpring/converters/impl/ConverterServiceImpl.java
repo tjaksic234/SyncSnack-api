@@ -136,6 +136,7 @@ public class ConverterServiceImpl implements ConverterService {
     @Override
     public OrderEventInfoDto convertToOrderEventInfoDto(OrderEventInfoDto dto) {
         OrderEventInfoDto orderEventInfoDto = new OrderEventInfoDto();
+        orderEventInfoDto.setOrderId(dto.getOrderId());
         orderEventInfoDto.setEventId(dto.getEventId());
         orderEventInfoDto.setEventType(dto.getEventType());
         orderEventInfoDto.setStatus(dto.getStatus());

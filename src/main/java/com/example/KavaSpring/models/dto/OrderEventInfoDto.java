@@ -13,6 +13,7 @@ import java.util.HashMap;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderEventInfoDto {
+    private String orderId;
     private String eventId;
     private EventType eventType;
     private OrderStatus status;

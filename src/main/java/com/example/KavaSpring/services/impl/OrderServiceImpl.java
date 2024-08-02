@@ -101,6 +101,7 @@ public class OrderServiceImpl implements OrderService {
         UnwindOperation unwindOperation = Aggregation.unwind("eventDetails");
 
         ProjectionOperation projectionOperation = Aggregation.project()
+                .and("_id").as("orderId")
                 .and("eventId").as("eventId")
                 .and("eventDetails.eventType").as("eventType")
                 .and("status").as("status")
