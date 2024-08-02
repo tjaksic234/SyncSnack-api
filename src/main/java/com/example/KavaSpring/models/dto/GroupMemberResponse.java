@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GroupMemberResponse {
-    private String photoUri;
+    private String photoUrl;
     private String firstName;
     private String lastName;
     private float score;

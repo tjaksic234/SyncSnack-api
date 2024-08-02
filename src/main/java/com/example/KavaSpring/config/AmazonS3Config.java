@@ -2,16 +2,14 @@ package com.example.KavaSpring.config;
 
 
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.HttpMethod;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectResult;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.services.s3.model.*;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +17,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
+import java.net.URL;
+import java.util.Date;
 
 @Component
 @Slf4j
@@ -83,6 +82,20 @@ public class AmazonS3Config {
             log.error("Error occurred while updating file in S3", e);
             throw new RuntimeException("Failed to update file in S3", e);
         }
+    }
+
+    public URL generatePresignedUrl(String fileUri) {
+        AmazonS3 s3client = S3client();
+        Date expiration = new Date();
+        long expTimeMillis = expiration.getTime();
+        expTimeMillis += 1000 * 60 * 60;
+        expiration.setTime(expTimeMillis);
+
+        GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(bucket, fileUri)
+                .withMethod(HttpMethod.GET)
+                .withExpiration(expiration);
+
+        return s3client.generatePresignedUrl(generatePresignedUrlRequest);
     }
 
 }

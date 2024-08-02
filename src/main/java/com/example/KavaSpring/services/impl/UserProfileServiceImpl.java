@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -193,11 +194,18 @@ public class UserProfileServiceImpl implements UserProfileService {
             int orderCount = (result != null) ? result.getInteger("orderCount") : 0;
 
             GroupMemberResponse groupMember  = new GroupMemberResponse();
-            groupMember.setPhotoUri(userProfileDoc.getString("profilePhoto"));
+            //groupMember.setPhotoUri(userProfileDoc.getString("profilePhoto"));
             groupMember.setFirstName(userProfileDoc.getString("firstName"));
             groupMember.setLastName(userProfileDoc.getString("lastName"));
             groupMember.setScore(userProfileDoc.getDouble("score").floatValue());
             groupMember.setOrderCount(orderCount);
+
+            String photoUri = userProfileDoc.getString("profilePhoto");
+            if (photoUri != null && !photoUri.isEmpty()) {
+                URL presignedUrl = amazonS3Config.generatePresignedUrl(photoUri);
+                groupMember.setPhotoUrl(presignedUrl.toString());
+            }
+
 
             groupMembers.add(groupMember);
         }
