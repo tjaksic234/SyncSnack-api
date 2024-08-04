@@ -216,7 +216,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
 
 
-        //? retrieve all the userProfileIds that made an event
+        //? retrieve all the userProfiles that made an event for the group the user checking the leaderboard is in
         MatchOperation matchGroup = Aggregation.match(Criteria.where("groupId").is(userProfile.getGroupId()));
 
         GroupOperation groupByUserProfile = Aggregation.group("userProfileId");
@@ -237,7 +237,9 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .map(doc -> doc.getString("userProfileId"))
                 .toList();
 
-        
+
+        //? average score calculation logic
+
     }
 
 
