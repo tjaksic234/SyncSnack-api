@@ -51,7 +51,7 @@ public class EmailTemplates {
                 "            display: inline-block;\n" +
                 "            padding: 10px 20px;\n" +
                 "            background-color: #1a73e8;\n" +
-                "            color: #ffffff;\n" +
+                "            color: #ffffff !important;\n" +
                 "            text-decoration: none;\n" +
                 "            border-radius: 5px;\n" +
                 "            margin-top: 20px;\n" +

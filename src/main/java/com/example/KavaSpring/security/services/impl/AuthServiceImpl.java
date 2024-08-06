@@ -29,6 +29,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 @Service
 @Slf4j
 @Transactional
@@ -51,6 +54,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Value("${FRONTEND_URL}")
     private String FRONTEND_URL;
+
+    @Value("${BACKEND_URL}")
+    private String BACKEND_URL;
 
     @Value("${EMAIL_FROM}")
     private String EMAIL_FROM;
@@ -134,10 +140,27 @@ public class AuthServiceImpl implements AuthService {
 
         verificationInvitationRepository.save(invitation);
 
-        String verificationUrl = FRONTEND_URL + "/verify/" + invitation.getId() + "/" + verificationCode;
+        String verificationUrl = BACKEND_URL + "/verify?" + "invitationId=" + invitation.getId() + "&"  + "verificationCode=" + verificationCode;
 
         //? sending the email
         sendGridEmailService.sendHtml(EMAIL_FROM, user.getEmail(), "Verification email", EmailTemplates.confirmationEmail(user.getEmail(), verificationUrl));
+
+    }
+
+    @Override
+    public void verifyUser(String invitationId, String verificationCode) {
+        VerificationInvitation invitation = verificationInvitationRepository.findByIdAndVerificationCode(invitationId, verificationCode);
+        if (invitation.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Invitation expired.");
+        }
+        Optional<User> user = userRepository.findByEmail(invitation.getEmail());
+
+        if (user.isPresent()) {
+            if (!user.get().isActive()) {
+                user.get().setActive(true);
+                userRepository.save(user.get());
+            }
+        }
 
     }
 

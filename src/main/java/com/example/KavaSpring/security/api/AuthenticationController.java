@@ -67,5 +67,19 @@ public class AuthenticationController {
         }
     }
 
+    @GetMapping("verify")
+    public ResponseEntity<String> verifyUser(@RequestParam String invitationId, @RequestParam String verificationCode) {
+        try {
+            log.info("Verify user started");
+            authService.verifyUser(invitationId, verificationCode);
+            return ResponseEntity.ok("Verification successful!");
+        } catch (RuntimeException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().body("Verification failed: " + e.getMessage());
+        }
+    }
+
+
+
 
 }

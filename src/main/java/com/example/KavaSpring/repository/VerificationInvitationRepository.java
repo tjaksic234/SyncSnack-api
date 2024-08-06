@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface VerificationInvitationRepository extends MongoRepository<VerificationInvitation, String> {
+    VerificationInvitation findByIdAndVerificationCode(String id, String verificationCode);
 }

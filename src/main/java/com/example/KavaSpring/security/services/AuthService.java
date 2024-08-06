@@ -12,4 +12,5 @@ public interface AuthService {
     LoginResponse login(LoginRequest request);
     RegisterUserResponse register(RegisterUserRequest request);
     void sendVerificationEmail(User user);
+    void verifyUser(String invitationId, String verificationCode);
 }
