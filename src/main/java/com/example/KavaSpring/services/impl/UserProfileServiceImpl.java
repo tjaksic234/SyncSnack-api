@@ -15,6 +15,7 @@ import com.example.KavaSpring.services.UserProfileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -171,9 +172,12 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .andInclude("groupId")
                 .andInclude("score");
 
+        SortOperation sortByScoreDesc = Aggregation.sort(Sort.by(Sort.Direction.DESC, "score"));
+
         Aggregation userProfileAggregation = Aggregation.newAggregation(
                 matchUserProfilesByGroupId,
-                projectionOperation
+                projectionOperation,
+                sortByScoreDesc
         );
 
         List<Document> userProfiles = mongoTemplate.aggregate(userProfileAggregation, "userProfiles", Document.class).getMappedResults();
