@@ -111,7 +111,7 @@ public class UserProfileController {
             log.info("Updating user profile scores started");
             userProfileService.calculateScore();
             return ResponseEntity.ok().build();
-        } catch (RuntimeException e) {
+        } catch (EntityNotFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
         }

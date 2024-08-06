@@ -1,6 +1,7 @@
 package com.example.KavaSpring.services.impl;
 
 import com.example.KavaSpring.converters.ConverterService;
+import com.example.KavaSpring.exceptions.EntityNotFoundException;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.exceptions.UserProfileExistsException;
 import com.example.KavaSpring.models.dao.UserProfile;
@@ -214,7 +215,11 @@ public class UserProfileServiceImpl implements UserProfileService {
     public void calculateScore() {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
 
-        
+        if (userProfile == null) {
+            throw new EntityNotFoundException("The userProfile was not found");
+        }
+
+
         //? average score calculation logic
         MatchOperation matchGroup = Aggregation.match(Criteria.where("groupId").is(userProfile.getGroupId()));
 

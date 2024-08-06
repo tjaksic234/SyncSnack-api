@@ -7,9 +7,11 @@ import com.example.KavaSpring.models.dao.Order;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.repository.UserProfileRepository;
+import com.example.KavaSpring.services.AmazonS3Service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.net.URL;
 import java.util.Optional;
 
 @Service
@@ -17,6 +19,8 @@ import java.util.Optional;
 public class ConverterServiceImpl implements ConverterService {
 
     private final UserProfileRepository userProfileRepository;
+
+    private final AmazonS3Service amazonS3Service;
 
     @Override
     public UserProfileDto convertToUserProfileDto(UserProfile userProfile) {
@@ -26,7 +30,10 @@ public class ConverterServiceImpl implements ConverterService {
         userProfileDto.setGroupId(userProfile.getGroupId());
         userProfileDto.setFirstName(userProfile.getFirstName());
         userProfileDto.setLastName(userProfile.getLastName());
-        userProfileDto.setPhotoUri(userProfile.getPhotoUri());
+        if (userProfile.getPhotoUri() != null && !userProfile.getPhotoUri().isEmpty()) {
+            URL presignedUrl = amazonS3Service.generatePresignedUrl(userProfile.getPhotoUri());
+            userProfileDto.setPhotoUrl(presignedUrl.toString());
+        }
         return userProfileDto;
     }
 
