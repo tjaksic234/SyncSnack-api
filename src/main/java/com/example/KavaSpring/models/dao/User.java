@@ -30,6 +30,9 @@ public class User {
     @Size(max = 120)
     private String password;
 
+    @NotBlank
+    private boolean isActive = false;
+
     @CreatedDate
     private LocalDateTime createdAt;
 

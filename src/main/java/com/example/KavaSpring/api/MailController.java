@@ -24,7 +24,7 @@ public class MailController {
             @RequestParam String subject) {
         try {
             log.info("Sending mail with SendGrid");
-            sendGridEmailService.sendHtml(from, to, subject, EmailTemplates.confirmationEmail(to));
+            sendGridEmailService.sendHtml(from, to, subject, EmailTemplates.confirmationEmail(to, "dfajvsfdvfhbjsdfgbhu"));
             return ResponseEntity.ok("Email sent successfully");
         } catch (Exception e) {
             log.error(e.getMessage());
