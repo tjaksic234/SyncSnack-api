@@ -109,7 +109,11 @@ public class UserProfileServiceImpl implements UserProfileService {
         if (userProfile == null) {
             throw new NotFoundException("The UserProfile was not retrieved successfully");
         }
+        
         String fileUri = userProfile.getPhotoUri();
+        if (fileUri == null || fileUri.trim().isEmpty()) {
+            throw new IllegalArgumentException("The photoUri field is missing or empty in the UserProfile.");
+        }
         log.info("fileUri: {}", fileUri);
         return amazonS3Service.downloadFromS3(fileUri);
     }

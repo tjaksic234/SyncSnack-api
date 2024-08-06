@@ -1,9 +1,11 @@
 package com.example.KavaSpring.api;
 
 import com.example.KavaSpring.config.openapi.ShowAPI;
-import com.example.KavaSpring.security.mail.MailgunEmailService;
+import com.example.KavaSpring.security.utils.EmailTemplates;
+import com.example.KavaSpring.services.SendGridEmailService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,19 +15,20 @@ import org.springframework.web.bind.annotation.*;
 @ShowAPI
 public class MailController {
 
-    private final MailgunEmailService emailService;
+    private final SendGridEmailService sendGridEmailService;
 
-    @PostMapping("/send")
-    public String sendMail(
+    @PostMapping("/verify")
+    public ResponseEntity<String> sendMail(
             @RequestParam String from,
             @RequestParam String to,
-            @RequestParam String subject,
-            @RequestParam String content) {
+            @RequestParam String subject) {
         try {
-            emailService.sendEmailWithHtmlContent(from, to, subject, content);
-            return "Email sent successfully!";
+            log.info("Sending mail with SendGrid");
+            sendGridEmailService.sendHtml(from, to, subject, EmailTemplates.confirmationEmail(to));
+            return ResponseEntity.ok("Email sent successfully");
         } catch (Exception e) {
-            throw new RuntimeException("Error sending mail", e);
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 }

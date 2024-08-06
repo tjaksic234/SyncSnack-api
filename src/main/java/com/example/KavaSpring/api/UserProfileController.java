@@ -70,7 +70,7 @@ public class UserProfileController {
         } catch (IOException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
-        } catch (EntityNotFoundException e) {
+        } catch (EntityNotFoundException | IllegalArgumentException e) {
             log.error(e.getMessage());
             return ResponseEntity.notFound().build();
         }
