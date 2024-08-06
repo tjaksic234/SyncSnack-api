@@ -4,10 +4,7 @@ import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.exceptions.UserProfileExistsException;
 import com.example.KavaSpring.models.dao.UserProfile;
-import com.example.KavaSpring.models.dto.GroupMemberResponse;
-import com.example.KavaSpring.models.dto.UserProfileDto;
-import com.example.KavaSpring.models.dto.UserProfileRequest;
-import com.example.KavaSpring.models.dto.UserProfileResponse;
+import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.repository.GroupRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.repository.UserRepository;
@@ -20,6 +17,8 @@ import org.bson.Document;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -215,31 +214,47 @@ public class UserProfileServiceImpl implements UserProfileService {
     public void calculateScore() {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
 
-
-        //? retrieve all the userProfiles that made an event for the group the user checking the leaderboard is in
+        
+        //? average score calculation logic
         MatchOperation matchGroup = Aggregation.match(Criteria.where("groupId").is(userProfile.getGroupId()));
 
-        GroupOperation groupByUserProfile = Aggregation.group("userProfileId");
+        AddFieldsOperation addStringId = Aggregation.addFields().addField("_id")
+                .withValue(ConvertOperators.ToString.toString("$_id")).build();
+
+        LookupOperation lookupOperation = Aggregation.lookup("orders", "_id", "eventId", "orders");
+
+        UnwindOperation unwindOperation = Aggregation.unwind("orders");
+
+        MatchOperation matchRating = Aggregation.match(Criteria.where("orders.rating").ne(0));
+
+        GroupOperation groupAndCalculateScore = Aggregation.group("userProfileId")
+                .avg("orders.rating").as("score");
 
         ProjectionOperation projectionOperation = Aggregation.project()
                 .and("_id").as("userProfileId")
+                .and("score").as("score")
                 .andExclude("_id");
 
         Aggregation aggregation = Aggregation.newAggregation(
                 matchGroup,
-                groupByUserProfile,
+                addStringId,
+                lookupOperation,
+                unwindOperation,
+                matchRating,
+                groupAndCalculateScore,
                 projectionOperation
         );
 
-        AggregationResults<Document> results = mongoTemplate.aggregate(aggregation, "events", Document.class);
+        AggregationResults<ScoreCalculationDto> results = mongoTemplate.aggregate(aggregation, "events", ScoreCalculationDto.class);
 
-        List<String> userProfileIds = results.getMappedResults().stream()
-                .map(doc -> doc.getString("userProfileId"))
-                .toList();
+        List<ScoreCalculationDto> userScores = results.getMappedResults();
 
-
-        //? average score calculation logic
-
+        for (ScoreCalculationDto score: userScores) {
+            Query query = new Query(Criteria.where("_id").is(score.getUserProfileId()));
+            Update update = new Update().set("score", score.getScore());
+            mongoTemplate.updateFirst(query, update, UserProfile.class);
+        }
+        log.info("Scores successfully updated");
     }
 
 

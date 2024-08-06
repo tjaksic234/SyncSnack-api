@@ -104,4 +104,16 @@ public class UserProfileController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @PatchMapping("scores")
+    public ResponseEntity<Void> updateUserProfileScores() {
+        try {
+            log.info("Updating user profile scores started");
+            userProfileService.calculateScore();
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }
