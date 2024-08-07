@@ -55,8 +55,8 @@ public class WebSecurityConfig {
                         .requestMatchers("api/groups/create").permitAll()
                         .requestMatchers("api/groups/join").permitAll()
                         .requestMatchers("api/users/check").permitAll()
-                        .requestMatchers("api/auth/verify").permitAll()
-                        .requestMatchers("api/auth/fetchMe").authenticated()
+                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/ws").permitAll()
                         .anyRequest().authenticated());
 
         http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);

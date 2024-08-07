@@ -8,6 +8,7 @@ import com.example.KavaSpring.models.dto.GroupMemberResponse;
 import com.example.KavaSpring.models.dto.UserProfileDto;
 import com.example.KavaSpring.models.dto.UserProfileRequest;
 import com.example.KavaSpring.models.dto.UserProfileResponse;
+import com.example.KavaSpring.models.enums.SortCondition;
 import com.example.KavaSpring.services.UserProfileService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -95,10 +96,10 @@ public class UserProfileController {
     }
 
     @GetMapping("group")
-    public ResponseEntity<List<GroupMemberResponse>> getGroupMembers() {
+    public ResponseEntity<List<GroupMemberResponse>> getGroupMembers(@RequestParam SortCondition sortCondition) {
         try {
             log.info("Fetching group members");
-            return ResponseEntity.ok(userProfileService.getGroupMembers());
+            return ResponseEntity.ok(userProfileService.getGroupMembers(sortCondition));
         } catch (IllegalStateException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();

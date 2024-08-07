@@ -42,6 +42,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final MongoTemplate mongoTemplate;
 
+
     @Override
     public OrderResponse createOrder(OrderRequest request) {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
@@ -67,6 +68,7 @@ public class OrderServiceImpl implements OrderService {
         order.setEventId(request.getEventId());
         order.setAdditionalOptions(request.getAdditionalOptions());
         orderRepository.save(order);
+
 
         log.info("Order created");
         return converterService.convertToOrderResponse(request);

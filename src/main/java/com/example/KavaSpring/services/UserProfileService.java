@@ -4,6 +4,7 @@ import com.example.KavaSpring.models.dto.GroupMemberResponse;
 import com.example.KavaSpring.models.dto.UserProfileDto;
 import com.example.KavaSpring.models.dto.UserProfileRequest;
 import com.example.KavaSpring.models.dto.UserProfileResponse;
+import com.example.KavaSpring.models.enums.SortCondition;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -15,6 +16,6 @@ public interface UserProfileService {
     UserProfileDto getProfileById(String id);
     byte[] downloadUserProfilePhoto() throws IOException;
     String editUserProfile(String firstName, String lastName, MultipartFile photoFile);
-    List<GroupMemberResponse> getGroupMembers();
+    List<GroupMemberResponse> getGroupMembers(SortCondition condition);
     void calculateScore();
 }

@@ -6,6 +6,7 @@ import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.exceptions.UserProfileExistsException;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.*;
+import com.example.KavaSpring.models.enums.SortCondition;
 import com.example.KavaSpring.repository.GroupRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.repository.UserRepository;
@@ -158,7 +159,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
-    public List<GroupMemberResponse> getGroupMembers() {
+    public List<GroupMemberResponse> getGroupMembers(SortCondition condition) {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
         String groupId = userProfile.getGroupId();
         List<GroupMemberResponse> groupMembers = new ArrayList<>();
@@ -176,12 +177,23 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .andInclude("groupId")
                 .andInclude("score");
 
-        SortOperation sortByScoreDesc = Aggregation.sort(Sort.by(Sort.Direction.DESC, "score"));
+        SortOperation sortOperation;
+        switch (condition) {
+            case SCORE:
+                sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "score"));
+                break;
+            case FIRSTNAME:
+                sortOperation = Aggregation.sort(Sort.by(Sort.Direction.ASC, "firstName"));
+                break;
+            default:
+                sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "score"));
+                break;
+        }
 
         Aggregation userProfileAggregation = Aggregation.newAggregation(
                 matchUserProfilesByGroupId,
                 projectionOperation,
-                sortByScoreDesc
+                sortOperation
         );
 
         List<Document> userProfiles = mongoTemplate.aggregate(userProfileAggregation, "userProfiles", Document.class).getMappedResults();
@@ -269,6 +281,5 @@ public class UserProfileServiceImpl implements UserProfileService {
         }
         log.info("Scores successfully updated");
     }
-
 
 }
