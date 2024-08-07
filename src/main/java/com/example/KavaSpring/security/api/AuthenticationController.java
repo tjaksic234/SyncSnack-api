@@ -68,7 +68,10 @@ public class AuthenticationController {
     }
 
     @GetMapping("verify")
-    public ResponseEntity<String> verifyUser(@RequestParam String invitationId, @RequestParam String verificationCode) {
+    public ResponseEntity<String> verifyUser(
+            @RequestParam String invitationId,
+            @RequestParam String verificationCode
+    ) {
         try {
             log.info("Verify user started");
             authService.verifyUser(invitationId, verificationCode);

@@ -140,7 +140,8 @@ public class AuthServiceImpl implements AuthService {
 
         verificationInvitationRepository.save(invitation);
 
-        String verificationUrl = BACKEND_URL + "/verify?" + "invitationId=" + invitation.getId() + "&"  + "verificationCode=" + verificationCode;
+        String verificationUrl = BACKEND_URL + "/api/auth/verify?invitationId=" + invitation.getId() + "&verificationCode=" + verificationCode;
+        log.info("The verification url: " + verificationUrl);
 
         //? sending the email
         sendGridEmailService.sendHtml(EMAIL_FROM, user.getEmail(), "Verification email", EmailTemplates.confirmationEmail(user.getEmail(), verificationUrl));
@@ -159,6 +160,7 @@ public class AuthServiceImpl implements AuthService {
             if (!user.get().isActive()) {
                 user.get().setActive(true);
                 userRepository.save(user.get());
+                log.info("User verification successful");
             }
         }
 
