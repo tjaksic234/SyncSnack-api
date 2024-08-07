@@ -170,17 +170,36 @@ public class UserProfileServiceImpl implements UserProfileService {
 
         MatchOperation matchUserProfilesByGroupId = Aggregation.match(Criteria.where("groupId").is(groupId));
 
+        AddFieldsOperation convertToStringId = Aggregation.addFields().addField("_id")
+                .withValue(ConvertOperators.ToString.toString("$_id")).build();
+
+        LookupOperation lookupOperation = Aggregation.lookup("orders", "_id", "userProfileId", "orderDetails");
+
+        UnwindOperation unwindOperation = Aggregation.unwind("orderDetails");
+
+        GroupOperation groupOperation =  Aggregation.group("_id")
+                .first("firstName").as("firstName")
+                .first("lastName").as("lastName")
+                .first("score").as("score")
+                .first("photoUri").as("profilePhoto")
+                .count().as("orderCount");
+
+
         ProjectionOperation projectionOperation = Aggregation.project()
-                .and("photoUri").as("profilePhoto")
+                .and("profilePhoto").as("photoUrl")
                 .andInclude("firstName")
                 .andInclude("lastName")
                 .andInclude("groupId")
-                .andInclude("score");
+                .andInclude("score")
+                .andInclude("orderCount");
 
         SortOperation sortOperation;
         switch (condition) {
             case SCORE:
                 sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "score"));
+                break;
+            case ORDER_COUNT:
+                sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "orderCount"));
                 break;
             case FIRSTNAME:
                 sortOperation = Aggregation.sort(Sort.by(Sort.Direction.ASC, "firstName"));
@@ -192,39 +211,28 @@ public class UserProfileServiceImpl implements UserProfileService {
 
         Aggregation userProfileAggregation = Aggregation.newAggregation(
                 matchUserProfilesByGroupId,
+                convertToStringId,
+                lookupOperation,
+                unwindOperation,
+                groupOperation,
                 projectionOperation,
                 sortOperation
         );
 
         List<Document> userProfiles = mongoTemplate.aggregate(userProfileAggregation, "userProfiles", Document.class).getMappedResults();
 
-        for (Document userProfileDoc: userProfiles) {
-            String userProfileId = userProfileDoc.getObjectId("_id").toString();
-
-            MatchOperation matchOperation = Aggregation.match(Criteria.where("userProfileId").is(userProfileId));
-            CountOperation countOperation = Aggregation.count().as("orderCount");
-
-            Aggregation orderCountAggregation = Aggregation.newAggregation(
-                    matchOperation,
-                    countOperation
-            );
-
-            Document result = mongoTemplate.aggregate(orderCountAggregation, "orders", Document.class).getUniqueMappedResult();
-
-            int orderCount = (result != null) ? result.getInteger("orderCount") : 0;
-
-            GroupMemberResponse groupMember  = new GroupMemberResponse();
+        for (Document userProfileDoc : userProfiles) {
+            GroupMemberResponse groupMember = new GroupMemberResponse();
             groupMember.setFirstName(userProfileDoc.getString("firstName"));
             groupMember.setLastName(userProfileDoc.getString("lastName"));
             groupMember.setScore(userProfileDoc.getDouble("score").floatValue());
-            groupMember.setOrderCount(orderCount);
+            groupMember.setOrderCount(userProfileDoc.getInteger("orderCount"));
 
-            String photoUri = userProfileDoc.getString("profilePhoto");
+            String photoUri = userProfileDoc.getString("photoUrl");
             if (photoUri != null && !photoUri.isEmpty()) {
                 URL presignedUrl = amazonS3Service.generatePresignedUrl(photoUri);
                 groupMember.setPhotoUrl(presignedUrl.toString());
             }
-
 
             groupMembers.add(groupMember);
         }
