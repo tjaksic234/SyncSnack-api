@@ -133,4 +133,15 @@ public class OrderController {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
+
+    @PostMapping("search")
+    public ResponseEntity<List<OrderSearchResponse>> searchOrders(@RequestBody OrderSearchRequest request) {
+        try {
+            log.info("Search orders");
+            return ResponseEntity.ok(orderService.searchOrders(request));
+        } catch (NotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

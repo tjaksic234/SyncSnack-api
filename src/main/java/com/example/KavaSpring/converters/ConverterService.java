@@ -21,4 +21,5 @@ public interface ConverterService {
     OrderResponse convertToOrderResponse(OrderRequest request);
     OrderActivityResponse convertToOrderActiveResponse(OrderActivityResponse response);
     OrderEventInfoDto convertToOrderEventInfoDto(OrderEventInfoDto dto);
+    OrderSearchResponse convertOrderToOrderSearchResponse(Order order);
 }

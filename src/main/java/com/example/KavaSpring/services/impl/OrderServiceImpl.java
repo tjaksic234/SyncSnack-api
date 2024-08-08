@@ -20,6 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +42,8 @@ public class OrderServiceImpl implements OrderService {
     private final ConverterService converterService;
 
     private final MongoTemplate mongoTemplate;
+
+    private final SimpMessagingTemplate messagingTemplate;
 
 
     @Override
@@ -69,6 +72,10 @@ public class OrderServiceImpl implements OrderService {
         order.setAdditionalOptions(request.getAdditionalOptions());
         orderRepository.save(order);
 
+        //? Websocket event update
+        OrderNotification orderNotification = new OrderNotification();
+        orderNotification.setOrder(order);
+        messagingTemplate.convertAndSend("/topic/newOrder", orderNotification);
 
         log.info("Order created");
         return converterService.convertToOrderResponse(request);
@@ -289,6 +296,42 @@ public class OrderServiceImpl implements OrderService {
         log.info("Order successfully rated");
 
         return "Order successfully rated";
+    }
+
+    @Override
+    public List<OrderSearchResponse> searchOrders(OrderSearchRequest request) {
+        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+        if (userProfile == null) {
+            throw new NotFoundException("No user profile defined");
+        }
+        String userProfileId = userProfile.getId();
+        String searchTerm = request.getSearchTerm();
+        log.info("Search term: " + searchTerm);
+
+        List<Criteria> criteriaList = new ArrayList<>();
+        criteriaList.add(Criteria.where("userProfileId").is(userProfileId));
+
+        if (searchTerm != null && !searchTerm.isEmpty()) {
+            criteriaList.add(Criteria.where("status").regex(searchTerm, "i"));
+        }
+
+        Criteria combinedCriteria = new Criteria().andOperator(criteriaList.toArray(new Criteria[0]));
+
+        SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "createdAt"));
+
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(combinedCriteria),
+                sortOperation
+        );
+
+        AggregationResults<Order> results = mongoTemplate.aggregate(aggregation, "orders", Order.class);
+
+        List<Order> matchingOrders = results.getMappedResults();
+
+        return matchingOrders.stream()
+                .map(converterService::convertOrderToOrderSearchResponse)
+                .collect(Collectors.toList());
     }
 
 

@@ -14,4 +14,5 @@ public interface OrderService {
     String updateAllOrdersStatus(String id, OrderStatus status);
     List<OrderExpandedResponse> getActiveOrdersByEventId(String id);
     String rateOrder(String id, int rating);
+    List<OrderSearchResponse> searchOrders(OrderSearchRequest request);
 }
