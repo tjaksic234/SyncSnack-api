@@ -20,7 +20,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +42,6 @@ public class OrderServiceImpl implements OrderService {
 
     private final MongoTemplate mongoTemplate;
 
-    private final SimpMessagingTemplate messagingTemplate;
 
 
     @Override
@@ -72,10 +70,6 @@ public class OrderServiceImpl implements OrderService {
         order.setAdditionalOptions(request.getAdditionalOptions());
         orderRepository.save(order);
 
-        //? Websocket event update
-        OrderNotification orderNotification = new OrderNotification();
-        orderNotification.setOrder(order);
-        messagingTemplate.convertAndSend("/topic/newOrder", orderNotification);
 
         log.info("Order created");
         return converterService.convertToOrderResponse(request);
