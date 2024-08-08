@@ -306,7 +306,6 @@ public class OrderServiceImpl implements OrderService {
         }
         String userProfileId = userProfile.getId();
         String searchTerm = request.getSearchTerm();
-        log.info("Search term: " + searchTerm);
 
         List<Criteria> criteriaList = new ArrayList<>();
         criteriaList.add(Criteria.where("userProfileId").is(userProfileId));
