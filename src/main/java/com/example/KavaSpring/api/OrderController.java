@@ -141,7 +141,7 @@ public class OrderController {
             return ResponseEntity.ok(orderService.searchOrders(request));
         } catch (NotFoundException e) {
             log.error(e.getMessage());
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.notFound().build();
         }
     }
 }

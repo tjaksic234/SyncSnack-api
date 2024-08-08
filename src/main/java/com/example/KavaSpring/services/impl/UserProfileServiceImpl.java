@@ -178,6 +178,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         UnwindOperation unwindOperation = Aggregation.unwind("orderDetails");
 
         GroupOperation groupOperation =  Aggregation.group("_id")
+                .first("orderDetails.userProfileId").as("userProfileId")
                 .first("firstName").as("firstName")
                 .first("lastName").as("lastName")
                 .first("score").as("score")
@@ -187,6 +188,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
         ProjectionOperation projectionOperation = Aggregation.project()
                 .and("profilePhoto").as("photoUrl")
+                .andInclude("userProfileId")
                 .andInclude("firstName")
                 .andInclude("lastName")
                 .andInclude("groupId")
@@ -223,6 +225,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
         for (Document userProfileDoc : userProfiles) {
             GroupMemberResponse groupMember = new GroupMemberResponse();
+            groupMember.setUserProfileId(userProfileDoc.getString("userProfileId"));
             groupMember.setFirstName(userProfileDoc.getString("firstName"));
             groupMember.setLastName(userProfileDoc.getString("lastName"));
             groupMember.setScore(userProfileDoc.getDouble("score").floatValue());
