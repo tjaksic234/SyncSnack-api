@@ -52,11 +52,11 @@ public class EventController {
         }
     }
 
-    @PostMapping("search")
-    public ResponseEntity<List<EventExpandedResponse>> searchEvents(@RequestBody EventSearchRequest request) {
+    @PostMapping("filter")
+    public ResponseEntity<List<EventExpandedResponse>> filterEvents(@RequestBody EventSearchRequest request) {
         try {
             log.info("Search for events started");
-            return ResponseEntity.ok(eventService.searchEvents(request));
+            return ResponseEntity.ok(eventService.filterEvents(request));
         } catch (NotValidEnumException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();

@@ -82,7 +82,7 @@ public class EventServiceImpl implements EventService {
 
 
     @Override
-    public List<EventExpandedResponse> searchEvents(EventSearchRequest request) {
+    public List<EventExpandedResponse> filterEvents(EventSearchRequest request) {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
         List<Criteria> criteriaList = new ArrayList<>();
 

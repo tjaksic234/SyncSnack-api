@@ -1,8 +1,7 @@
 package com.example.KavaSpring.api.websocket;
 
-import com.example.KavaSpring.models.dto.OrderRequest;
-import com.example.KavaSpring.models.dto.OrderResponse;
 import com.example.KavaSpring.services.OrderService;
+import com.example.KavaSpring.services.WebSocketService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -15,18 +14,27 @@ import org.springframework.web.util.HtmlUtils;
 @AllArgsConstructor
 public class OrderWebSocketController {
 
+    //? everything sent to the server has a prefix /app e.g. app/welcome
+
     private final OrderService orderService;
 
-    @MessageMapping("/order")
+    private final WebSocketService webSocketService;
+
+   /* @MessageMapping("/order")
     @SendTo("/topic/newOrder")
     public OrderResponse handleOrder(OrderRequest request) {
         return orderService.createOrder(request);
     }
-
-    @MessageMapping("/welcome")
+*/
+/*    @MessageMapping("/welcome")
     @SendTo("/topic/greetings")
-    public String handleWelcomeMessage(String message) {
+    public String handleWelcomeMessage(MessageDto message) {
         log.info("Received message: {}", message);
-        return "Welcome to the WebSocket server, " + HtmlUtils.htmlEscape(message) + "!";
-    }
+        return "Welcome to the WebSocket server, " + HtmlUtils.htmlEscape(message.getName()) + "!";
+    }*/
+
+   /* @MessageMapping("/disconnect")
+    public void handleDisconnect(String username) {
+        webSocketService.removeUser(username);
+    }*/
 }
