@@ -59,6 +59,8 @@ public class WebSecurityConfig {
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/ws").permitAll()
                         .anyRequest().authenticated());
+                      //  .anyRequest().permitAll());
+                    // ? za testiranje web socketa
 
         http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

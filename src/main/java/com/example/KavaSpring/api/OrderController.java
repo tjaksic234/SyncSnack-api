@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +24,8 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
+
+    private SimpMessagingTemplate messagingTemplate;
 
     @PostMapping("create")
     public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest request) {

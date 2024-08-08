@@ -14,6 +14,7 @@ import com.example.KavaSpring.repository.OrderRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.security.utils.Helper;
 import com.example.KavaSpring.services.OrderService;
+import com.example.KavaSpring.services.WebSocketService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -42,7 +43,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final MongoTemplate mongoTemplate;
 
-
+    private final WebSocketService webSocketService;
 
     @Override
     public OrderResponse createOrder(OrderRequest request) {
@@ -58,18 +59,20 @@ public class OrderServiceImpl implements OrderService {
             throw new NotFoundException("No event associated with eventId in the order");
         }
 
-        boolean existingOrder = orderRepository.existsByUserProfileIdAndEventId(userProfile.getId(), request.getEventId());
+       /* boolean existingOrder = orderRepository.existsByUserProfileIdAndEventId(userProfile.getId(), request.getEventId());
         if (existingOrder) {
             throw new IllegalStateException("User already has an order for this event");
         }
-
-        log.info("the order request is: {}", request);
+*/
+        log.info("The order request is: {}", request);
         Order order = new Order();
         order.setUserProfileId(userProfile.getId());
         order.setEventId(request.getEventId());
         order.setAdditionalOptions(request.getAdditionalOptions());
         orderRepository.save(order);
 
+        //? notify the event creator userProfile through websocket
+        webSocketService.notifyEventUserProfile(order);
 
         log.info("Order created");
         return converterService.convertToOrderResponse(request);
