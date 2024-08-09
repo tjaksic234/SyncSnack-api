@@ -59,11 +59,11 @@ public class OrderServiceImpl implements OrderService {
             throw new NotFoundException("No event associated with eventId in the order");
         }
 
-       /* boolean existingOrder = orderRepository.existsByUserProfileIdAndEventId(userProfile.getId(), request.getEventId());
+        boolean existingOrder = orderRepository.existsByUserProfileIdAndEventId(userProfile.getId(), request.getEventId());
         if (existingOrder) {
             throw new IllegalStateException("User already has an order for this event");
         }
-*/
+
         log.info("The order request is: {}", request);
         Order order = new Order();
         order.setUserProfileId(userProfile.getId());
