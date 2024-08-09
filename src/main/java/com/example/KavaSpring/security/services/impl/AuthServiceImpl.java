@@ -153,17 +153,26 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void verifyUser(String invitationId, String verificationCode) {
         VerificationInvitation invitation = verificationInvitationRepository.findByIdAndVerificationCode(invitationId, verificationCode);
+
+        if (!invitation.isActive()) {
+            throw new IllegalStateException("Invitation expired.");
+        }
+
         if (invitation.getExpiresAt().isBefore(LocalDateTime.now())) {
             invitation.setActive(false);
             verificationInvitationRepository.save(invitation);
             throw new IllegalStateException("Invitation expired.");
         }
+
+
         Optional<User> user = userRepository.findByEmail(invitation.getEmail());
 
         if (user.isPresent()) {
             if (!user.get().isVerified()) {
                 user.get().setVerified(true);
+                invitation.setActive(false);
                 userRepository.save(user.get());
+                verificationInvitationRepository.save(invitation);
                 log.info("User verification successful");
             }
         }
