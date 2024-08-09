@@ -3,7 +3,9 @@ package com.example.KavaSpring.services.impl;
 import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.EntityNotFoundException;
 import com.example.KavaSpring.exceptions.NotFoundException;
+import com.example.KavaSpring.exceptions.UnverifiedUserException;
 import com.example.KavaSpring.exceptions.UserProfileExistsException;
+import com.example.KavaSpring.models.dao.User;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.models.enums.SortCondition;
@@ -52,10 +54,14 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     public UserProfileResponse createUserProfile(UserProfileRequest request, MultipartFile photoFile) {
-        userRepository.findById(request.getUserId())
+        User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         boolean exists = userProfileRepository.existsByUserId(request.getUserId());
+
+        if (!user.isVerified()) {
+            throw new UnverifiedUserException("User is not verified");
+        }
 
         if (exists) {
             throw new UserProfileExistsException("The User Profile already exists");

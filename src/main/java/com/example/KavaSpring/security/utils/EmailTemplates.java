@@ -79,4 +79,84 @@ public class EmailTemplates {
                 "</body>\n" +
                 "</html>\n";
     }
+
+    public static String emailVerified(String userId) {
+        return "<!DOCTYPE html>\n" +
+                "<html lang=\"en\">\n" +
+                "<head>\n" +
+                "    <meta charset=\"UTF-8\">\n" +
+                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
+                "    <title>Email Verified</title>\n" +
+                "    <style>\n" +
+                "        body {\n" +
+                "            font-family: Arial, sans-serif;\n" +
+                "            margin: 0;\n" +
+                "            padding: 0;\n" +
+                "            background-color: #f4f4f4;\n" +
+                "            display: flex;\n" +
+                "            justify-content: center;\n" +
+                "            align-items: center;\n" +
+                "            min-height: 100vh;\n" +
+                "        }\n" +
+                "        .container {\n" +
+                "            width: 100%;\n" +
+                "            max-width: 600px;\n" +
+                "            padding: 20px;\n" +
+                "            background-color: #ffffff;\n" +
+                "            border-radius: 8px;\n" +
+                "            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);\n" +
+                "        }\n" +
+                "        .content {\n" +
+                "            padding: 20px;\n" +
+                "            text-align: center;\n" +
+                "        }\n" +
+                "        .footer {\n" +
+                "            text-align: center;\n" +
+                "            padding: 20px;\n" +
+                "            font-size: 12px;\n" +
+                "            color: #888888;\n" +
+                "        }\n" +
+                "        a {\n" +
+                "            color: #1a73e8;\n" +
+                "            text-decoration: none;\n" +
+                "        }\n" +
+                "        .button {\n" +
+                "            display: inline-block;\n" +
+                "            padding: 10px 20px;\n" +
+                "            background-color: #4CAF50;\n" +
+                "            color: #ffffff !important;\n" +
+                "            text-decoration: none;\n" +
+                "            border-radius: 5px;\n" +
+                "            margin-top: 20px;\n" +
+                "        }\n" +
+                "        .icon {\n" +
+                "            font-size: 48px;\n" +
+                "            color: #4CAF50;\n" +
+                "        }\n" +
+                "    </style>\n" +
+                "    <script>\n" +
+                "        setTimeout(function() {\n" +
+                "            window.location.href = 'http://localhost:3000/login?userId=" + userId + "';\n" +
+                "        }, 10000);\n" +
+                "    </script>\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "    <div class=\"container\">\n" +
+                "        <div class=\"content\">\n" +
+                "            <div class=\"icon\">✓</div>\n" +
+                "            <h1>Email Verified Successfully!</h1>\n" +
+                "            <p>Congratulations! Your email address has been successfully verified.</p>\n" +
+                "            <p>You can now enjoy full access to all features of SyncSnack.</p>\n" +
+                "            <p>You will be automatically redirected to the login page in 10 seconds.</p>\n" +
+                "            <a href=\"http://localhost:3000/login?userId=" + userId + "\" class=\"button\">Log In to Your Account</a>\n" +
+                "            <p>If you have any questions or need assistance, please don't hesitate to <a href=\"mailto:support@syncsnack.com\">contact our support team</a>.</p>\n" +
+                "            <p>Thank you for choosing SyncSnack!</p>\n" +
+                "        </div>\n" +
+                "        <div class=\"footer\">\n" +
+                "            <p>&copy; 2024 SyncSnack. All rights reserved.</p>\n" +
+                "        </div>\n" +
+                "    </div>\n" +
+                "</body>\n" +
+                "</html>";
+    }
 }

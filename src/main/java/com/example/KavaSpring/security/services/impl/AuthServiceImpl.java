@@ -140,7 +140,9 @@ public class AuthServiceImpl implements AuthService {
 
         verificationInvitationRepository.save(invitation);
 
-        String verificationUrl = BACKEND_URL + "/api/auth/verify?invitationId=" + invitation.getId() + "&verificationCode=" + verificationCode;
+        String verificationUrl = BACKEND_URL + "/api/auth/verify?invitationId=" + invitation.getId()
+                + "&verificationCode=" + verificationCode
+                + "&userId=" + user.getId();
         log.info("The verification url: " + verificationUrl);
 
         //? sending the email
@@ -152,7 +154,9 @@ public class AuthServiceImpl implements AuthService {
     public void verifyUser(String invitationId, String verificationCode) {
         VerificationInvitation invitation = verificationInvitationRepository.findByIdAndVerificationCode(invitationId, verificationCode);
         if (invitation.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Invitation expired.");
+            invitation.setActive(false);
+            verificationInvitationRepository.save(invitation);
+            throw new IllegalStateException("Invitation expired.");
         }
         Optional<User> user = userRepository.findByEmail(invitation.getEmail());
 

@@ -28,6 +28,9 @@ public class VerificationInvitation {
     private String verificationCode;
 
     @NotBlank
+    private boolean active = true;
+
+    @NotBlank
     private LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(30);
 
 }

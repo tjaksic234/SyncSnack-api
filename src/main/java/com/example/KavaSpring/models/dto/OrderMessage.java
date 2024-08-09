@@ -1,10 +1,15 @@
 package com.example.KavaSpring.models.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class OrderMessage {
     private String orderId;
-    private String eventId;
     private String userProfileId;
+    private String eventId;
+    private String description;
 }

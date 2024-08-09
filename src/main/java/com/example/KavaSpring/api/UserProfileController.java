@@ -3,6 +3,7 @@ package com.example.KavaSpring.api;
 import com.example.KavaSpring.config.openapi.ShowAPI;
 import com.example.KavaSpring.exceptions.EntityNotFoundException;
 import com.example.KavaSpring.exceptions.NotFoundException;
+import com.example.KavaSpring.exceptions.UnverifiedUserException;
 import com.example.KavaSpring.exceptions.UserProfileExistsException;
 import com.example.KavaSpring.models.dto.GroupMemberResponse;
 import com.example.KavaSpring.models.dto.UserProfileDto;
@@ -48,6 +49,9 @@ public class UserProfileController {
         } catch (IOException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
+        } catch (UnverifiedUserException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
 

@@ -30,10 +30,12 @@ public class WebSocketServiceImpl implements WebSocketService {
             throw new IllegalStateException("No event present for the order being placed");
         }
         String userProfileId = event.get().getUserProfileId();
+
         OrderMessage message = new OrderMessage();
         message.setOrderId(order.getId());
+        message.setUserProfileId(order.getUserProfileId());
         message.setEventId(event.get().getId());
-        message.setUserProfileId(userProfileId);
+        message.setDescription("New order was placed for your event");
 
         log.info("Notifying the event creator");
         messagingTemplate.convertAndSend("/topic/orders/" + userProfileId, message);

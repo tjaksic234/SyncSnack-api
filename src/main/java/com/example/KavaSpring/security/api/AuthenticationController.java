@@ -9,6 +9,7 @@ import com.example.KavaSpring.security.api.dto.LoginResponse;
 import com.example.KavaSpring.security.api.dto.RegisterUserRequest;
 import com.example.KavaSpring.security.api.dto.RegisterUserResponse;
 import com.example.KavaSpring.security.services.AuthService;
+import com.example.KavaSpring.security.utils.EmailTemplates;
 import com.example.KavaSpring.security.utils.JwtUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -70,13 +71,14 @@ public class AuthenticationController {
     @GetMapping("verify")
     public ResponseEntity<String> verifyUser(
             @RequestParam String invitationId,
-            @RequestParam String verificationCode
+            @RequestParam String verificationCode,
+            @RequestParam String userId
     ) {
         try {
             log.info("Verify user started");
             authService.verifyUser(invitationId, verificationCode);
-            return ResponseEntity.ok("Verification successful!");
-        } catch (RuntimeException e) {
+            return ResponseEntity.ok(EmailTemplates.emailVerified(userId));
+        } catch (IllegalStateException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().body("Verification failed: " + e.getMessage());
         }
