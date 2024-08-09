@@ -31,7 +31,7 @@ public class User {
     private String password;
 
     @NotBlank
-    private boolean isActive = false;
+    private boolean isVerified = false;
 
     @CreatedDate
     private LocalDateTime createdAt;

@@ -157,8 +157,8 @@ public class AuthServiceImpl implements AuthService {
         Optional<User> user = userRepository.findByEmail(invitation.getEmail());
 
         if (user.isPresent()) {
-            if (!user.get().isActive()) {
-                user.get().setActive(true);
+            if (!user.get().isVerified()) {
+                user.get().setVerified(true);
                 userRepository.save(user.get());
                 log.info("User verification successful");
             }
