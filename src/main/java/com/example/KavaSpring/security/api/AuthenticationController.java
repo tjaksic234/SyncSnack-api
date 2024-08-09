@@ -1,7 +1,9 @@
 package com.example.KavaSpring.security.api;
 
 import com.example.KavaSpring.config.openapi.ShowAPI;
+import com.example.KavaSpring.exceptions.EntityNotFoundException;
 import com.example.KavaSpring.exceptions.UnauthorizedException;
+import com.example.KavaSpring.exceptions.UnverifiedUserException;
 import com.example.KavaSpring.exceptions.UserAlreadyExistsException;
 import com.example.KavaSpring.models.dto.UserDto;
 import com.example.KavaSpring.security.api.dto.LoginRequest;
@@ -14,6 +16,7 @@ import com.example.KavaSpring.security.utils.JwtUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,6 +56,12 @@ public class AuthenticationController {
         } catch (UnauthorizedException e) {
             log.error(String.format("Exception on user authentication: %s", e.getMessage()));
             return ResponseEntity.badRequest().build();
+        } catch (UnverifiedUserException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (EntityNotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
         }
 
     }

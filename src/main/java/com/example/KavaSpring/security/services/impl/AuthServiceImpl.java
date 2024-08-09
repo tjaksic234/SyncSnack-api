@@ -1,5 +1,7 @@
 package com.example.KavaSpring.security.services.impl;
 
+import com.example.KavaSpring.exceptions.EntityNotFoundException;
+import com.example.KavaSpring.exceptions.UnverifiedUserException;
 import com.example.KavaSpring.exceptions.UserAlreadyExistsException;
 import com.example.KavaSpring.models.dao.User;
 import com.example.KavaSpring.models.dao.UserProfile;
@@ -52,9 +54,6 @@ public class AuthServiceImpl implements AuthService {
 
     private final SendGridEmailService sendGridEmailService;
 
-    @Value("${FRONTEND_URL}")
-    private String FRONTEND_URL;
-
     @Value("${BACKEND_URL}")
     private String BACKEND_URL;
 
@@ -95,6 +94,20 @@ public class AuthServiceImpl implements AuthService {
                 request.getEmail(),
                 request.getPassword()
         ));
+
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!user.isVerified()) {
+            sendVerificationEmail(user);
+            throw new UnverifiedUserException("User is not verified. Please check your email for verification instructions.");
+        }
+
+        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(user.getId());
+        if (userProfile == null) {
+            throw new EntityNotFoundException("User profile not found. Please set up your profile.");
+        }
 
         LoginResponse response = new LoginResponse();
 
@@ -143,7 +156,7 @@ public class AuthServiceImpl implements AuthService {
         String verificationUrl = BACKEND_URL + "/api/auth/verify?invitationId=" + invitation.getId()
                 + "&verificationCode=" + verificationCode
                 + "&userId=" + user.getId();
-        log.info("The verification url: " + verificationUrl);
+        //log.info("The verification url: " + verificationUrl);
 
         //? sending the email
         sendGridEmailService.sendHtml(EMAIL_FROM, user.getEmail(), "Verification email", EmailTemplates.confirmationEmail(user.getEmail(), verificationUrl));
@@ -155,12 +168,10 @@ public class AuthServiceImpl implements AuthService {
         VerificationInvitation invitation = verificationInvitationRepository.findByIdAndVerificationCode(invitationId, verificationCode);
 
         if (!invitation.isActive()) {
-            throw new IllegalStateException("Invitation expired.");
+            throw new IllegalStateException("Invitation was already activated.");
         }
 
         if (invitation.getExpiresAt().isBefore(LocalDateTime.now())) {
-            invitation.setActive(false);
-            verificationInvitationRepository.save(invitation);
             throw new IllegalStateException("Invitation expired.");
         }
 
