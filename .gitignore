@@ -35,6 +35,7 @@ build/
 ##  Environment variable configuration files ##
 /src/main/resources/application.properties
 
-## environment variable for asset links in flutter
+## environment variable for asset links and firebase in flutter
 /src/main/resources/static/*
+/src/main/resources/*
 
