@@ -5,6 +5,7 @@ import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.models.dao.User;
 import com.example.KavaSpring.models.dto.UserDto;
+import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.repository.UserRepository;
 import com.example.KavaSpring.services.UserService;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+
+    private final UserProfileRepository userProfileRepository;
 
     private final ConverterService converterService;
 
@@ -54,6 +57,11 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("User not found with email: " + email));
         return user.getId();
+    }
+
+    @Override
+    public boolean isUserProfilePresent(String userId) {
+        return userProfileRepository.existsByUserId(userId);
     }
 
 

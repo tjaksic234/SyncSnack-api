@@ -8,4 +8,5 @@ public interface UserService {
     boolean checkEmail(String email);
     boolean isUserVerified(String email);
     String getUserIdByEmail(String email);
+    boolean isUserProfilePresent(String userId);
 }

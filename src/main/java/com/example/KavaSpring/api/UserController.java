@@ -6,6 +6,7 @@ import com.example.KavaSpring.models.dto.UserDto;
 import com.example.KavaSpring.services.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -60,6 +61,7 @@ public class UserController {
     @GetMapping("id")
     public ResponseEntity<Map<String, String>> getUserIdByEmail(@RequestParam String email) {
         try {
+            log.info("Fetching userId by email");
             String userId = userService.getUserIdByEmail(email);
             Map<String, String> response = Map.of("userId", userId);
             return ResponseEntity.ok(response);
@@ -69,6 +71,18 @@ public class UserController {
         }
     }
 
+    @GetMapping("profile")
+    public ResponseEntity<Map<String, Boolean>> isUserProfilePresent(@RequestParam String userId) {
+        try {
+            log.info("Checking if the userProfile is present for the userId");
+            boolean isPresent = userService.isUserProfilePresent(userId);
+            Map<String, Boolean> response = Map.of("isProfilePresent", isPresent);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.I_AM_A_TEAPOT).build();
+        }
+    }
 
 
 
