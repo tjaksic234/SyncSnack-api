@@ -46,7 +46,7 @@ public class WebSecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                      /*  .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("v3/**").permitAll()
                         .requestMatchers("api/profiles/create").permitAll()
@@ -58,8 +58,8 @@ public class WebSecurityConfig {
                         .requestMatchers("api/profiles/{id}").permitAll() //! privremeno
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/ws").permitAll()
-                        .anyRequest().authenticated());*/
-                        .anyRequest().permitAll());
+                        .anyRequest().authenticated());
+                     //   .anyRequest().permitAll());
                     // ? za testiranje web socketa
 
         http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
