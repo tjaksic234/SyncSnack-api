@@ -55,6 +55,7 @@ public class WebSecurityConfig {
                         .requestMatchers("api/groups/create").permitAll()
                         .requestMatchers("api/groups/join").permitAll()
                         .requestMatchers("api/users/check").permitAll()
+                        .requestMatchers("api/users/verify").permitAll()
                         .requestMatchers("api/profiles/{id}").permitAll() //! privremeno
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/ws").permitAll()
