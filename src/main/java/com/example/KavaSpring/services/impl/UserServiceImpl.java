@@ -49,6 +49,13 @@ public class UserServiceImpl implements UserService {
         return user.isVerified();
     }
 
+    @Override
+    public String getUserIdByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User not found with email: " + email));
+        return user.getId();
+    }
+
 
 }
 

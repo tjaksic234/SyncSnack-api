@@ -57,6 +57,17 @@ public class UserController {
         }
     }
 
+    @GetMapping("id")
+    public ResponseEntity<Map<String, String>> getUserIdByEmail(@RequestParam String email) {
+        try {
+            String userId = userService.getUserIdByEmail(email);
+            Map<String, String> response = Map.of("userId", userId);
+            return ResponseEntity.ok(response);
+        } catch (NotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
 
 
 

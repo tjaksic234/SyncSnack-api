@@ -94,12 +94,6 @@
 			<artifactId>aws-java-sdk-s3</artifactId>
 			<version>1.12.760</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.mailgun/mailgun-java -->
-		<dependency>
-			<groupId>com.mailgun</groupId>
-			<artifactId>mailgun-java</artifactId>
-			<version>1.1.3</version>
-		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.konghq/unirest-java-core -->
 		<dependency>
