@@ -24,6 +24,7 @@ public class NotificationController {
 
     private final FCMService fcmService;
 
+    //! zasad ova klasa nema funkcionalnost trenutno se testira
     @PostMapping("/send")
     public ResponseEntity sendNotification(@RequestBody NotificationRequest request) {
         try {

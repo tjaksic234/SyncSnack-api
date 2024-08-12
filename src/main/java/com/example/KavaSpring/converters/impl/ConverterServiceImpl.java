@@ -114,6 +114,24 @@ public class ConverterServiceImpl implements ConverterService {
     }
 
     @Override
+    public EventNotification convertEventToEventNotification(Event event) {
+        EventNotification notification = new EventNotification();
+        Optional<UserProfile> userProfile = userProfileRepository.findById(event.getUserProfileId());
+        if (userProfile.isPresent()) {
+            notification.setFirstName(userProfile.get().getFirstName());
+            notification.setLastName(userProfile.get().getLastName());
+        }
+        notification.setEventId(event.getId());
+        notification.setGroupId(event.getGroupId());
+        notification.setTitle(event.getTitle());
+        notification.setDescription(event.getDescription());
+        notification.setEventType(event.getEventType());
+        notification.setCreatedAt(event.getCreatedAt());
+        notification.setPendingUntil(event.getPendingUntil());
+        return notification;
+    }
+
+    @Override
     public OrderDto convertToOrderDto(Order order) {
         OrderDto orderDto = new OrderDto();
         orderDto.setUserProfileId(order.getUserProfileId());
@@ -169,5 +187,29 @@ public class ConverterServiceImpl implements ConverterService {
         response.setRating(order.getRating());
         response.setCreatedAt(order.getCreatedAt());
         return response;
+    }
+
+    @Override
+    public OrderNotification convertOrderToOrderNotification(Order order) {
+        OrderNotification notification = new OrderNotification();
+        Optional<UserProfile> userProfile = userProfileRepository.findById(order.getUserProfileId());
+        if (userProfile.isPresent()) {
+            notification.setFirstName(userProfile.get().getFirstName());
+            notification.setLastName(userProfile.get().getLastName());
+        }
+        userProfile.ifPresent(profile -> notification.setProfilePhoto(convertPhotoUriToUrl(profile.getPhotoUri())));
+
+        notification.setOrderId(order.getId());
+        notification.setUserProfileId(order.getUserProfileId());
+        notification.setEventId(order.getEventId());
+        notification.setAdditionalOptions(order.getAdditionalOptions());
+        notification.setCreatedAt(order.getCreatedAt());
+        return notification;
+    }
+
+    @Override
+    public String convertPhotoUriToUrl(String photoUri) {
+        URL presignedUrl = amazonS3Service.generatePresignedUrl(photoUri);
+        return presignedUrl.toString();
     }
 }
