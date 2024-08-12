@@ -20,6 +20,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -56,13 +57,13 @@ public class WebSecurityConfig {
                         .requestMatchers("api/groups/join").permitAll()
                         .requestMatchers("api/users/check").permitAll()
                         .requestMatchers("api/users/verify").permitAll()
+                        .requestMatchers("api/users/id").permitAll()
                         .requestMatchers("api/profiles/{id}").permitAll() //! privremeno
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/ws").permitAll()
                         .anyRequest().authenticated());
                      //   .anyRequest().permitAll());
                     // ? za testiranje web socketa
-
         http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
@@ -77,7 +78,7 @@ public class WebSecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(Collections.singletonList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

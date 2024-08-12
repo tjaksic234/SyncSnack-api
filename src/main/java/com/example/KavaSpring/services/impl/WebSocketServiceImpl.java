@@ -3,7 +3,6 @@ package com.example.KavaSpring.services.impl;
 import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.models.dao.Event;
 import com.example.KavaSpring.models.dao.Order;
-import com.example.KavaSpring.models.dto.OrderNotification;
 import com.example.KavaSpring.repository.EventRepository;
 import com.example.KavaSpring.services.WebSocketService;
 import lombok.AllArgsConstructor;
