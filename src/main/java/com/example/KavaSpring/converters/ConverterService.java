@@ -1,15 +1,13 @@
 package com.example.KavaSpring.converters;
 
-import com.example.KavaSpring.models.dao.Event;
-import com.example.KavaSpring.models.dao.Group;
-import com.example.KavaSpring.models.dao.Order;
-import com.example.KavaSpring.models.dao.UserProfile;
+import com.example.KavaSpring.models.dao.*;
 import com.example.KavaSpring.models.dto.*;
 
 import java.util.List;
 
 public interface ConverterService {
 
+    UserDto convertToUserDto(User user);
     UserProfileDto convertToUserProfileDto(UserProfile userProfile);
     UserProfileResponse convertToUserProfileResponse(UserProfileRequest request);
     GroupDto convertToGroupDto(Group group);

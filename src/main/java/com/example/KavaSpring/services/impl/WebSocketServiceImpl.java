@@ -2,7 +2,8 @@ package com.example.KavaSpring.services.impl;
 
 import com.example.KavaSpring.models.dao.Event;
 import com.example.KavaSpring.models.dao.Order;
-import com.example.KavaSpring.models.dto.OrderMessage;
+import com.example.KavaSpring.models.dto.EventNotification;
+import com.example.KavaSpring.models.dto.OrderNotification;
 import com.example.KavaSpring.repository.EventRepository;
 import com.example.KavaSpring.services.WebSocketService;
 import lombok.AllArgsConstructor;
@@ -31,13 +32,25 @@ public class WebSocketServiceImpl implements WebSocketService {
         }
         String userProfileId = event.get().getUserProfileId();
 
-        OrderMessage message = new OrderMessage();
-        message.setOrderId(order.getId());
-        message.setUserProfileId(order.getUserProfileId());
-        message.setEventId(event.get().getId());
-        message.setDescription("New order was placed for your event");
+        OrderNotification notification = new OrderNotification();
+        notification.setOrderId(order.getId());
+        notification.setUserProfileId(order.getUserProfileId());
+        notification.setEventId(event.get().getId());
+        notification.setDescription("New order was placed for your event");
 
         log.info("Notifying the event creator");
-        messagingTemplate.convertAndSend("/topic/orders/" + userProfileId, message);
+        messagingTemplate.convertAndSend("/topic/orders/" + userProfileId, notification);
+    }
+
+    @Override
+    public void notifyGroupMembers(Event event) {
+
+        EventNotification notification = new EventNotification();
+        notification.setEventId(event.getId());
+        notification.setGroupId(event.getGroupId());
+        notification.setDescription(event.getDescription());
+
+        log.info("Notifying the group with a new event");
+        messagingTemplate.convertAndSend("/topic/groups/" + event.getGroupId(), notification);
     }
 }

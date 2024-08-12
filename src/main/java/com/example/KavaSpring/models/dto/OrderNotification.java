@@ -7,12 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
+public class OrderNotification {
+    private String orderId;
     private String userProfileId;
-    private String email;
-    private String firstName;
-    private String lastName;
-    private String groupId;
-    private String profileUri;
-    private boolean isVerified;
+    private String eventId;
+    private String description;
 }

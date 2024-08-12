@@ -1,10 +1,7 @@
 package com.example.KavaSpring.converters.impl;
 
 import com.example.KavaSpring.converters.ConverterService;
-import com.example.KavaSpring.models.dao.Event;
-import com.example.KavaSpring.models.dao.Group;
-import com.example.KavaSpring.models.dao.Order;
-import com.example.KavaSpring.models.dao.UserProfile;
+import com.example.KavaSpring.models.dao.*;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.services.AmazonS3Service;
@@ -21,6 +18,14 @@ public class ConverterServiceImpl implements ConverterService {
     private final UserProfileRepository userProfileRepository;
 
     private final AmazonS3Service amazonS3Service;
+
+    @Override
+    public UserDto convertToUserDto(User user) {
+        UserDto userDto = new UserDto();
+        userDto.setEmail(user.getEmail());
+        userDto.setVerified(user.isVerified());
+        return userDto;
+    }
 
     @Override
     public UserProfileDto convertToUserProfileDto(UserProfile userProfile) {

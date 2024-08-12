@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("api/users")
 @Slf4j
@@ -38,6 +40,19 @@ public class UserController {
             return ResponseEntity.ok(userService.checkEmail(email));
         } catch (NotFoundException e) {
             log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("verify")
+    public ResponseEntity<Map<String, Boolean>> isUserVerified(@RequestParam String email) {
+        try {
+            log.info("Checking if user is verified: {}", email);
+            boolean isVerified = userService.isUserVerified(email);
+            Map<String, Boolean> response = Map.of("isVerified", isVerified);
+            return ResponseEntity.ok(response);
+        } catch (NotFoundException e) {
+            log.error("User not found: {}", e.getMessage());
             return ResponseEntity.notFound().build();
         }
     }

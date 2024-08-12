@@ -11,6 +11,7 @@ import com.example.KavaSpring.repository.EventRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.security.utils.Helper;
 import com.example.KavaSpring.services.EventService;
+import com.example.KavaSpring.services.WebSocketService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -45,6 +46,8 @@ public class EventServiceImpl implements EventService {
 
     private final MongoTemplate mongoTemplate;
 
+    private final WebSocketService webSocketService;
+
     @Override
     public EventResponse createEvent(EventRequest request) {
         List<EventStatus> activeStatuses = Arrays.asList(EventStatus.PENDING, EventStatus.IN_PROGRESS);
@@ -67,6 +70,9 @@ public class EventServiceImpl implements EventService {
         event.setEventType(request.getEventType());
         event.setPendingUntil(LocalDateTime.now().plusMinutes(request.getPendingTime()));
         eventRepository.save(event);
+
+        //? notifying the group members
+        webSocketService.notifyGroupMembers(event);
 
         log.info("Event created");
         return converterService.convertToEventResponse(request);

@@ -5,11 +5,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class OrderMessage {
-    private String orderId;
-    private String userProfileId;
+@AllArgsConstructor
+public class EventNotification {
     private String eventId;
+    private String groupId;
     private String description;
 }

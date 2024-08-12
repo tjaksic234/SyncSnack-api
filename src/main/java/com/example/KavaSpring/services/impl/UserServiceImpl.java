@@ -1,6 +1,7 @@
 
 package com.example.KavaSpring.services.impl;
 
+import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.models.dao.User;
 import com.example.KavaSpring.models.dto.UserDto;
@@ -19,16 +20,16 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    private final ConverterService converterService;
+
     @Override
     public UserDto getUserById(String id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-        UserDto userDto = new UserDto();
-        userDto.setEmail(user.getEmail());
 
         log.info("Get user by id finished");
-        return userDto;
+        return converterService.convertToUserDto(user);
     }
 
     @Override
@@ -39,6 +40,13 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("The provided email is not correct");
         }
         return true;
+    }
+
+    @Override
+    public boolean isUserVerified(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User not found with email: " + email));
+        return user.isVerified();
     }
 
 
