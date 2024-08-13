@@ -21,4 +21,5 @@ public class EventNotification {
     private LocalDateTime createdAt;
     private LocalDateTime pendingUntil;
     private String userProfileId;
+    private String profilePhoto;
 }

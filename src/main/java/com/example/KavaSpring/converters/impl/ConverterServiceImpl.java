@@ -122,6 +122,7 @@ public class ConverterServiceImpl implements ConverterService {
             notification.setLastName(userProfile.get().getLastName());
             notification.setUserProfileId(event.getUserProfileId());
         }
+        userProfile.ifPresent(profile -> notification.setProfilePhoto(convertPhotoUriToUrl(profile.getPhotoUri())));
         notification.setEventId(event.getId());
         notification.setGroupId(event.getGroupId());
         notification.setTitle(event.getTitle());

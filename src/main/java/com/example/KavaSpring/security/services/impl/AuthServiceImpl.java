@@ -22,7 +22,6 @@ import com.example.KavaSpring.services.SendGridEmailService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -117,8 +116,6 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtUtils.generateJwtToken(authentication);
 
-        ResponseCookie cookie = jwtUtils.createJwtCookie(token);
-
         response.setAccessToken(token);
 
         return response;
@@ -169,14 +166,11 @@ public class AuthServiceImpl implements AuthService {
     public void verifyUser(String invitationId, String verificationCode) {
         VerificationInvitation invitation = verificationInvitationRepository.findByIdAndVerificationCode(invitationId, verificationCode);
 
-        if (!invitation.isActive()) {
-            throw new IllegalStateException("Invitation was already activated.");
+        if (!invitation.isActive() || invitation.getExpiresAt().isBefore(LocalDateTime.now())) {
+            invitation.setActive(false);
+            verificationInvitationRepository.save(invitation);
+            throw new IllegalStateException("Invitation is no longer valid.");
         }
-
-        if (invitation.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new IllegalStateException("Invitation expired.");
-        }
-
 
         Optional<User> user = userRepository.findByEmail(invitation.getEmail());
 
