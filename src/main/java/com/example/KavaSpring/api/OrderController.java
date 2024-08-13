@@ -2,7 +2,6 @@ package com.example.KavaSpring.api;
 
 import com.example.KavaSpring.config.openapi.ShowAPI;
 import com.example.KavaSpring.exceptions.NotFoundException;
-import com.example.KavaSpring.exceptions.NotValidEnumException;
 import com.example.KavaSpring.exceptions.OrderAlreadyRatedException;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.models.enums.OrderStatus;
@@ -98,16 +97,6 @@ public class OrderController {
         }
     }
 
-    @PatchMapping("update/all")
-    public ResponseEntity<String> updateAllOrdersStatus(@RequestParam String eventId) {
-        try {
-            log.info("All orders status update started");
-            return ResponseEntity.ok(orderService.updateAllOrdersStatus(eventId));
-        } catch (NotValidEnumException e) {
-            log.error(e.getMessage());
-            return ResponseEntity.badRequest().build();
-        }
-    }
 
     @GetMapping("event/{eventId}")
     public ResponseEntity<List<OrderExpandedResponse>> getActiveOrdersByEventId(@PathVariable String eventId) {

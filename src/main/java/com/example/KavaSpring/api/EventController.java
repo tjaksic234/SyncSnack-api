@@ -71,6 +71,9 @@ public class EventController {
         } catch (NotFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.notFound().build();
+        } catch (NotValidEnumException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 

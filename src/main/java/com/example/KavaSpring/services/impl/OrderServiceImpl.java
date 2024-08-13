@@ -213,27 +213,6 @@ public class OrderServiceImpl implements OrderService {
         return "Order status successfully updated";
     }
 
-    @Override
-    public String updateAllOrdersStatus(String id) {
-        Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Event not found for ID: " + id));
-
-        OrderStatus orderStatus;
-        try {
-            orderStatus = OrderStatus.valueOf(event.getStatus().toString());
-        } catch (IllegalArgumentException e) {
-            throw new NotValidEnumException("Bad enum value provided from event status");
-        }
-
-        List<Order> orders = orderRepository.findAllByEventId(id);
-        orders.forEach(order -> {
-                            order.setStatus(orderStatus);
-                            orderRepository.save(order);
-                        });
-
-        log.info("Updated {} orders for event: {} to status: {}", orders.size(), id, orderStatus);
-        return String.format("Successfully updated %d orders", orders.size());
-    }
 
     @Override
     public List<OrderExpandedResponse> getActiveOrdersByEventId(String id) {

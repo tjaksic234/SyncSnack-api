@@ -5,6 +5,7 @@ import com.example.KavaSpring.models.enums.NotificationType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -27,7 +28,6 @@ public class Notification {
     private String firstName;
     private String lastName;
     private String eventId;
-    private LocalDateTime createdAt;
     private String photoUri;
 
     //? Event notification specific fields
@@ -40,4 +40,7 @@ public class Notification {
     //? Order notification specific fields
     private String orderId;
     private HashMap<String, Object> additionalOptions;
+
+    @CreatedDate
+    private LocalDateTime createdAt;
 }

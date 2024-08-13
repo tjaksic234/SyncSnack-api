@@ -241,7 +241,6 @@ public class ConverterServiceImpl implements ConverterService {
         notification.setUserProfileId(orderNotification.getUserProfileId());
         notification.setEventId(orderNotification.getEventId());
         notification.setAdditionalOptions(orderNotification.getAdditionalOptions());
-        notification.setCreatedAt(orderNotification.getCreatedAt());
         notification.setNotificationType(NotificationType.ORDER);
         return notification;
     }
@@ -259,7 +258,6 @@ public class ConverterServiceImpl implements ConverterService {
         notification.setTitle(eventNotification.getTitle());
         notification.setDescription(eventNotification.getDescription());
         notification.setEventType(eventNotification.getEventType());
-        notification.setCreatedAt(eventNotification.getCreatedAt());
         notification.setPendingUntil(eventNotification.getPendingUntil());
         notification.setUserProfileId(eventNotification.getUserProfileId());
         return notification;

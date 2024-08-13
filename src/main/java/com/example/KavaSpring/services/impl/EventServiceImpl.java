@@ -2,12 +2,16 @@ package com.example.KavaSpring.services.impl;
 
 import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.NotFoundException;
+import com.example.KavaSpring.exceptions.NotValidEnumException;
 import com.example.KavaSpring.models.dao.Event;
+import com.example.KavaSpring.models.dao.Order;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.models.enums.EventType;
+import com.example.KavaSpring.models.enums.OrderStatus;
 import com.example.KavaSpring.repository.EventRepository;
+import com.example.KavaSpring.repository.OrderRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.security.utils.Helper;
 import com.example.KavaSpring.services.EventService;
@@ -47,6 +51,8 @@ public class EventServiceImpl implements EventService {
     private final MongoTemplate mongoTemplate;
 
     private final WebSocketService webSocketService;
+
+    private final OrderRepository orderRepository;
 
     @Override
     public EventResponse createEvent(EventRequest request) {
@@ -160,14 +166,25 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public String updateEventStatus(String id, EventStatus status) {
-        Optional<Event> event = eventRepository.getById(id);
-        if (event.isEmpty()) {
-            throw new NotFoundException("The event with the given id was not found");
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Event not found for ID: " + id));
+        event.setStatus(status);
+        eventRepository.save(event);
+        OrderStatus orderStatus;
+        try {
+            orderStatus = OrderStatus.valueOf(status.toString());
+        } catch (IllegalArgumentException e) {
+            throw new NotValidEnumException("Bad enum value provided from event status");
         }
-        event.get().setStatus(status);
-        eventRepository.save(event.get());
-        log.info("Event status updated successfully");
 
+        List<Order> orders = orderRepository.findAllByEventId(id);
+        orders.forEach(order -> {
+            order.setStatus(orderStatus);
+            orderRepository.save(order);
+        });
+
+        log.info("Event status updated successfully");
+        log.info("Updated {} orders for event: {} to status: {}", orders.size(), id, orderStatus);
         return "Event status updated successfully";
     }
 
