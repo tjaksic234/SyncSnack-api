@@ -17,7 +17,6 @@ import com.example.KavaSpring.services.AmazonS3Service;
 import com.example.KavaSpring.services.UserProfileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.Document;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
@@ -29,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -181,19 +179,19 @@ public class UserProfileServiceImpl implements UserProfileService {
 
         LookupOperation lookupOperation = Aggregation.lookup("orders", "_id", "userProfileId", "orderDetails");
 
-        UnwindOperation unwindOperation = Aggregation.unwind("orderDetails");
+        UnwindOperation unwindOperation = Aggregation.unwind("orderDetails", true);
 
         GroupOperation groupOperation =  Aggregation.group("_id")
-                .first("orderDetails.userProfileId").as("userProfileId")
+                .first("_id").as("userProfileId")
                 .first("firstName").as("firstName")
                 .first("lastName").as("lastName")
                 .first("score").as("score")
-                .first("photoUri").as("profilePhoto")
+                .first("photoUri").as("photoUri")
                 .count().as("orderCount");
 
 
         ProjectionOperation projectionOperation = Aggregation.project()
-                .and("profilePhoto").as("photoUrl")
+                .and("photoUri").as("photoUrl")
                 .andInclude("userProfileId")
                 .andInclude("firstName")
                 .andInclude("lastName")
@@ -201,21 +199,11 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .andInclude("score")
                 .andInclude("orderCount");
 
-        SortOperation sortOperation;
-        switch (condition) {
-            case SCORE:
-                sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "score"));
-                break;
-            case ORDER_COUNT:
-                sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "orderCount"));
-                break;
-            case FIRSTNAME:
-                sortOperation = Aggregation.sort(Sort.by(Sort.Direction.ASC, "firstName"));
-                break;
-            default:
-                sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "score"));
-                break;
-        }
+        SortOperation sortOperation = switch (condition) {
+            case SCORE -> Aggregation.sort(Sort.by(Sort.Direction.DESC, "score"));
+            case ORDER_COUNT -> Aggregation.sort(Sort.by(Sort.Direction.DESC, "orderCount"));
+            case FIRSTNAME -> Aggregation.sort(Sort.by(Sort.Direction.ASC, "firstName"));
+        };
 
         Aggregation userProfileAggregation = Aggregation.newAggregation(
                 matchUserProfilesByGroupId,
@@ -227,22 +215,10 @@ public class UserProfileServiceImpl implements UserProfileService {
                 sortOperation
         );
 
-        List<Document> userProfiles = mongoTemplate.aggregate(userProfileAggregation, "userProfiles", Document.class).getMappedResults();
+        List<UserProfileExpandedResponse> userProfiles = mongoTemplate.aggregate(userProfileAggregation, "userProfiles", UserProfileExpandedResponse.class).getMappedResults();
 
-        for (Document userProfileDoc : userProfiles) {
-            GroupMemberResponse groupMember = new GroupMemberResponse();
-            groupMember.setUserProfileId(userProfileDoc.getString("userProfileId"));
-            groupMember.setFirstName(userProfileDoc.getString("firstName"));
-            groupMember.setLastName(userProfileDoc.getString("lastName"));
-            groupMember.setScore(userProfileDoc.getDouble("score").floatValue());
-            groupMember.setOrderCount(userProfileDoc.getInteger("orderCount"));
-
-            String photoUri = userProfileDoc.getString("photoUrl");
-            if (photoUri != null && !photoUri.isEmpty()) {
-                URL presignedUrl = amazonS3Service.generatePresignedUrl(photoUri);
-                groupMember.setPhotoUrl(presignedUrl.toString());
-            }
-
+        for (UserProfileExpandedResponse userProfileResponse : userProfiles) {
+            GroupMemberResponse groupMember = converterService.convertToGroupMemberResponse(userProfileResponse);
             groupMembers.add(groupMember);
         }
         return groupMembers;

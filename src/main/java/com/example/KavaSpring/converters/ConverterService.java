@@ -10,6 +10,7 @@ public interface ConverterService {
     UserProfileResponse convertToUserProfileResponse(UserProfileRequest request);
     GroupDto convertToGroupDto(Group group);
     GroupResponse convertToGroupResponse(GroupRequest request);
+    GroupMemberResponse convertToGroupMemberResponse(UserProfileExpandedResponse response);
     EventDto convertToEventDto(Event event);
     EventResponse convertToEventResponse(EventRequest request);
     EventExpandedResponse convertToEventExpandedResponse(Event event);

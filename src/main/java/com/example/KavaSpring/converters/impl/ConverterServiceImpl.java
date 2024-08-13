@@ -69,6 +69,18 @@ public class ConverterServiceImpl implements ConverterService {
     }
 
     @Override
+    public GroupMemberResponse convertToGroupMemberResponse(UserProfileExpandedResponse response) {
+        GroupMemberResponse groupMember = new GroupMemberResponse();
+        groupMember.setUserProfileId(response.getUserProfileId());
+        groupMember.setFirstName(response.getFirstName());
+        groupMember.setLastName(response.getLastName());
+        groupMember.setScore(response.getScore());
+        groupMember.setOrderCount(response.getOrderCount());
+        groupMember.setPhotoUrl(convertPhotoUriToUrl(response.getPhotoUrl()));
+        return groupMember;
+    }
+
+    @Override
     public EventDto convertToEventDto(Event event) {
         EventDto eventDto = new EventDto();
         eventDto.setEventId(event.getId());

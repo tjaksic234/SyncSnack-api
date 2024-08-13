@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
-@Document(collection = "verificationCodes")
+@Document(collection = "verificationInvitations")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
