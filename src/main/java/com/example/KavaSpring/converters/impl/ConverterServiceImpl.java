@@ -3,6 +3,7 @@ package com.example.KavaSpring.converters.impl;
 import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.models.dao.*;
 import com.example.KavaSpring.models.dto.*;
+import com.example.KavaSpring.models.enums.NotificationType;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.services.AmazonS3Service;
 import lombok.AllArgsConstructor;
@@ -225,5 +226,23 @@ public class ConverterServiceImpl implements ConverterService {
     public String convertPhotoUriToUrl(String photoUri) {
         URL presignedUrl = amazonS3Service.generatePresignedUrl(photoUri);
         return presignedUrl.toString();
+    }
+
+    @Override
+    public Notification convertOrderNotificationToNotification(OrderNotification orderNotification) {
+        Notification notification = new Notification();
+        Optional<UserProfile> userProfile = userProfileRepository.findById(orderNotification.getUserProfileId());
+        if (userProfile.isPresent()) {
+            notification.setFirstName(userProfile.get().getFirstName());
+            notification.setLastName(userProfile.get().getLastName());
+        }
+        notification.setOrderId(orderNotification.getOrderId());
+        notification.setUserProfileId(orderNotification.getUserProfileId());
+        notification.setEventId(orderNotification.getEventId());
+        notification.setAdditionalOptions(orderNotification.getAdditionalOptions());
+        notification.setCreatedAt(orderNotification.getCreatedAt());
+        notification.setPhotoUri(orderNotification.getProfilePhoto());
+        notification.setNotificationType(NotificationType.ORDER);
+        return notification;
     }
 }

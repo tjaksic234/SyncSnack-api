@@ -3,7 +3,9 @@ package com.example.KavaSpring.services.impl;
 import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.models.dao.Event;
 import com.example.KavaSpring.models.dao.Order;
+import com.example.KavaSpring.models.dto.OrderNotification;
 import com.example.KavaSpring.repository.EventRepository;
+import com.example.KavaSpring.repository.NotificationRepository;
 import com.example.KavaSpring.services.WebSocketService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,8 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     private final ConverterService converterService;
 
+    private final NotificationRepository notificationRepository;
+
     @Override
     public void notifyEventUserProfile(Order order) {
         Optional<Event> event = eventRepository.findById(order.getEventId());
@@ -33,9 +37,14 @@ public class WebSocketServiceImpl implements WebSocketService {
         }
         String userProfileId = event.get().getUserProfileId();
 
+        OrderNotification orderNotification = converterService.convertOrderToOrderNotification(order);
+
+        //? saving the notification to the database
+        notificationRepository.save(converterService.convertOrderNotificationToNotification(orderNotification));
+
         log.info("Notifying the event creator");
         messagingTemplate.convertAndSend("/topic/orders/" + userProfileId,
-                converterService.convertOrderToOrderNotification(order));
+                orderNotification);
     }
 
     @Override

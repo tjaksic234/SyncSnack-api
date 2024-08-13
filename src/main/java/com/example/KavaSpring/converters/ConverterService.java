@@ -22,4 +22,5 @@ public interface ConverterService {
     OrderSearchResponse convertOrderToOrderSearchResponse(Order order);
     OrderNotification convertOrderToOrderNotification(Order order);
     String convertPhotoUriToUrl(String photoUri);
+    Notification convertOrderNotificationToNotification(OrderNotification orderNotification);
 }
