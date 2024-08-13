@@ -4,6 +4,7 @@ import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.NotValidEnumException;
 import com.example.KavaSpring.exceptions.OrderAlreadyRatedException;
 import com.example.KavaSpring.exceptions.NotFoundException;
+import com.example.KavaSpring.models.dao.Event;
 import com.example.KavaSpring.models.dao.Order;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.*;
@@ -213,19 +214,24 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public String updateAllOrdersStatus(String id, OrderStatus status) {
-        List<Order> orders = orderRepository.findAllByEventIdAndStatus(id, OrderStatus.IN_PROGRESS);
+    public String updateAllOrdersStatus(String id) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Event not found for ID: " + id));
 
-        if (!EnumSet.allOf(OrderStatus.class).contains(status)) {
-            throw new NotValidEnumException("Bad enum value provided");
+        OrderStatus orderStatus;
+        try {
+            orderStatus = OrderStatus.valueOf(event.getStatus().toString());
+        } catch (IllegalArgumentException e) {
+            throw new NotValidEnumException("Bad enum value provided from event status");
         }
 
+        List<Order> orders = orderRepository.findAllByEventId(id);
         orders.forEach(order -> {
-                            order.setStatus(status);
+                            order.setStatus(orderStatus);
                             orderRepository.save(order);
                         });
 
-        log.info("Updated {} orders for event: {} to status: {}", orders.size(), id, status);
+        log.info("Updated {} orders for event: {} to status: {}", orders.size(), id, orderStatus);
         return String.format("Successfully updated %d orders", orders.size());
     }
 

@@ -76,7 +76,7 @@ public class ConverterServiceImpl implements ConverterService {
         groupMember.setLastName(response.getLastName());
         groupMember.setScore(response.getScore());
         groupMember.setOrderCount(response.getOrderCount());
-        groupMember.setPhotoUrl(convertPhotoUriToUrl(response.getPhotoUrl()));
+       // groupMember.setPhotoUrl(convertPhotoUriToUrl(response.getPhotoUrl()));
         return groupMember;
     }
 

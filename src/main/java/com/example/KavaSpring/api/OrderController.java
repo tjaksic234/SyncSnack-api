@@ -11,7 +11,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,8 +23,6 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
-
-    private SimpMessagingTemplate messagingTemplate;
 
     @PostMapping("create")
     public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest request) {
@@ -102,10 +99,10 @@ public class OrderController {
     }
 
     @PatchMapping("update/all")
-    public ResponseEntity<String> updateAllOrdersStatus(@RequestParam String eventId, @RequestParam OrderStatus status) {
+    public ResponseEntity<String> updateAllOrdersStatus(@RequestParam String eventId) {
         try {
             log.info("All orders status update started");
-            return ResponseEntity.ok(orderService.updateAllOrdersStatus(eventId, status));
+            return ResponseEntity.ok(orderService.updateAllOrdersStatus(eventId));
         } catch (NotValidEnumException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
