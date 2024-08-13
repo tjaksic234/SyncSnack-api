@@ -120,6 +120,7 @@ public class ConverterServiceImpl implements ConverterService {
         if (userProfile.isPresent()) {
             notification.setFirstName(userProfile.get().getFirstName());
             notification.setLastName(userProfile.get().getLastName());
+            notification.setUserProfileId(event.getUserProfileId());
         }
         notification.setEventId(event.getId());
         notification.setGroupId(event.getGroupId());
