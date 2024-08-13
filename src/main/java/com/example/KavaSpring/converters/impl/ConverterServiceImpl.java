@@ -245,4 +245,23 @@ public class ConverterServiceImpl implements ConverterService {
         notification.setNotificationType(NotificationType.ORDER);
         return notification;
     }
+
+    @Override
+    public Notification convertEventNotificationToNotification(EventNotification eventNotification) {
+        Notification notification = new Notification();
+        Optional<UserProfile> userProfile = userProfileRepository.findById(eventNotification.getUserProfileId());
+        userProfile.ifPresent(profile -> notification.setPhotoUri(profile.getPhotoUri()));
+        notification.setEventId(eventNotification.getEventId());
+        notification.setGroupId(eventNotification.getGroupId());
+        notification.setUserProfileId(eventNotification.getUserProfileId());
+        notification.setFirstName(eventNotification.getFirstName());
+        notification.setLastName(eventNotification.getLastName());
+        notification.setTitle(eventNotification.getTitle());
+        notification.setDescription(eventNotification.getDescription());
+        notification.setEventType(eventNotification.getEventType());
+        notification.setCreatedAt(eventNotification.getCreatedAt());
+        notification.setPendingUntil(eventNotification.getPendingUntil());
+        notification.setUserProfileId(eventNotification.getUserProfileId());
+        return notification;
+    }
 }

@@ -3,6 +3,7 @@ package com.example.KavaSpring.services.impl;
 import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.models.dao.Event;
 import com.example.KavaSpring.models.dao.Order;
+import com.example.KavaSpring.models.dto.EventNotification;
 import com.example.KavaSpring.models.dto.OrderNotification;
 import com.example.KavaSpring.repository.EventRepository;
 import com.example.KavaSpring.repository.NotificationRepository;
@@ -49,8 +50,14 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     @Override
     public void notifyGroupMembers(Event event) {
+
+        EventNotification eventNotification = converterService.convertEventToEventNotification(event);
+
+        //? saving the notification to the database
+        notificationRepository.save(converterService.convertEventNotificationToNotification(eventNotification));
+
         log.info("Notifying the group with a new event");
         messagingTemplate.convertAndSend("/topic/groups/" + event.getGroupId(),
-                converterService.convertEventToEventNotification(event));
+                eventNotification);
     }
 }
