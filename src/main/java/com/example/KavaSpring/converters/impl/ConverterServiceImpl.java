@@ -235,13 +235,13 @@ public class ConverterServiceImpl implements ConverterService {
         if (userProfile.isPresent()) {
             notification.setFirstName(userProfile.get().getFirstName());
             notification.setLastName(userProfile.get().getLastName());
+            notification.setPhotoUri(userProfile.get().getPhotoUri());
         }
         notification.setOrderId(orderNotification.getOrderId());
         notification.setUserProfileId(orderNotification.getUserProfileId());
         notification.setEventId(orderNotification.getEventId());
         notification.setAdditionalOptions(orderNotification.getAdditionalOptions());
         notification.setCreatedAt(orderNotification.getCreatedAt());
-        notification.setPhotoUri(orderNotification.getProfilePhoto());
         notification.setNotificationType(NotificationType.ORDER);
         return notification;
     }
