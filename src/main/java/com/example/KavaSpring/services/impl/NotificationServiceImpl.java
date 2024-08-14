@@ -40,7 +40,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .and("recipientUserProfileId").is(userProfile.getId()));
 
         ProjectionOperation projectToOrderNotification = Aggregation.project(
-                "orderId", "userProfileId", "firstName", "lastName",
+                "notificationType", "orderId", "userProfileId", "firstName", "lastName",
                         "eventId", "additionalOptions", "createdAt", "photoUri")
                 .and("photoUri").as("profilePhoto")
                 .andExclude("_id");
@@ -64,7 +64,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .and("userProfileId").ne(userProfile.getId()));
 
         ProjectionOperation projectToEventNotification = Aggregation.project(
-                "eventId", "groupId", "firstName", "lastName", "title", "description",
+                "notificationType", "eventId", "groupId", "firstName", "lastName", "title", "description",
                         "eventType", "createdAt", "pendingUntil", "userProfileId", "photoUri")
                 .and("photoUri").as("profilePhoto")
                 .andExclude("_id");
@@ -77,12 +77,12 @@ public class NotificationServiceImpl implements NotificationService {
         AggregationResults<Notification> resultsEventNotifications = mongoTemplate.aggregate(aggregationEventNotification, "notifications", Notification.class);
 
         notifications.addAll(resultsEventNotifications.getMappedResults());
-        notifications.forEach(notification -> {
+       /* notifications.forEach(notification -> {
             if (notification.getPhotoUri() != null) {
                 String convertedUrl = converterService.convertPhotoUriToUrl(notification.getPhotoUri());
                 notification.setPhotoUri(convertedUrl);
             }
-        });
+        });*/
         return notifications;
     }
 }
