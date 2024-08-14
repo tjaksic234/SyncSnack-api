@@ -19,7 +19,6 @@ public interface ConverterService {
     OrderResponse convertToOrderResponse(OrderRequest request);
     OrderActivityResponse convertToOrderActiveResponse(OrderActivityResponse response);
     OrderEventInfoDto convertToOrderEventInfoDto(OrderEventInfoDto dto);
-    OrderSearchResponse convertOrderToOrderSearchResponse(Order order);
     OrderNotification convertOrderToOrderNotification(Order order);
     String convertPhotoUriToUrl(String photoUri);
     Notification convertOrderNotificationToNotification(OrderNotification orderNotification, String recipientUserProfileId);

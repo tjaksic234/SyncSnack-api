@@ -193,18 +193,6 @@ public class ConverterServiceImpl implements ConverterService {
     }
 
     @Override
-    public OrderSearchResponse convertOrderToOrderSearchResponse(Order order) {
-        OrderSearchResponse response = new OrderSearchResponse();
-        response.setOrderId(order.getId());
-        response.setStatus(order.getStatus());
-        response.setEventId(order.getEventId());
-        response.setAdditionalOptions(order.getAdditionalOptions());
-        response.setRating(order.getRating());
-        response.setCreatedAt(order.getCreatedAt());
-        return response;
-    }
-
-    @Override
     public OrderNotification convertOrderToOrderNotification(Order order) {
         OrderNotification notification = new OrderNotification();
         Optional<UserProfile> userProfile = userProfileRepository.findById(order.getUserProfileId());

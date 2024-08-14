@@ -296,21 +296,40 @@ public class OrderServiceImpl implements OrderService {
 
         Criteria combinedCriteria = new Criteria().andOperator(criteriaList.toArray(new Criteria[0]));
 
+        AddFieldsOperation convertEventIdToObjectId = Aggregation.addFields()
+                .addField("eventId")
+                .withValue(ConvertOperators.ToObjectId.toObjectId("$eventId"))
+                .build();
+
+        LookupOperation lookupOperation = Aggregation.lookup("events", "eventId", "_id", "eventDetails");
+
+        UnwindOperation unwindOperation = Aggregation.unwind("eventDetails");
+
+
+        ProjectionOperation projectionOperation = Aggregation.project()
+                .and("_id").as("orderId")
+                .and("eventId").as("eventId")
+                .and("eventDetails.eventType").as("eventType")
+                .and("status").as("status")
+                .and("additionalOptions").as("additionalOptions")
+                .and("rating").as("rating")
+                .and("createdAt").as("createdAt");
+
         SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "createdAt"));
 
 
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.match(combinedCriteria),
+                convertEventIdToObjectId,
+                lookupOperation,
+                unwindOperation,
+                projectionOperation,
                 sortOperation
         );
 
-        AggregationResults<Order> results = mongoTemplate.aggregate(aggregation, "orders", Order.class);
+        AggregationResults<OrderSearchResponse> results = mongoTemplate.aggregate(aggregation, "orders", OrderSearchResponse.class);
 
-        List<Order> matchingOrders = results.getMappedResults();
-
-        return matchingOrders.stream()
-                .map(converterService::convertOrderToOrderSearchResponse)
-                .collect(Collectors.toList());
+        return results.getMappedResults();
     }
 
 
