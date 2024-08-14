@@ -39,6 +39,7 @@ public class Notification {
 
     //? Order notification specific fields
     private String orderId;
+    private String eventCreatorUserProfileId;
     private HashMap<String, Object> additionalOptions;
 
     @CreatedDate

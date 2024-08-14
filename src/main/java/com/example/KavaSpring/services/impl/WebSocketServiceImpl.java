@@ -41,7 +41,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         OrderNotification orderNotification = converterService.convertOrderToOrderNotification(order);
 
         //? saving the notification to the database
-        notificationRepository.save(converterService.convertOrderNotificationToNotification(orderNotification));
+        notificationRepository.save(converterService.convertOrderNotificationToNotification(orderNotification, userProfileId));
 
         log.info("Notifying the event creator");
         messagingTemplate.convertAndSend("/topic/orders/" + userProfileId,
