@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.data.domain.PageRequest;
 import java.util.List;
 
 @RestController
@@ -49,10 +50,13 @@ public class OrderController {
     }
 
     @GetMapping("all")
-    public ResponseEntity<List<OrderEventInfoDto>> getAllOrdersFromUserProfile() {
+    public ResponseEntity<List<OrderEventInfoDto>> getAllOrdersFromUserProfile (
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
+    ) {
         try {
             log.info("Fetching all orders from user profile");
-            List<OrderEventInfoDto> orders = orderService.getAllOrdersFromUserProfile();
+            List<OrderEventInfoDto> orders = orderService.getAllOrdersFromUserProfile(PageRequest.of(page, size));
 
             if (orders.isEmpty()) {
                 log.info("No orders found for user profile id");

@@ -16,6 +16,7 @@ import com.example.KavaSpring.services.OrderService;
 import com.example.KavaSpring.services.WebSocketService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
@@ -87,8 +88,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderEventInfoDto> getAllOrdersFromUserProfile() {
+    public List<OrderEventInfoDto> getAllOrdersFromUserProfile(Pageable pageable) {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+
 
         if (userProfile == null) {
             throw new NotFoundException("Bad user profile id provided");
@@ -116,13 +118,21 @@ public class OrderServiceImpl implements OrderService {
 
         SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "createdAt"));
 
+        int pageNumber = pageable.getPageNumber();
+        int pageSize = pageable.getPageSize();
+
+        SkipOperation skipOperation = Aggregation.skip((long) pageNumber * pageSize);
+        LimitOperation limitOperation = Aggregation.limit(pageSize);
+
         Aggregation aggregation = Aggregation.newAggregation(
                 matchOperation,
                 convertEventIdToObjectId,
                 lookupOperation,
                 unwindOperation,
                 projectionOperation,
-                sortOperation
+                sortOperation,
+                skipOperation,
+                limitOperation
         );
 
         AggregationResults<OrderEventInfoDto> results = mongoTemplate.aggregate(aggregation, "orders", OrderEventInfoDto.class);
