@@ -8,6 +8,7 @@ import com.example.KavaSpring.security.utils.Helper;
 import com.example.KavaSpring.services.NotificationService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
@@ -31,9 +32,15 @@ public class NotificationServiceImpl implements NotificationService {
     private final ConverterService converterService;
 
     @Override
-    public List<Notification> getAllNotifications() {
+    public List<Notification> getAllNotifications(Pageable pageable) {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
         List<Notification> notifications = new ArrayList<>();
+
+        int pageNumber = pageable.getPageNumber();
+        int pageSize = pageable.getPageSize();
+
+        SkipOperation skipOperation = Aggregation.skip((long) pageNumber * pageSize);
+        LimitOperation limitOperation = Aggregation.limit(pageSize);
 
         //? aggregation for the order notifications
         MatchOperation matchByOrderNotificationAndRecipientId = Aggregation.match(Criteria.where("notificationType").is("ORDER")
@@ -50,7 +57,9 @@ public class NotificationServiceImpl implements NotificationService {
         Aggregation aggregationOrderNotification = Aggregation.newAggregation(
                 matchByOrderNotificationAndRecipientId,
                 projectToOrderNotification,
-                sortOperation
+                sortOperation,
+                skipOperation,
+                limitOperation
         );
 
         AggregationResults<Notification> resultsOrderNotifications = mongoTemplate.aggregate(aggregationOrderNotification, "notifications", Notification.class);
@@ -72,7 +81,9 @@ public class NotificationServiceImpl implements NotificationService {
         Aggregation aggregationEventNotification = Aggregation.newAggregation(
                 matchByEventNotificationAndGroupId,
                 projectToEventNotification,
-                sortOperation
+                sortOperation,
+                skipOperation,
+                limitOperation
         );
         AggregationResults<Notification> resultsEventNotifications = mongoTemplate.aggregate(aggregationEventNotification, "notifications", Notification.class);
 

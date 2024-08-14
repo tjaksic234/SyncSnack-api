@@ -5,10 +5,12 @@ import com.example.KavaSpring.models.dao.Notification;
 import com.example.KavaSpring.services.NotificationService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -23,9 +25,12 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @GetMapping("recipient")
-    public ResponseEntity<?> getAllNotifications() {
+    public ResponseEntity<?> getAllNotifications(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
         try {
-            List<Notification> notifications = notificationService.getAllNotifications();
+            List<Notification> notifications = notificationService.getAllNotifications(PageRequest.of(page, size));
             if (notifications.isEmpty()) {
                 log.info("No notifications found");
                 return ResponseEntity
