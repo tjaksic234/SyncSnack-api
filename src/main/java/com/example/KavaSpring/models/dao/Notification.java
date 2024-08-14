@@ -2,6 +2,7 @@ package com.example.KavaSpring.models.dao;
 
 import com.example.KavaSpring.models.enums.EventType;
 import com.example.KavaSpring.models.enums.NotificationType;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.HashMap;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Notification {
 
     @Id
@@ -39,7 +41,7 @@ public class Notification {
 
     //? Order notification specific fields
     private String orderId;
-    private String eventCreatorUserProfileId;
+    private String recipientUserProfileId;
     private HashMap<String, Object> additionalOptions;
 
     @CreatedDate

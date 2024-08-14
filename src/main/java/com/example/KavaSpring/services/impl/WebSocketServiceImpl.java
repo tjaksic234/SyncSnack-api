@@ -36,15 +36,15 @@ public class WebSocketServiceImpl implements WebSocketService {
         if (event.isEmpty()) {
             throw new IllegalStateException("No event present for the order being placed");
         }
-        String userProfileId = event.get().getUserProfileId();
+        String recipientUserProfileId = event.get().getUserProfileId();
 
         OrderNotification orderNotification = converterService.convertOrderToOrderNotification(order);
 
         //? saving the notification to the database
-        notificationRepository.save(converterService.convertOrderNotificationToNotification(orderNotification, userProfileId));
+        notificationRepository.save(converterService.convertOrderNotificationToNotification(orderNotification, recipientUserProfileId));
 
         log.info("Notifying the event creator");
-        messagingTemplate.convertAndSend("/topic/orders/" + userProfileId,
+        messagingTemplate.convertAndSend("/topic/orders/" + recipientUserProfileId,
                 orderNotification);
     }
 

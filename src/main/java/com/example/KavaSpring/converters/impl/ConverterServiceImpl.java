@@ -229,7 +229,7 @@ public class ConverterServiceImpl implements ConverterService {
     }
 
     @Override
-    public Notification convertOrderNotificationToNotification(OrderNotification orderNotification, String eventCreatorUserProfileId) {
+    public Notification convertOrderNotificationToNotification(OrderNotification orderNotification, String recipientUserProfileId) {
         Notification notification = new Notification();
         Optional<UserProfile> userProfile = userProfileRepository.findById(orderNotification.getUserProfileId());
         if (userProfile.isPresent()) {
@@ -238,7 +238,7 @@ public class ConverterServiceImpl implements ConverterService {
             notification.setPhotoUri(userProfile.get().getPhotoUri());
         }
         notification.setOrderId(orderNotification.getOrderId());
-        notification.setEventCreatorUserProfileId(eventCreatorUserProfileId);
+        notification.setRecipientUserProfileId(recipientUserProfileId);
         notification.setUserProfileId(orderNotification.getUserProfileId());
         notification.setEventId(orderNotification.getEventId());
         notification.setAdditionalOptions(orderNotification.getAdditionalOptions());

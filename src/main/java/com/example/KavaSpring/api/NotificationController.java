@@ -22,7 +22,7 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
-    @GetMapping
+    @GetMapping("recipient")
     public ResponseEntity<?> getAllNotifications() {
         try {
             List<Notification> notifications = notificationService.getAllNotifications();
