@@ -1,10 +1,8 @@
 package com.example.KavaSpring.services.impl;
 
 import com.example.KavaSpring.converters.ConverterService;
-import com.example.KavaSpring.exceptions.NotValidEnumException;
 import com.example.KavaSpring.exceptions.OrderAlreadyRatedException;
 import com.example.KavaSpring.exceptions.NotFoundException;
-import com.example.KavaSpring.models.dao.Event;
 import com.example.KavaSpring.models.dao.Order;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.*;

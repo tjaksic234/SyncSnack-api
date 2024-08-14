@@ -260,6 +260,7 @@ public class ConverterServiceImpl implements ConverterService {
         notification.setEventType(eventNotification.getEventType());
         notification.setPendingUntil(eventNotification.getPendingUntil());
         notification.setUserProfileId(eventNotification.getUserProfileId());
+        notification.setNotificationType(NotificationType.EVENT);
         return notification;
     }
 }
