@@ -77,12 +77,12 @@ public class NotificationServiceImpl implements NotificationService {
         AggregationResults<Notification> resultsEventNotifications = mongoTemplate.aggregate(aggregationEventNotification, "notifications", Notification.class);
 
         notifications.addAll(resultsEventNotifications.getMappedResults());
-       /* notifications.forEach(notification -> {
+        notifications.forEach(notification -> {
             if (notification.getPhotoUri() != null) {
                 String convertedUrl = converterService.convertPhotoUriToUrl(notification.getPhotoUri());
                 notification.setPhotoUri(convertedUrl);
             }
-        });*/
+        });
         return notifications;
     }
 }
