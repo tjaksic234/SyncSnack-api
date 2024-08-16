@@ -5,10 +5,7 @@ import com.example.KavaSpring.exceptions.EntityNotFoundException;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.exceptions.UnverifiedUserException;
 import com.example.KavaSpring.exceptions.UserProfileExistsException;
-import com.example.KavaSpring.models.dto.GroupMemberResponse;
-import com.example.KavaSpring.models.dto.UserProfileDto;
-import com.example.KavaSpring.models.dto.UserProfileRequest;
-import com.example.KavaSpring.models.dto.UserProfileResponse;
+import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.models.enums.SortCondition;
 import com.example.KavaSpring.services.UserProfileService;
 import jakarta.validation.Valid;
@@ -82,7 +79,7 @@ public class UserProfileController {
     }
 
     @PatchMapping(value = "edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> editUserProfile(
+    public ResponseEntity<UserProfileEditResponse> editUserProfile(
             @RequestPart(value = "firstName", required = false) String firstName,
             @RequestPart(value = "lastName", required = false) String lastName,
             @RequestPart(value = "file", required = false) MultipartFile file

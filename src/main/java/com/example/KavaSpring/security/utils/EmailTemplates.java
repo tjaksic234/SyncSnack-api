@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 public class EmailTemplates {
 
     @Value("${FRONTEND_URL}")
-    private String FRONTEND_URL;
+    private static String FRONTEND_URL;
 
     public static String confirmationEmail(String recipient, String verificationUrl) {
         return "<!DOCTYPE html>\n" +
@@ -141,7 +141,7 @@ public class EmailTemplates {
                 "    </style>\n" +
                 "    <script>\n" +
                 "        setTimeout(function() {\n" +
-                "            window.location.href = 'http://localhost:3000/setprofile?userId=" + userId + "';\n" +
+                "            window.location.href = '" + FRONTEND_URL + "/setprofile?userId=" + userId + "';\n" +
                 "        }, 10000);\n" +
                 "    </script>\n" +
                 "</head>\n" +
@@ -153,7 +153,7 @@ public class EmailTemplates {
                 "            <p>Congratulations! Your email address has been successfully verified.</p>\n" +
                 "            <p>You can now enjoy full access to all features of SyncSnack.</p>\n" +
                 "            <p>You will be automatically redirected to the login page in 10 seconds.</p>\n" +
-                "            <a href=\"http://localhost:3000/setprofile?userId=" + userId + "\" class=\"button\">Log In to Your Account</a>\n" +
+                "            <a href=\"" + FRONTEND_URL + "/setprofile?userId=" + userId + "\" class=\"button\">Log In to Your Account</a>\n" +
                 "            <p>If you have any questions or need assistance, please don't hesitate to <a href=\"mailto:support@syncsnack.com\">contact our support team</a>.</p>\n" +
                 "            <p>Thank you for choosing SyncSnack!</p>\n" +
                 "        </div>\n" +

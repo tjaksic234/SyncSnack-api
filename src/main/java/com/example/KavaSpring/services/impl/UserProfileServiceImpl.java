@@ -124,7 +124,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
-    public String editUserProfile(String firstName, String lastName, MultipartFile photoFile) {
+    public UserProfileEditResponse editUserProfile(String firstName, String lastName, MultipartFile photoFile) {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
 
         if (userProfile == null) {
@@ -159,7 +159,9 @@ public class UserProfileServiceImpl implements UserProfileService {
         userProfileRepository.save(userProfile);
 
         log.info("UserProfile successfully updated");
-        return "UserProfile successfully updated";
+        UserProfileEditResponse response = new UserProfileEditResponse();
+        response.setPhotoUrl(converterService.convertPhotoUriToUrl(userProfile.getPhotoUri()));
+        return response;
     }
 
     @Override
