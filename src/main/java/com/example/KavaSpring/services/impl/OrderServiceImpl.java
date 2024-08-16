@@ -88,7 +88,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderEventInfoDto> getAllOrdersFromUserProfile(Pageable pageable, int rating, OrderStatus status) {
+    public List<OrderEventInfoDto> getAllOrdersFromUserProfile(Pageable pageable, int rating, OrderStatus status, String search) {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
 
 
@@ -105,6 +105,11 @@ public class OrderServiceImpl implements OrderService {
         if (status != null) {
             criteria.and("status").is(status);
         }
+
+        if (search != null && !search.isEmpty()) {
+            criteria.and("additionalOptions.description").regex(search, "i");
+        }
+
 
         MatchOperation matchOperation = Aggregation.match(criteria);
 
@@ -147,6 +152,7 @@ public class OrderServiceImpl implements OrderService {
 
         AggregationResults<OrderEventInfoDto> results = mongoTemplate.aggregate(aggregation, "orders", OrderEventInfoDto.class);
 
+        log.info("Search results: " + results.getMappedResults().size());
         log.info("Fetched orders for the user profile successfully");
         return results
                 .getMappedResults()

@@ -54,11 +54,12 @@ public class OrderController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(required = false, defaultValue = "0") int rating,
-            @RequestParam(required = false) OrderStatus status
+            @RequestParam(required = false) OrderStatus status,
+            @RequestParam(required = false) String search
     ) {
         try {
             log.info("Fetching all orders from user profile");
-            List<OrderEventInfoDto> orders = orderService.getAllOrdersFromUserProfile(PageRequest.of(page, size), rating, status);
+            List<OrderEventInfoDto> orders = orderService.getAllOrdersFromUserProfile(PageRequest.of(page, size), rating, status, search);
 
             if (orders.isEmpty()) {
                 log.info("No orders found for user profile id");
