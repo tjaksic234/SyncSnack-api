@@ -53,7 +53,7 @@ public class OrderController {
     public ResponseEntity<List<OrderEventInfoDto>> getAllOrdersFromUserProfile (
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
-            @RequestParam(required = false, defaultValue = "0") int rating,
+            @RequestParam(defaultValue = "0") int rating,
             @RequestParam(required = false) OrderStatus status,
             @RequestParam(required = false) String search
     ) {
@@ -130,14 +130,4 @@ public class OrderController {
         }
     }
 
-    @PostMapping("search")
-    public ResponseEntity<List<OrderSearchResponse>> searchOrders(@RequestBody OrderSearchRequest request) {
-        try {
-            log.info("Search orders");
-            return ResponseEntity.ok(orderService.searchOrders(request));
-        } catch (NotFoundException e) {
-            log.error(e.getMessage());
-            return ResponseEntity.notFound().build();
-        }
-    }
 }
