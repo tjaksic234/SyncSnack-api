@@ -27,7 +27,7 @@ public class NotificationController {
     @GetMapping("recipient")
     public ResponseEntity<?> getAllNotifications(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size
+            @RequestParam(defaultValue = "3") int size
     ) {
         try {
             List<Notification> notifications = notificationService.getAllNotifications(PageRequest.of(page, size));
