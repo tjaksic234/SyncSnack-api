@@ -112,11 +112,11 @@ public class GroupServiceImpl implements GroupService {
 
         MatchOperation matchByGroupId = Aggregation.match(Criteria.where("userProfile.groupId").is(groupId));
 
-        GroupOperation groupByOrderStatus = Aggregation.group("status").count().as("count");
+        GroupOperation groupByOrderStatus = Aggregation.group("status").count().as("value");
 
         ProjectionOperation projectionOperation = Aggregation.project()
-                .and("_id").as("status")
-                .andInclude("count")
+                .and("_id").as("name")
+                .andInclude("value")
                 .andExclude("_id");
 
         Aggregation aggregation = Aggregation.newAggregation(

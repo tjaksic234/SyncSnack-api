@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GroupOrderCountDto {
-    private OrderStatus status;
-    private int count;
+    private OrderStatus name;
+    private int value;
 }
