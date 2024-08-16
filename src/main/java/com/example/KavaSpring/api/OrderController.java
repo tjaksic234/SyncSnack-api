@@ -52,11 +52,13 @@ public class OrderController {
     @GetMapping("all")
     public ResponseEntity<List<OrderEventInfoDto>> getAllOrdersFromUserProfile (
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(required = false, defaultValue = "0") int rating,
+            @RequestParam(required = false) OrderStatus status
     ) {
         try {
             log.info("Fetching all orders from user profile");
-            List<OrderEventInfoDto> orders = orderService.getAllOrdersFromUserProfile(PageRequest.of(page, size));
+            List<OrderEventInfoDto> orders = orderService.getAllOrdersFromUserProfile(PageRequest.of(page, size), rating, status);
 
             if (orders.isEmpty()) {
                 log.info("No orders found for user profile id");

@@ -88,7 +88,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderEventInfoDto> getAllOrdersFromUserProfile(Pageable pageable) {
+    public List<OrderEventInfoDto> getAllOrdersFromUserProfile(Pageable pageable, int rating, OrderStatus status) {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
 
 
@@ -96,7 +96,17 @@ public class OrderServiceImpl implements OrderService {
             throw new NotFoundException("Bad user profile id provided");
         }
 
-        MatchOperation matchOperation = Aggregation.match(Criteria.where("userProfileId").is(userProfile.getId()));
+        Criteria criteria = Criteria.where("userProfileId").is(userProfile.getId());
+
+        if (rating > 0) {
+            criteria.and("rating").is(rating);
+        }
+
+        if (status != null) {
+            criteria.and("status").is(status);
+        }
+
+        MatchOperation matchOperation = Aggregation.match(criteria);
 
         AddFieldsOperation convertEventIdToObjectId  = Aggregation.addFields()
                 .addField("eventId")
@@ -137,6 +147,7 @@ public class OrderServiceImpl implements OrderService {
 
         AggregationResults<OrderEventInfoDto> results = mongoTemplate.aggregate(aggregation, "orders", OrderEventInfoDto.class);
 
+        log.info("Fetched orders for the user profile successfully");
         return results
                 .getMappedResults()
                 .stream()
