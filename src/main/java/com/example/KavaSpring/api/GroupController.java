@@ -4,6 +4,7 @@ import com.example.KavaSpring.config.openapi.ShowAPI;
 import com.example.KavaSpring.exceptions.GroupAlreadyExistsException;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.models.dto.GroupDto;
+import com.example.KavaSpring.models.dto.GroupOrderCountDto;
 import com.example.KavaSpring.models.dto.GroupRequest;
 import com.example.KavaSpring.models.dto.GroupResponse;
 import com.example.KavaSpring.services.GroupService;
@@ -11,6 +12,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/groups")
@@ -53,6 +56,17 @@ public class GroupController {
         } catch (IllegalArgumentException e) {
             log.error(e.getMessage());
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("count")
+    public ResponseEntity<List<GroupOrderCountDto>> countGroupOrders() {
+        try {
+            log.info("Fetching group order count");
+            return ResponseEntity.ok(groupService.countGroupOrders());
+        } catch (IllegalStateException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 }
