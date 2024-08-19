@@ -108,7 +108,7 @@ public class AuthenticationController {
             return ResponseEntity.ok("Reset password email sent");
         } catch (NotFoundException e) {
             log.error(e.getMessage());
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.notFound().build();
         }
     }
 
