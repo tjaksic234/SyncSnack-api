@@ -112,18 +112,17 @@ public class AuthenticationController {
         }
     }
 
-    @GetMapping("resetPassword")
-    public ResponseEntity<?> resetPassword(
-            @RequestParam String passwordResetTokenId,
-            @RequestParam String resetCode
-    ) {
+    @PostMapping("resetPassword")
+    public ResponseEntity<?> resetPassword(@RequestBody PasswordResetRequest passwordResetRequest) {
         try {
             log.info("Resetting password");
-            authService.resetPassword(passwordResetTokenId, resetCode);
+            authService.resetPassword(passwordResetRequest);
             return ResponseEntity.ok("Password successfully reset");
-        } catch (Exception e) {
+        } catch (IllegalStateException | IllegalArgumentException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
+        } catch (NotFoundException e) {
+            return ResponseEntity.notFound().build();
         }
     }
 

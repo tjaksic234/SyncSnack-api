@@ -165,7 +165,7 @@ public class EmailTemplates {
                 "</html>";
     }
 
-    public static String resetPassword(String activationUrl) {
+    public static String resetPassword(String resetPasswordUrl) {
         return "<!DOCTYPE html>\n" +
                 "<html lang=\"en\">\n" +
                 "<head>\n" +
@@ -186,9 +186,9 @@ public class EmailTemplates {
                 "        <p>Hello,</p>\n" +
                 "        <p>We received a request to reset your password. If you didn't make this request, you can ignore this email.</p>\n" +
                 "        <p>To reset your password, please click the button below:</p>\n" +
-                "        <a href=\"" + activationUrl + "\" class=\"btn\">Reset Password</a>\n" +
+                "        <a href=\"" + resetPasswordUrl + "\" class=\"btn\">Reset Password</a>\n" +
                 "        <p>If the button doesn't work, you can copy and paste the following link into your browser:</p>\n" +
-                "        <p>" + activationUrl + "</p>\n" +
+                "        <p>" + resetPasswordUrl + "</p>\n" +
                 "        <p>This link will expire in 24 hours for security reasons.</p>\n" +
                 "        <p>If you have any questions or need assistance, please don't hesitate to contact our support team.</p>\n" +
                 "        <p>Best regards,<br>Your SyncSnack Team</p>\n" +

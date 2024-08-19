@@ -222,17 +222,17 @@ public class AuthServiceImpl implements AuthService {
 
         passwordResetRequestRepository.save(passwordResetToken);
 
-        String resetPasswordUrl = FRONTEND_URL + "/api/auth/resetPassword?resetPasswordCodeId=" + passwordResetToken.getId()
+        String resetPasswordUrl = FRONTEND_URL + "/forgot-password?passwordResetTokenId=" + passwordResetToken.getId()
                 + "&resetCode=" + resetCode;
 
         sendGridEmailService.sendHtml(EMAIL_FROM, user.get().getEmail(), "Reset password", EmailTemplates.resetPassword(resetPasswordUrl));
     }
 
     @Override
-    public void resetPassword(String passwordResetTokenId, String resetCode) {
-        Optional<PasswordResetToken> passwordResetToken = passwordResetRequestRepository.findById(passwordResetTokenId);
+    public void resetPassword(PasswordResetRequest request) {
+        Optional<PasswordResetToken> passwordResetToken = passwordResetRequestRepository.findById(request.getPasswordResetTokenId());
 
-        if (resetCode.isEmpty()) {
+        if (request.getResetCode().isEmpty()) {
             throw new NotFoundException("No password reset entity found with the provided id");
         }
 
@@ -242,10 +242,14 @@ public class AuthServiceImpl implements AuthService {
             throw new IllegalStateException("The reset password request is no longer valid.");
         }
 
+        if (!request.getResetCode().equals(passwordResetToken.get().getResetCode())) {
+            throw new IllegalArgumentException("Invalid reset code");
+        }
+
         Optional<User> user = userRepository.findByEmail(passwordResetToken.get().getEmail());
 
         if (user.isPresent()) {
-            //user.get().setPassword(passwordEncoder.encode(newPassword));
+            user.get().setPassword(passwordEncoder.encode(request.getNewPassword()));
             userRepository.save(user.get());
 
             passwordResetToken.get().setActive(false);

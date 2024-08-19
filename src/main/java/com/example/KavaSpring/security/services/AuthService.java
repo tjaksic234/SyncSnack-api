@@ -12,5 +12,5 @@ public interface AuthService {
     void verifyUser(String invitationId, String verificationCode);
     void changePassword(PasswordChangeRequest request);
     void requestPasswordReset(PasswordResetRequest request);
-    void resetPassword(String passwordResetTokenId, String resetCode);
+    void resetPassword(PasswordResetRequest request);
 }
