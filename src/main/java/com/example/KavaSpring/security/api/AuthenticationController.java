@@ -6,10 +6,7 @@ import com.example.KavaSpring.exceptions.UnauthorizedException;
 import com.example.KavaSpring.exceptions.UnverifiedUserException;
 import com.example.KavaSpring.exceptions.UserAlreadyExistsException;
 import com.example.KavaSpring.models.dto.UserDto;
-import com.example.KavaSpring.security.api.dto.LoginRequest;
-import com.example.KavaSpring.security.api.dto.LoginResponse;
-import com.example.KavaSpring.security.api.dto.RegisterUserRequest;
-import com.example.KavaSpring.security.api.dto.RegisterUserResponse;
+import com.example.KavaSpring.security.api.dto.*;
 import com.example.KavaSpring.security.services.AuthService;
 import com.example.KavaSpring.security.utils.EmailTemplates;
 import com.example.KavaSpring.security.utils.JwtUtils;
@@ -93,6 +90,17 @@ public class AuthenticationController {
         }
     }
 
+    @PostMapping("changePassword")
+    public ResponseEntity<?> changePassword(@RequestBody PasswordChangeRequest request) {
+        try {
+            log.info("Changing password for user");
+            authService.changePassword(request);
+            return ResponseEntity.ok("Password changed successfully");
+        } catch (RuntimeException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
 
 

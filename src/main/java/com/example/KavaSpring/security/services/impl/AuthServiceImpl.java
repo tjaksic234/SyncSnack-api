@@ -10,10 +10,7 @@ import com.example.KavaSpring.models.dto.UserDto;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.repository.UserRepository;
 import com.example.KavaSpring.repository.VerificationInvitationRepository;
-import com.example.KavaSpring.security.api.dto.LoginRequest;
-import com.example.KavaSpring.security.api.dto.LoginResponse;
-import com.example.KavaSpring.security.api.dto.RegisterUserRequest;
-import com.example.KavaSpring.security.api.dto.RegisterUserResponse;
+import com.example.KavaSpring.security.api.dto.*;
 import com.example.KavaSpring.security.services.AuthService;
 import com.example.KavaSpring.security.utils.EmailTemplates;
 import com.example.KavaSpring.security.utils.Helper;
@@ -184,6 +181,22 @@ public class AuthServiceImpl implements AuthService {
             }
         }
 
+    }
+
+    @Override
+    public void changePassword(PasswordChangeRequest request) {
+        Optional<User> user = userRepository.findById(Helper.getLoggedInUserId());
+
+        if (user.isPresent() && user.get().isVerified()) {
+            if (!passwordEncoder.matches(request.getOldPassword(), user.get().getPassword())) {
+                throw new RuntimeException("Wrong old password");
+            }
+            user.get().setPassword(passwordEncoder.encode(request.getPassword()));
+            userRepository.save(user.get());
+            log.info("Password changed successfully");
+        } else {
+            throw new RuntimeException("Error occurred when fetching user");
+        }
     }
 
 }
