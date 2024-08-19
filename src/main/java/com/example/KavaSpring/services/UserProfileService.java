@@ -2,6 +2,7 @@ package com.example.KavaSpring.services;
 
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.models.enums.SortCondition;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -13,6 +14,6 @@ public interface UserProfileService {
     UserProfileDto getProfileById(String id);
     byte[] downloadUserProfilePhoto() throws IOException;
     UserProfileEditResponse editUserProfile(String firstName, String lastName, MultipartFile photoFile);
-    List<GroupMemberResponse> getGroupMembers(SortCondition condition);
+    List<GroupMemberResponse> getGroupMembers(SortCondition condition, Pageable pageable);
     void calculateScore();
 }

@@ -11,6 +11,7 @@ import com.example.KavaSpring.services.UserProfileService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -97,10 +98,14 @@ public class UserProfileController {
     }
 
     @GetMapping("group")
-    public ResponseEntity<List<GroupMemberResponse>> getGroupMembers(@RequestParam SortCondition sortCondition) {
+    public ResponseEntity<List<GroupMemberResponse>> getGroupMembers(
+            @RequestParam SortCondition sortCondition,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "4") int size
+    ) {
         try {
             log.info("Fetching group members");
-            return ResponseEntity.ok(userProfileService.getGroupMembers(sortCondition));
+            return ResponseEntity.ok(userProfileService.getGroupMembers(sortCondition, PageRequest.of(page, size)));
         } catch (IllegalStateException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();

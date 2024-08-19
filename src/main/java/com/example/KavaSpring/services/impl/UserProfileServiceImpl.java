@@ -17,6 +17,7 @@ import com.example.KavaSpring.services.AmazonS3Service;
 import com.example.KavaSpring.services.UserProfileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
@@ -165,7 +166,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
-    public List<GroupMemberResponse> getGroupMembers(SortCondition condition) {
+    public List<GroupMemberResponse> getGroupMembers(SortCondition condition, Pageable pageable) {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
         String groupId = userProfile.getGroupId();
         List<GroupMemberResponse> groupMembers = new ArrayList<>();
@@ -207,6 +208,12 @@ public class UserProfileServiceImpl implements UserProfileService {
             case FIRSTNAME -> Aggregation.sort(Sort.by(Sort.Direction.ASC, "firstName"));
         };
 
+        int pageNumber = pageable.getPageNumber();
+        int pageSize = pageable.getPageSize();
+
+        SkipOperation skipOperation = Aggregation.skip((long) pageNumber * pageSize);
+        LimitOperation limitOperation = Aggregation.limit(pageSize);
+
         Aggregation userProfileAggregation = Aggregation.newAggregation(
                 matchUserProfilesByGroupId,
                 convertToStringId,
@@ -214,7 +221,9 @@ public class UserProfileServiceImpl implements UserProfileService {
                 unwindOperation,
                 groupOperation,
                 projectionOperation,
-                sortOperation
+                sortOperation,
+                skipOperation,
+                limitOperation
         );
 
         List<UserProfileExpandedResponse> userProfiles = mongoTemplate.aggregate(userProfileAggregation, "userProfiles", UserProfileExpandedResponse.class).getMappedResults();
