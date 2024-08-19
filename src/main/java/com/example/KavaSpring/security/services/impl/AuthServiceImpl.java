@@ -235,7 +235,7 @@ public class AuthServiceImpl implements AuthService {
         if (request.getResetCode().isEmpty()) {
             throw new NotFoundException("No password reset entity found with the provided id");
         }
-
+        
         if (!passwordResetToken.get().isActive() || passwordResetToken.get().getExpiresAt().isBefore(LocalDateTime.now())) {
             passwordResetToken.get().setActive(false);
             passwordResetRequestRepository.save(passwordResetToken.get());

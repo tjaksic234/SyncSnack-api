@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -31,6 +30,5 @@ public class PasswordResetToken {
     @NotBlank
     private boolean isActive = true;
 
-    @CreatedDate
     private LocalDateTime expiresAt = LocalDateTime.now().plusHours(1);
 }
