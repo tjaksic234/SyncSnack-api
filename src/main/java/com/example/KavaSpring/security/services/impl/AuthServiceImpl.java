@@ -1,12 +1,15 @@
 package com.example.KavaSpring.security.services.impl;
 
 import com.example.KavaSpring.exceptions.EntityNotFoundException;
+import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.exceptions.UnverifiedUserException;
 import com.example.KavaSpring.exceptions.UserAlreadyExistsException;
+import com.example.KavaSpring.models.dao.PasswordResetToken;
 import com.example.KavaSpring.models.dao.User;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dao.VerificationInvitation;
 import com.example.KavaSpring.models.dto.UserDto;
+import com.example.KavaSpring.repository.PasswordResetRequestRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.repository.UserRepository;
 import com.example.KavaSpring.repository.VerificationInvitationRepository;
@@ -29,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -50,8 +54,13 @@ public class AuthServiceImpl implements AuthService {
 
     private final SendGridEmailService sendGridEmailService;
 
+    private final PasswordResetRequestRepository passwordResetRequestRepository;
+
     @Value("${BACKEND_URL}")
     private String BACKEND_URL;
+
+    @Value("${FRONTEND_URL}")
+    private String FRONTEND_URL;
 
     @Value("${EMAIL_FROM}")
     private String EMAIL_FROM;
@@ -152,7 +161,6 @@ public class AuthServiceImpl implements AuthService {
         String verificationUrl = BACKEND_URL + "/api/auth/verify?invitationId=" + invitation.getId()
                 + "&verificationCode=" + verificationCode
                 + "&userId=" + user.getId();
-        //log.info("The verification url: " + verificationUrl);
 
         //? sending the email
         sendGridEmailService.sendHtml(EMAIL_FROM, user.getEmail(), "Verification email", EmailTemplates.confirmationEmail(user.getEmail(), verificationUrl));
@@ -197,6 +205,57 @@ public class AuthServiceImpl implements AuthService {
         } else {
             throw new RuntimeException("Error occurred when fetching user");
         }
+    }
+
+    @Override
+    public void requestPasswordReset(PasswordResetRequest request) {
+        Optional<User> user = userRepository.findByEmail(request.getEmail());
+
+        if (user.isEmpty()) {
+            throw new NotFoundException("No user with the provided email found");
+        }
+
+        String resetCode = UUID.randomUUID().toString();
+        PasswordResetToken passwordResetToken = new PasswordResetToken();
+        passwordResetToken.setEmail(request.getEmail());
+        passwordResetToken.setResetCode(resetCode);
+
+        passwordResetRequestRepository.save(passwordResetToken);
+
+        String resetPasswordUrl = FRONTEND_URL + "/api/auth/resetPassword?resetPasswordCodeId=" + passwordResetToken.getId()
+                + "&resetCode=" + resetCode;
+
+        sendGridEmailService.sendHtml(EMAIL_FROM, user.get().getEmail(), "Reset password", EmailTemplates.resetPassword(resetPasswordUrl));
+    }
+
+    @Override
+    public void resetPassword(String passwordResetTokenId, String resetCode) {
+        Optional<PasswordResetToken> passwordResetToken = passwordResetRequestRepository.findById(passwordResetTokenId);
+
+        if (resetCode.isEmpty()) {
+            throw new NotFoundException("No password reset entity found with the provided id");
+        }
+
+        if (!passwordResetToken.get().isActive() || passwordResetToken.get().getExpiresAt().isBefore(LocalDateTime.now())) {
+            passwordResetToken.get().setActive(false);
+            passwordResetRequestRepository.save(passwordResetToken.get());
+            throw new IllegalStateException("The reset password request is no longer valid.");
+        }
+
+        Optional<User> user = userRepository.findByEmail(passwordResetToken.get().getEmail());
+
+        if (user.isPresent()) {
+            //user.get().setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user.get());
+
+            passwordResetToken.get().setActive(false);
+            passwordResetRequestRepository.save(passwordResetToken.get());
+
+            log.info("Password reset successfully for user: {}", user.get().getEmail());
+        } else {
+            throw new NotFoundException("User not found for the given reset password code");
+        }
+
     }
 
 }

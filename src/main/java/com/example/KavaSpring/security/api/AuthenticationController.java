@@ -1,15 +1,13 @@
 package com.example.KavaSpring.security.api;
 
 import com.example.KavaSpring.config.openapi.ShowAPI;
-import com.example.KavaSpring.exceptions.EntityNotFoundException;
-import com.example.KavaSpring.exceptions.UnauthorizedException;
-import com.example.KavaSpring.exceptions.UnverifiedUserException;
-import com.example.KavaSpring.exceptions.UserAlreadyExistsException;
+import com.example.KavaSpring.exceptions.*;
 import com.example.KavaSpring.models.dto.UserDto;
 import com.example.KavaSpring.security.api.dto.*;
 import com.example.KavaSpring.security.services.AuthService;
 import com.example.KavaSpring.security.utils.EmailTemplates;
 import com.example.KavaSpring.security.utils.JwtUtils;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -102,6 +100,31 @@ public class AuthenticationController {
         }
     }
 
+    @PostMapping("reset-password-request")
+    public ResponseEntity<?> requestPasswordReset(@RequestBody @Valid PasswordResetRequest request) {
+        try {
+            log.info("Attempting to send reset password email");
+            authService.requestPasswordReset(request);
+            return ResponseEntity.ok("Reset password email sent");
+        } catch (NotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
+    @GetMapping("resetPassword")
+    public ResponseEntity<?> resetPassword(
+            @RequestParam String passwordResetTokenId,
+            @RequestParam String resetCode
+    ) {
+        try {
+            log.info("Resetting password");
+            authService.resetPassword(passwordResetTokenId, resetCode);
+            return ResponseEntity.ok("Password successfully reset");
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
 }

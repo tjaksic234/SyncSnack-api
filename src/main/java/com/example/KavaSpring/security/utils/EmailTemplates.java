@@ -164,4 +164,40 @@ public class EmailTemplates {
                 "</body>\n" +
                 "</html>";
     }
+
+    public static String resetPassword(String activationUrl) {
+        return "<!DOCTYPE html>\n" +
+                "<html lang=\"en\">\n" +
+                "<head>\n" +
+                "    <meta charset=\"UTF-8\">\n" +
+                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
+                "    <title>Reset Your Password</title>\n" +
+                "    <style>\n" +
+                "        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }\n" +
+                "        .container { background-color: #f9f9f9; border-radius: 5px; padding: 20px; }\n" +
+                "        h1 { color: #2c3e50; }\n" +
+                "        .btn { display: inline-block; background-color: #3498db; color: #ffffff !important; text-decoration: none; padding: 10px 20px; border-radius: 5px; margin-top: 20px; }\n" +
+                "        .footer { margin-top: 20px; font-size: 12px; color: #777; }\n" +
+                "    </style>\n" +
+                "</head>\n" +
+                "<body>\n" +
+                "    <div class=\"container\">\n" +
+                "        <h1>Reset Your Password</h1>\n" +
+                "        <p>Hello,</p>\n" +
+                "        <p>We received a request to reset your password. If you didn't make this request, you can ignore this email.</p>\n" +
+                "        <p>To reset your password, please click the button below:</p>\n" +
+                "        <a href=\"" + activationUrl + "\" class=\"btn\">Reset Password</a>\n" +
+                "        <p>If the button doesn't work, you can copy and paste the following link into your browser:</p>\n" +
+                "        <p>" + activationUrl + "</p>\n" +
+                "        <p>This link will expire in 24 hours for security reasons.</p>\n" +
+                "        <p>If you have any questions or need assistance, please don't hesitate to contact our support team.</p>\n" +
+                "        <p>Best regards,<br>Your SyncSnack Team</p>\n" +
+                "    </div>\n" +
+                "    <div class=\"footer\">\n" +
+                "        <p>This email was sent to you as part of our password reset process. If you didn't request a password reset, please ignore this email or contact us if you have concerns.</p>\n" +
+                "    </div>\n" +
+                "</body>\n" +
+                "</html>";
+    }
+
 }
