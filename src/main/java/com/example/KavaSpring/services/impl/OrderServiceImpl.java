@@ -13,8 +13,10 @@ import com.example.KavaSpring.repository.EventRepository;
 import com.example.KavaSpring.repository.OrderRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.security.utils.Helper;
+import com.example.KavaSpring.services.FirebaseMessagingService;
 import com.example.KavaSpring.services.OrderService;
 import com.example.KavaSpring.services.WebSocketService;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -46,6 +48,8 @@ public class OrderServiceImpl implements OrderService {
 
     private final WebSocketService webSocketService;
 
+    private final FirebaseMessagingService firebaseMessagingService;
+
     @Override
     public OrderResponse createOrder(OrderRequest request) {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
@@ -74,6 +78,13 @@ public class OrderServiceImpl implements OrderService {
 
         //? notify the event creator userProfile through websocket
         webSocketService.notifyEventUserProfile(order);
+
+        //? notify the event creator userProfile on mobile through firebase
+        try {
+            firebaseMessagingService.notifyEventCreatorOfNewOrder(order);
+        } catch (FirebaseMessagingException e) {
+            throw new RuntimeException(e);
+        }
 
         log.info("Order created");
         return converterService.convertToOrderResponse(request);
