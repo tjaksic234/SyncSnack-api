@@ -4,6 +4,7 @@ import com.example.KavaSpring.config.openapi.ShowAPI;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.exceptions.OrderAlreadyRatedException;
 import com.example.KavaSpring.models.dto.*;
+import com.example.KavaSpring.models.enums.EventType;
 import com.example.KavaSpring.models.enums.OrderStatus;
 import com.example.KavaSpring.services.OrderService;
 import lombok.AllArgsConstructor;
@@ -55,11 +56,12 @@ public class OrderController {
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "0") int rating,
             @RequestParam(required = false) OrderStatus status,
+            @RequestParam(defaultValue = "MIX") EventType eventType,
             @RequestParam(required = false) String search
     ) {
         try {
             log.info("Fetching all orders from user profile");
-            List<OrderEventInfoDto> orders = orderService.getAllOrdersFromUserProfile(PageRequest.of(page, size), rating, status, search);
+            List<OrderEventInfoDto> orders = orderService.getAllOrdersFromUserProfile(PageRequest.of(page, size), rating, status, eventType, search);
 
             if (orders.isEmpty()) {
                 log.info("No orders found for user profile id");

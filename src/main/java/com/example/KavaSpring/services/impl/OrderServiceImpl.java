@@ -7,6 +7,7 @@ import com.example.KavaSpring.models.dao.Order;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.models.enums.EventStatus;
+import com.example.KavaSpring.models.enums.EventType;
 import com.example.KavaSpring.models.enums.OrderStatus;
 import com.example.KavaSpring.repository.EventRepository;
 import com.example.KavaSpring.repository.OrderRepository;
@@ -88,8 +89,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderEventInfoDto> getAllOrdersFromUserProfile(Pageable pageable, int rating, OrderStatus status, String search) {
+    public List<OrderEventInfoDto> getAllOrdersFromUserProfile(Pageable pageable, int rating, OrderStatus status, EventType eventType, String search) {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+        List<AggregationOperation> operations = new ArrayList<>();
 
 
         if (userProfile == null) {
@@ -122,6 +124,17 @@ public class OrderServiceImpl implements OrderService {
 
         UnwindOperation unwindOperation = Aggregation.unwind("eventDetails");
 
+        //? adding the aggregation operations to the list
+        operations.add(matchOperation);
+        operations.add(convertEventIdToObjectId);
+        operations.add(lookupOperation);
+        operations.add(unwindOperation);
+
+        if (eventType != EventType.MIX) {
+            MatchOperation matchByEventType = Aggregation.match(Criteria.where("eventDetails.eventType").is(eventType));
+            operations.add(matchByEventType);
+        }
+
         ProjectionOperation projectionOperation = Aggregation.project()
                 .and("_id").as("orderId")
                 .and("eventId").as("eventId")
@@ -139,20 +152,16 @@ public class OrderServiceImpl implements OrderService {
         SkipOperation skipOperation = Aggregation.skip((long) pageNumber * pageSize);
         LimitOperation limitOperation = Aggregation.limit(pageSize);
 
-        Aggregation aggregation = Aggregation.newAggregation(
-                matchOperation,
-                convertEventIdToObjectId,
-                lookupOperation,
-                unwindOperation,
-                projectionOperation,
-                sortOperation,
-                skipOperation,
-                limitOperation
-        );
+        operations.add(projectionOperation);
+        operations.add(sortOperation);
+        operations.add(skipOperation);
+        operations.add(limitOperation);
+
+        Aggregation aggregation = Aggregation.newAggregation(operations);
 
         AggregationResults<OrderEventInfoDto> results = mongoTemplate.aggregate(aggregation, "orders", OrderEventInfoDto.class);
 
-        log.info("Search results: " + results.getMappedResults().size());
+        log.info("Search results: {}", results.getMappedResults().size());
         log.info("Fetched orders for the user profile successfully");
         return results
                 .getMappedResults()
