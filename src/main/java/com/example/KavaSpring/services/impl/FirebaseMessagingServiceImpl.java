@@ -85,7 +85,7 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
         contentBuilder.append(orderNotification.getFirstName())
                 .append(" ")
                 .append(orderNotification.getLastName())
-                .append(" wants to order. ");
+                .append(" wants to order: ");
 
         orderNotification.getAdditionalOptions().forEach((key, value) ->
                 contentBuilder.append(key).append(": ").append(value).append(", ")
