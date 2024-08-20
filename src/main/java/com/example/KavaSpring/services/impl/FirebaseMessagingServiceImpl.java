@@ -51,17 +51,8 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
                 .putAllData(mobileNotification.getData());
 
         if (mobileNotification.getImage() != null && !mobileNotification.getImage().isEmpty()) {
-            AndroidConfig androidConfig = AndroidConfig.builder()
-                    .setNotification(AndroidNotification.builder()
-                            .setImage(mobileNotification.getImage())
-                            .build())
-                    .build();
-            messageBuilder.setAndroidConfig(androidConfig);
+            messageBuilder.setAndroidConfig(setupAndroidConfig(mobileNotification.getImage()));
         }
-
-
-
-
         return firebaseMessaging.send(messageBuilder.build());
     }
 
@@ -103,4 +94,16 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
         //? sending the notification to the event creator on mobile
         sendNotification(mobileNotification, fcmToken);
     }
+
+    @Override
+    public AndroidConfig setupAndroidConfig(String imageUrl) {
+        return AndroidConfig.builder()
+                .setNotification(AndroidNotification.builder()
+                        .setIcon(imageUrl)
+                        .setColor("#FF0000")
+                        .build())
+                .build();
+    }
+
+
 }
