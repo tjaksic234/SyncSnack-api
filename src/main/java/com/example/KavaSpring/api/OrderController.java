@@ -53,7 +53,7 @@ public class OrderController {
     public ResponseEntity<List<OrderEventInfoDto>> getAllOrdersFromUserProfile (
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
-            @RequestParam(required = false) Integer rating,
+            @RequestParam(defaultValue = "0") int rating,
             @RequestParam(required = false) OrderStatus status,
             @RequestParam(required = false) String search
     ) {

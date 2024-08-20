@@ -88,7 +88,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderEventInfoDto> getAllOrdersFromUserProfile(Pageable pageable, Integer rating, OrderStatus status, String search) {
+    public List<OrderEventInfoDto> getAllOrdersFromUserProfile(Pageable pageable, int rating, OrderStatus status, String search) {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
 
 
@@ -98,7 +98,7 @@ public class OrderServiceImpl implements OrderService {
 
         Criteria criteria = Criteria.where("userProfileId").is(userProfile.getId());
 
-        if (rating != null) {
+        if (rating != 0) {
             criteria.and("rating").is(rating);
         }
 
