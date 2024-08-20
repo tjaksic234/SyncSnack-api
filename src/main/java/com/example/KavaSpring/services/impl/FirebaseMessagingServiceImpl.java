@@ -42,7 +42,6 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
                 .builder()
                 .setTitle(mobileNotification.getSubject())
                 .setBody(mobileNotification.getContent())
-                .setImage(mobileNotification.getImage())
                 .build();
 
         Message.Builder messageBuilder = Message
@@ -81,15 +80,15 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
         String fcmToken = userProfile.getFcmToken();
 
         if (fcmToken == null || fcmToken.isEmpty()) {
-            log.warn("FCM token not found for event creator user profile: {}", userProfile.getId());
-            throw new NotFoundException("FCM token not found for event user profile");
+            log.warn("FCM token not found for event creator user profile: {}. Skipping mobile notification.", userProfile.getId());
+            return;
         }
 
         //? Convert the order into an order notification
         OrderNotification orderNotification = converterService.convertOrderToOrderNotification(order);
 
         String subject = "New order placed";
-        String content = userProfile.getFirstName() + " " + userProfile.getLastName() + "wants to order";
+        String content = userProfile.getFirstName() + " " + userProfile.getLastName() + " wants to order";
 
         Map<String, String> data = new HashMap<>();
         data.put("test", "test");
@@ -98,7 +97,8 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
         mobileNotification.setSubject(subject);
         mobileNotification.setContent(content);
         mobileNotification.setData(data);
-        mobileNotification.setImage(orderNotification.getProfilePhoto());
+        //mobileNotification.setImage(orderNotification.getProfilePhoto());
+        log.warn("The image: {}", mobileNotification.getImage());
 
         //? sending the notification to the event creator on mobile
         sendNotification(mobileNotification, fcmToken);

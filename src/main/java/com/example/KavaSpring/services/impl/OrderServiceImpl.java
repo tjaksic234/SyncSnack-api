@@ -82,8 +82,8 @@ public class OrderServiceImpl implements OrderService {
         //? notify the event creator userProfile on mobile through firebase
         try {
             firebaseMessagingService.notifyEventCreatorOfNewOrder(order);
-        } catch (FirebaseMessagingException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            log.warn("Failed to send mobile notification for order: {}. Error: {}", order.getId(), e.getMessage());
         }
 
         log.info("Order created");

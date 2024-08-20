@@ -39,55 +39,42 @@ public class NotificationServiceImpl implements NotificationService {
         int pageNumber = pageable.getPageNumber();
         int pageSize = pageable.getPageSize();
 
+
+        //? aggregation for the different types of notifications
+        MatchOperation matchOperation = Aggregation.match(
+                new Criteria().orOperator(
+                        Criteria.where("notificationType").is("ORDER")
+                                .and("recipientUserProfileId").is(userProfile.getId()),
+                        Criteria.where("notificationType").is("EVENT")
+                                .and("groupId").is(userProfile.getGroupId())
+                                .and("userProfileId").ne(userProfile.getId())
+                )
+        );
+
+        ProjectionOperation projectOperation = Aggregation.project()
+                .andInclude("notificationType", "orderId", "userProfileId", "firstName", "lastName",
+                        "eventId", "additionalOptions", "createdAt", "photoUri", "groupId",
+                        "title", "description", "eventType", "pendingUntil")
+                .and("photoUri").as("profilePhoto")
+                .andExclude("_id");
+
         SkipOperation skipOperation = Aggregation.skip((long) pageNumber * pageSize);
         LimitOperation limitOperation = Aggregation.limit(pageSize);
 
-        //? aggregation for the order notifications
-        MatchOperation matchByOrderNotificationAndRecipientId = Aggregation.match(Criteria.where("notificationType").is("ORDER")
-                .and("recipientUserProfileId").is(userProfile.getId()));
-
-        ProjectionOperation projectToOrderNotification = Aggregation.project(
-                "notificationType", "orderId", "userProfileId", "firstName", "lastName",
-                        "eventId", "additionalOptions", "createdAt", "photoUri")
-                .and("photoUri").as("profilePhoto")
-                .andExclude("_id");
-
         SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        Aggregation aggregationOrderNotification = Aggregation.newAggregation(
-                matchByOrderNotificationAndRecipientId,
-                projectToOrderNotification,
+        Aggregation aggregation  = Aggregation.newAggregation(
+                matchOperation,
+                projectOperation,
                 sortOperation,
                 skipOperation,
                 limitOperation
         );
 
-        AggregationResults<Notification> resultsOrderNotifications = mongoTemplate.aggregate(aggregationOrderNotification, "notifications", Notification.class);
+        AggregationResults<Notification> results = mongoTemplate.aggregate(aggregation , "notifications", Notification.class);
+        notifications.addAll(results.getMappedResults());
 
-        notifications.addAll(resultsOrderNotifications.getMappedResults());
 
-
-        //? aggregation for the event notifications
-        MatchOperation matchByEventNotificationAndGroupId = Aggregation.match(Criteria.where("notificationType").is("EVENT")
-                .and("groupId").is(userProfile.getGroupId())
-                .and("userProfileId").ne(userProfile.getId()));
-
-        ProjectionOperation projectToEventNotification = Aggregation.project(
-                "notificationType", "eventId", "groupId", "firstName", "lastName", "title", "description",
-                        "eventType", "createdAt", "pendingUntil", "userProfileId", "photoUri")
-                .and("photoUri").as("profilePhoto")
-                .andExclude("_id");
-
-        Aggregation aggregationEventNotification = Aggregation.newAggregation(
-                matchByEventNotificationAndGroupId,
-                projectToEventNotification,
-                sortOperation,
-                skipOperation,
-                limitOperation
-        );
-        AggregationResults<Notification> resultsEventNotifications = mongoTemplate.aggregate(aggregationEventNotification, "notifications", Notification.class);
-
-        notifications.addAll(resultsEventNotifications.getMappedResults());
         notifications.forEach(notification -> {
             if (notification.getPhotoUri() != null) {
                 String convertedUrl = converterService.convertPhotoUriToUrl(notification.getPhotoUri());

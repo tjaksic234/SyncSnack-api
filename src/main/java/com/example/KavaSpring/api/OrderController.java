@@ -62,11 +62,6 @@ public class OrderController {
         try {
             log.info("Fetching all orders from user profile");
             List<OrderEventInfoDto> orders = orderService.getAllOrdersFromUserProfile(PageRequest.of(page, size), rating, status, eventType, search);
-
-            if (orders.isEmpty()) {
-                log.info("No orders found for user profile id");
-                return ResponseEntity.noContent().build();
-            }
             return ResponseEntity.ok(orders);
         } catch (NotFoundException e) {
             log.error(e.getMessage());
