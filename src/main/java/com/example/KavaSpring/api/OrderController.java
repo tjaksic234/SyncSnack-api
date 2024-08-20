@@ -56,7 +56,7 @@ public class OrderController {
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "0") int rating,
             @RequestParam(required = false) OrderStatus status,
-            @RequestParam(defaultValue = "MIX") EventType eventType,
+            @RequestParam(defaultValue = "ALL") EventType eventType,
             @RequestParam(required = false) String search
     ) {
         try {

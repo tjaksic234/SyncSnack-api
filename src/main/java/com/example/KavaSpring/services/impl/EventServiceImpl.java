@@ -101,8 +101,7 @@ public class EventServiceImpl implements EventService {
             criteriaList.add(Criteria.where("status").is(request.getStatus()));
         }
 
-        //? u slucaju da je MIX eventType vratiti ce sve eventove sa bilo kojim EventTypom (FOOD, COFFEE......)
-        if (request.getEventType() != null && request.getEventType() != EventType.MIX) {
+        if (request.getEventType() != null && request.getEventType() != EventType.ALL) {
             criteriaList.add(Criteria.where("eventType").is(request.getEventType()));
         }
 

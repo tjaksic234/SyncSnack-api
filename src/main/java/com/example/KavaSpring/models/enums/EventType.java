@@ -4,5 +4,6 @@ public enum EventType {
     FOOD,
     BEVERAGE,
     COFFEE,
-    MIX
+    MIX,
+    ALL
 }

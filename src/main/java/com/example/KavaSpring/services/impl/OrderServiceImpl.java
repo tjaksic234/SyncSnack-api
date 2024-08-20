@@ -130,7 +130,7 @@ public class OrderServiceImpl implements OrderService {
         operations.add(lookupOperation);
         operations.add(unwindOperation);
 
-        if (eventType != EventType.MIX) {
+        if (eventType != EventType.ALL) {
             MatchOperation matchByEventType = Aggregation.match(Criteria.where("eventDetails.eventType").is(eventType));
             operations.add(matchByEventType);
         }
