@@ -102,7 +102,6 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
         mobileNotification.setContent(content);
         mobileNotification.setData(data);
         mobileNotification.setImage(orderNotification.getProfilePhoto());
-        log.warn("The image: {}", mobileNotification.getImage());
 
         //? sending the notification to the event creator on mobile
         sendNotification(mobileNotification, fcmToken);
@@ -112,7 +111,7 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
     public AndroidConfig setupAndroidConfig(String imageUrl) {
         return AndroidConfig.builder()
                 .setNotification(AndroidNotification.builder()
-                        .setIcon(imageUrl)
+                        .setImage(imageUrl)
                         .setPriority(AndroidNotification.Priority.HIGH)
                         .setColor("#FF0000")
                         .build())
