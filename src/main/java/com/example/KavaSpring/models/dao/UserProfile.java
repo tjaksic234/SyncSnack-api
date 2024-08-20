@@ -41,6 +41,8 @@ public class UserProfile {
 
     private String photoUri;
 
+    private String fcmToken;
+
     @CreatedDate
     private LocalDateTime createdAt;
 

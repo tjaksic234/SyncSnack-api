@@ -16,4 +16,5 @@ public interface UserProfileService {
     UserProfileEditResponse editUserProfile(String firstName, String lastName, MultipartFile photoFile);
     List<GroupMemberResponse> getGroupMembers(SortCondition condition, Pageable pageable);
     void calculateScore();
+    void updateFcmToken(String token);
 }

@@ -34,6 +34,7 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
                 .putAllData(mobileNotification.getData())
                 .build();
 
+
         return firebaseMessaging.send(message);
     }
 }

@@ -139,6 +139,8 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.save(user);
 
+
+
         //? Send verification email
         sendVerificationEmail(user);
 

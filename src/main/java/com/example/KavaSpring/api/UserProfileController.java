@@ -69,7 +69,7 @@ public class UserProfileController {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.IMAGE_JPEG);
-            return new ResponseEntity(userProfileService.downloadUserProfilePhoto(), headers, HttpStatus.OK);
+            return new ResponseEntity<>(userProfileService.downloadUserProfilePhoto(), headers, HttpStatus.OK);
         } catch (IOException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
@@ -121,6 +121,18 @@ public class UserProfileController {
         } catch (EntityNotFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PatchMapping("fcm-token")
+    public ResponseEntity<?> updateFcmToken(@RequestParam String token) {
+        try {
+            log.info("Updating fcm token");
+            userProfileService.updateFcmToken(token);
+            return ResponseEntity.ok("UserProfile fcmToken successfully updated");
+        } catch (NotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 }

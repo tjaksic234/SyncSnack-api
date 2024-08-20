@@ -286,4 +286,17 @@ public class UserProfileServiceImpl implements UserProfileService {
         log.info("Scores successfully updated");
     }
 
+    @Override
+    public void updateFcmToken(String token) {
+        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+
+        if (userProfile == null) {
+            throw new NotFoundException("No user profile found with the provided user id");
+        }
+
+        userProfile.setFcmToken(token);
+        userProfileRepository.save(userProfile);
+        log.info("FcmToken successfully updated for the user profile");
+    }
+
 }
