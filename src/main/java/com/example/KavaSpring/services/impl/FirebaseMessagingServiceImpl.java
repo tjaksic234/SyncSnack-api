@@ -78,11 +78,24 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
         //? Convert the order into an order notification
         OrderNotification orderNotification = converterService.convertOrderToOrderNotification(order);
 
+        //? Setting the notification display order
         String title = "New order placed";
-        String content = userProfile.getFirstName() + " " + userProfile.getLastName() + " wants to order";
+
+        StringBuilder contentBuilder = new StringBuilder();
+        contentBuilder.append(orderNotification.getFirstName())
+                .append(" ")
+                .append(orderNotification.getLastName())
+                .append(" wants to order. ");
+
+        orderNotification.getAdditionalOptions().forEach((key, value) ->
+                contentBuilder.append(key).append(": ").append(value).append(", ")
+        );
+        contentBuilder.setLength(contentBuilder.length() - 2);
+        String content = contentBuilder.toString();
 
         Map<String, String> data = new HashMap<>();
-        data.put("name", orderNotification.getFirstName());
+        data.put("orderId", orderNotification.getOrderId());
+        data.put("eventId", order.getEventId());
 
         MobileNotification mobileNotification = new MobileNotification();
         mobileNotification.setTitle(title);
@@ -100,7 +113,6 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
         return AndroidConfig.builder()
                 .setNotification(AndroidNotification.builder()
                         .setIcon(imageUrl)
-                        .setImage(imageUrl)
                         .setPriority(AndroidNotification.Priority.HIGH)
                         .setColor("#FF0000")
                         .build())
