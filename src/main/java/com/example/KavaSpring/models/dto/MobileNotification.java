@@ -10,7 +10,7 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MobileNotification {
-    private String subject;
+    private String title;
     private String content;
     private Map<String, String> data;
     private String image;
