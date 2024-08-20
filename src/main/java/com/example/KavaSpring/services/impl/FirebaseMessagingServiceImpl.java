@@ -42,7 +42,6 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
                 .builder()
                 .setTitle(mobileNotification.getTitle())
                 .setBody(mobileNotification.getContent())
-                .setImage(mobileNotification.getImage())
                 .build();
 
         Message.Builder messageBuilder = Message
@@ -51,9 +50,9 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
                 .setNotification(notification)
                 .putAllData(mobileNotification.getData());
 
-       /* if (mobileNotification.getImage() != null && !mobileNotification.getImage().isEmpty()) {
+        if (mobileNotification.getImage() != null && !mobileNotification.getImage().isEmpty()) {
             messageBuilder.setAndroidConfig(setupAndroidConfig(mobileNotification.getImage()));
-        }*/
+        }
         return firebaseMessaging.send(messageBuilder.build());
     }
 
@@ -83,13 +82,13 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
         String content = userProfile.getFirstName() + " " + userProfile.getLastName() + " wants to order";
 
         Map<String, String> data = new HashMap<>();
-        data.put("image", orderNotification.getProfilePhoto());
+        data.put("name", orderNotification.getFirstName());
 
         MobileNotification mobileNotification = new MobileNotification();
         mobileNotification.setTitle(subject);
         mobileNotification.setContent(content);
         mobileNotification.setData(data);
-        //mobileNotification.setImage(orderNotification.getProfilePhoto());
+        mobileNotification.setImage(orderNotification.getProfilePhoto());
         log.warn("The image: {}", mobileNotification.getImage());
 
         //? sending the notification to the event creator on mobile
