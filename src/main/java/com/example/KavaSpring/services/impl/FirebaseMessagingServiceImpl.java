@@ -1,10 +1,12 @@
 package com.example.KavaSpring.services.impl;
 
+import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.models.dao.Event;
 import com.example.KavaSpring.models.dao.Order;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.MobileNotification;
+import com.example.KavaSpring.models.dto.OrderNotification;
 import com.example.KavaSpring.repository.EventRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.services.FirebaseMessagingService;
@@ -33,12 +35,15 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
 
     private final EventRepository eventRepository;
 
+    private final ConverterService converterService;
+
     @Override
     public String sendNotification(MobileNotification mobileNotification, String token) throws FirebaseMessagingException {
         Notification notification = Notification
                 .builder()
                 .setTitle(mobileNotification.getSubject())
                 .setBody(mobileNotification.getContent())
+                .setImage(mobileNotification.getImage())
                 .build();
 
         Message message = Message
@@ -71,8 +76,11 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
             throw new NotFoundException("FCM token not found for event user profile");
         }
 
+        //? Convert the order into an order notification
+        OrderNotification orderNotification = converterService.convertOrderToOrderNotification(order);
+
         String subject = "New order placed";
-        String content = userProfile.getFirstName() + userProfile.getLastName() + "wants to order";
+        String content = userProfile.getFirstName() + " " + userProfile.getLastName() + "wants to order";
 
         Map<String, String> data = new HashMap<>();
         data.put("test", "test");
@@ -81,6 +89,7 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
         mobileNotification.setSubject(subject);
         mobileNotification.setContent(content);
         mobileNotification.setData(data);
+        mobileNotification.setImage(orderNotification.getProfilePhoto());
 
         //? sending the notification to the event creator on mobile
         sendNotification(mobileNotification, fcmToken);
