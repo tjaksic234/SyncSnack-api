@@ -10,10 +10,7 @@ import com.example.KavaSpring.models.dto.OrderNotification;
 import com.example.KavaSpring.repository.EventRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.services.FirebaseMessagingService;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
-import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.Notification;
+import com.google.firebase.messaging.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,6 +36,8 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
 
     @Override
     public String sendNotification(MobileNotification mobileNotification, String token) throws FirebaseMessagingException {
+
+
         Notification notification = Notification
                 .builder()
                 .setTitle(mobileNotification.getSubject())
@@ -46,15 +45,25 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
                 .setImage(mobileNotification.getImage())
                 .build();
 
-        Message message = Message
+        Message.Builder messageBuilder = Message
                 .builder()
                 .setToken(token)
                 .setNotification(notification)
-                .putAllData(mobileNotification.getData())
-                .build();
+                .putAllData(mobileNotification.getData());
+
+        if (mobileNotification.getImage() != null && !mobileNotification.getImage().isEmpty()) {
+            AndroidConfig androidConfig = AndroidConfig.builder()
+                    .setNotification(AndroidNotification.builder()
+                            .setImage(mobileNotification.getImage())
+                            .build())
+                    .build();
+            messageBuilder.setAndroidConfig(androidConfig);
+        }
 
 
-        return firebaseMessaging.send(message);
+
+
+        return firebaseMessaging.send(messageBuilder.build());
     }
 
     @Override
