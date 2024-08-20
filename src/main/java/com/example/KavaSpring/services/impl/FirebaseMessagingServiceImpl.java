@@ -78,14 +78,14 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
         //? Convert the order into an order notification
         OrderNotification orderNotification = converterService.convertOrderToOrderNotification(order);
 
-        String subject = "New order placed";
+        String title = "New order placed";
         String content = userProfile.getFirstName() + " " + userProfile.getLastName() + " wants to order";
 
         Map<String, String> data = new HashMap<>();
         data.put("name", orderNotification.getFirstName());
 
         MobileNotification mobileNotification = new MobileNotification();
-        mobileNotification.setTitle(subject);
+        mobileNotification.setTitle(title);
         mobileNotification.setContent(content);
         mobileNotification.setData(data);
         mobileNotification.setImage(orderNotification.getProfilePhoto());
@@ -99,7 +99,9 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
     public AndroidConfig setupAndroidConfig(String imageUrl) {
         return AndroidConfig.builder()
                 .setNotification(AndroidNotification.builder()
+                        .setIcon(imageUrl)
                         .setImage(imageUrl)
+                        .setPriority(AndroidNotification.Priority.HIGH)
                         .setColor("#FF0000")
                         .build())
                 .build();
