@@ -88,7 +88,7 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
         mobileNotification.setSubject(subject);
         mobileNotification.setContent(content);
         mobileNotification.setData(data);
-        //mobileNotification.setImage(orderNotification.getProfilePhoto());
+        mobileNotification.setImage(orderNotification.getProfilePhoto());
         log.warn("The image: {}", mobileNotification.getImage());
 
         //? sending the notification to the event creator on mobile
