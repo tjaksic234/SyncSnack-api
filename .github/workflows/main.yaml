@@ -21,7 +21,7 @@ jobs:
 
       - name: Create application.properties
         run: |
-          echo "${{ secrets.PROPERTY_CONFIG }}" > src/main/resources/application.properties     
+          echo "${{ secrets.APPLICATION_PROPERTIES }}" > src/main/resources/application.properties     
 
       - name: Create Firebase config file
         run: |
