@@ -135,4 +135,15 @@ public class UserProfileController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("stats")
+    public ResponseEntity<List<UserProfileStats>> getUserProfileStats() {
+        try {
+            log.info("Fetching stats for the user");
+            return ResponseEntity.ok(userProfileService.getUserProfileStats());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

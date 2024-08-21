@@ -17,4 +17,5 @@ public interface UserProfileService {
     List<GroupMemberResponse> getGroupMembers(SortCondition condition, Pageable pageable);
     void calculateScore();
     void updateFcmToken(String token);
+    List<UserProfileStats> getUserProfileStats();
 }

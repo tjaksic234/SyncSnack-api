@@ -121,6 +121,7 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
         mobileNotification.setImage(orderNotification.getProfilePhoto());
 
         //? sending the notification to the event creator on mobile
+        log.info("Sending mobile notification to the event creator of the new order");
         sendNotification(mobileNotification, fcmToken);
     }
 
@@ -132,7 +133,6 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
         for (UserProfile userProfile : userProfilesWithTokens) {
             tokens.add(userProfile.getFcmToken());
         }
-        log.info("The retrieved tokens: {}", tokens);
 
         String title = "New event created for your group";
         String content = "New Event: " + event.getTitle() + "\n\n" +

@@ -299,4 +299,61 @@ public class UserProfileServiceImpl implements UserProfileService {
         log.info("FcmToken successfully updated for the user profile");
     }
 
+    @Override
+    public List<UserProfileStats> getUserProfileStats() {
+        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+        List<UserProfileStats> stats = new ArrayList<>();
+
+        //* Aggregation for fetching the order count based on the status of the order
+        MatchOperation matchByUserProfileId = Aggregation.match(Criteria.where("userProfileId").is(userProfile.getId()));
+
+        GroupOperation groupByStatus = Aggregation.group("status").count().as("count");
+
+        ProjectionOperation projectOrderStatusCount = Aggregation.project()
+                .andExclude("_id")
+                .and("_id").as("status")
+                .andInclude("count");
+
+        Aggregation aggregateOrderStatusCount = Aggregation.newAggregation(
+                matchByUserProfileId,
+                groupByStatus,
+                projectOrderStatusCount
+        );
+
+        AggregationResults<UserProfileStats> countStatusResults = mongoTemplate.aggregate(aggregateOrderStatusCount, "orders", UserProfileStats.class);
+
+        stats.addAll(countStatusResults.getMappedResults());
+
+        //* Aggregation for fetching the order count based on the event type the order was placed for
+        AddFieldsOperation convertStringUserProfileIdToObjectId = Aggregation.addFields().addField("eventId")
+                .withValue(ConvertOperators.ToObjectId.toObjectId("$eventId")).build();
+
+        LookupOperation lookupOperation = Aggregation.lookup("events", "eventId", "_id", "events");
+
+        UnwindOperation unwindOperation = Aggregation.unwind("$events");
+
+        GroupOperation groupByEventType = Aggregation.group("events.eventType").count().as("count");
+
+        ProjectionOperation projectOrderTypeCount = Aggregation.project()
+                .andExclude("_id")
+                .and("_id").as("type")
+                .andInclude("count");
+
+        Aggregation aggregateOrderTypeCount = Aggregation.newAggregation(
+                matchByUserProfileId,
+                convertStringUserProfileIdToObjectId,
+                lookupOperation,
+                unwindOperation,
+                groupByEventType,
+                projectOrderTypeCount
+        );
+
+        AggregationResults<UserProfileStats> countTypeResults = mongoTemplate.aggregate(aggregateOrderTypeCount, "orders", UserProfileStats.class);
+
+        stats.addAll(countTypeResults.getMappedResults());
+
+        log.info("Fetched the user stats successfully");
+        return stats;
+    }
+
 }
