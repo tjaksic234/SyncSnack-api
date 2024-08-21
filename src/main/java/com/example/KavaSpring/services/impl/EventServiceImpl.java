@@ -15,7 +15,9 @@ import com.example.KavaSpring.repository.OrderRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.security.utils.Helper;
 import com.example.KavaSpring.services.EventService;
+import com.example.KavaSpring.services.FirebaseMessagingService;
 import com.example.KavaSpring.services.WebSocketService;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -53,6 +55,8 @@ public class EventServiceImpl implements EventService {
 
     private final OrderRepository orderRepository;
 
+    private final FirebaseMessagingService firebaseMessagingService;
+
     @Override
     public EventResponse createEvent(EventRequest request) {
         List<EventStatus> activeStatuses = Arrays.asList(EventStatus.PENDING, EventStatus.IN_PROGRESS);
@@ -76,8 +80,15 @@ public class EventServiceImpl implements EventService {
         event.setPendingUntil(LocalDateTime.now().plusMinutes(request.getPendingTime()));
         eventRepository.save(event);
 
-        //? notifying the group members
+        //? notifying the group members through websocket
         webSocketService.notifyGroupMembers(event);
+
+        //? notifying the group of the created event on mobile through firebase
+        try {
+            firebaseMessagingService.notifyGroupOfNewEvent(event);
+        } catch (FirebaseMessagingException e) {
+            throw new RuntimeException(e);
+        }
 
         log.info("Event created");
         return converterService.convertToEventResponse(request);

@@ -16,9 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+
 
 @Service
 @Slf4j
@@ -36,8 +35,6 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
 
     @Override
     public String sendNotification(MobileNotification mobileNotification, String token) throws FirebaseMessagingException {
-
-
         Notification notification = Notification
                 .builder()
                 .setTitle(mobileNotification.getTitle())
@@ -54,6 +51,23 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
             messageBuilder.setAndroidConfig(setupAndroidConfig(mobileNotification.getImage()));
         }
         return firebaseMessaging.send(messageBuilder.build());
+    }
+
+    @Override
+    public String sendMulticastNotification(MobileNotification mobileNotification, List<String> tokens) throws FirebaseMessagingException {
+        Notification notification = Notification
+                .builder()
+                .setTitle(mobileNotification.getTitle())
+                .setBody(mobileNotification.getContent())
+                .build();
+
+        MulticastMessage.Builder messageBuilder = MulticastMessage
+                .builder()
+                .addAllTokens(tokens)
+                .setNotification(notification)
+                .putAllData(mobileNotification.getData());
+
+        return firebaseMessaging.sendEachForMulticast(messageBuilder.build()).toString();
     }
 
     @Override
@@ -105,6 +119,30 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
 
         //? sending the notification to the event creator on mobile
         sendNotification(mobileNotification, fcmToken);
+    }
+
+    @Override
+    public void notifyGroupOfNewEvent(Event event) throws FirebaseMessagingException {
+        List<UserProfile> userProfilesWithTokens = userProfileRepository.findByGroupIdAndFcmTokenIsNotNull(event.getGroupId());
+        List<String> tokens = new ArrayList<>();
+
+        for (UserProfile userProfile : userProfilesWithTokens) {
+            tokens.add(userProfile.getFcmToken());
+        }
+
+        String title = "New event created for your group";
+        String content = "New Event: " + event.getTitle() + "\n\n" +
+                "Type: " + event.getEventType() + "\n" +
+                "Description: " +
+                event.getDescription() +
+                "\n" +
+                "Created: " + event.getCreatedAt() + "\n" +
+                "Pending until: " + event.getPendingUntil();
+
+        MobileNotification mobileNotification = new MobileNotification();
+        mobileNotification.setTitle(title);
+        mobileNotification.setContent(content);
+        sendMulticastNotification(mobileNotification, tokens);
     }
 
     @Override

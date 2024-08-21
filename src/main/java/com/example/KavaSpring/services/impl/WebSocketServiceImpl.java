@@ -50,7 +50,6 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     @Override
     public void notifyGroupMembers(Event event) {
-
         EventNotification eventNotification = converterService.convertEventToEventNotification(event);
 
         //? saving the notification to the database
