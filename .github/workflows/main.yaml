@@ -19,16 +19,25 @@ jobs:
           distribution: 'oracle'
           java-version: 17.0.11
 
-      - name: Build and Test the app
-        run:  mvn clean package
+      - name: Create Firebase config file
+        run: |
+          mkdir -p src/main/resources
+          echo '${{ secrets.FIREBASE_CONFIG }}' > src/main/resources/firebase-adminsdk.json
 
-      - name: Build Docker Image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          dockerfile: Dockerfile
-          push: false
-          tags: ${{ secrets.DOCKER_USERNAME }}/syncsnack-api:2.0
+      - name: Build and Test the app
+        env:
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+          FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+          JWTCOOKIENAME: ${{ secrets.JWTCOOKIENAME }}
+          JWTEXPIRATIONMS: ${{ secrets.JWTEXPIRATIONMS }}
+          JWTSECRET: ${{ secrets.JWTSECRET }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
+          S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+          S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
+          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+        run:  mvn clean package
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -36,10 +45,22 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PAT }}
 
-      - name: Push to Docker Hub
+      - name: Build and Push Docker Image
         uses: docker/build-push-action@v6
         with:
           context: .
           dockerfile: Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/syncsnack-api:2.0
+          build-args: |
+            BACKEND_URL=${{ secrets.BACKEND_URL }}
+            FRONTEND_URL=${{ secrets.FRONTEND_URL }}
+            JWTCOOKIENAME=${{ secrets.JWTCOOKIENAME }}
+            JWTEXPIRATIONMS=${{ secrets.JWTEXPIRATIONMS }}
+            JWTSECRET=${{ secrets.JWTSECRET }}
+            MONGODB_URI=${{ secrets.MONGODB_URI }}
+            S3_ACCESS_KEY=${{ secrets.S3_ACCESS_KEY }}
+            S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
+            S3_SECRET_KEY=${{ secrets.S3_SECRET_KEY }}
+            SENDGRID_API_KEY=${{ secrets.SENDGRID_API_KEY }}
+            EMAIL_FROM=${{ secrets.EMAIL_FROM }}
