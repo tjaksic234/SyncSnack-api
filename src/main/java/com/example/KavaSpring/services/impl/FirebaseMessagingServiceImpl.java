@@ -67,7 +67,7 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
                 .setNotification(notification)
                 .putAllData(mobileNotification.getData());
 
-        return firebaseMessaging.sendMulticast(messageBuilder.build());
+        return firebaseMessaging.sendEachForMulticast(messageBuilder.build());
     }
 
     @Override
@@ -125,11 +125,11 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
     public void notifyGroupOfNewEvent(Event event) throws FirebaseMessagingException {
         List<UserProfile> userProfilesWithTokens = userProfileRepository.findByGroupIdAndFcmTokenIsNotNull(event.getGroupId());
         List<String> tokens = new ArrayList<>();
-        log.info("The retrieved tokens: {}", tokens);
 
         for (UserProfile userProfile : userProfilesWithTokens) {
             tokens.add(userProfile.getFcmToken());
         }
+        log.info("The retrieved tokens: {}", tokens);
 
         String title = "New event created for your group";
         String content = "New Event: " + event.getTitle() + "\n\n" +
@@ -140,9 +140,14 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
                 "Created: " + event.getCreatedAt() + "\n" +
                 "Pending until: " + event.getPendingUntil();
 
+        Map<String, String> data = new HashMap<>();
+        data.put("event", event.getGroupId());
+
+
         MobileNotification mobileNotification = new MobileNotification();
         mobileNotification.setTitle(title);
         mobileNotification.setContent(content);
+        mobileNotification.setData(data);
 
         log.info("Sending mobile notification to the entire group");
         sendMulticastNotification(mobileNotification, tokens);
