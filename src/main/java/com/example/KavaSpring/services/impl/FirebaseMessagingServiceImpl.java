@@ -54,7 +54,7 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
     }
 
     @Override
-    public String sendMulticastNotification(MobileNotification mobileNotification, List<String> tokens) throws FirebaseMessagingException {
+    public BatchResponse sendMulticastNotification(MobileNotification mobileNotification, List<String> tokens) throws FirebaseMessagingException {
         Notification notification = Notification
                 .builder()
                 .setTitle(mobileNotification.getTitle())
@@ -67,7 +67,7 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
                 .setNotification(notification)
                 .putAllData(mobileNotification.getData());
 
-        return firebaseMessaging.sendEachForMulticast(messageBuilder.build()).toString();
+        return firebaseMessaging.sendMulticast(messageBuilder.build());
     }
 
     @Override
@@ -125,6 +125,7 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
     public void notifyGroupOfNewEvent(Event event) throws FirebaseMessagingException {
         List<UserProfile> userProfilesWithTokens = userProfileRepository.findByGroupIdAndFcmTokenIsNotNull(event.getGroupId());
         List<String> tokens = new ArrayList<>();
+        log.info("The retrieved tokens: {}", tokens);
 
         for (UserProfile userProfile : userProfilesWithTokens) {
             tokens.add(userProfile.getFcmToken());
@@ -142,6 +143,8 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
         MobileNotification mobileNotification = new MobileNotification();
         mobileNotification.setTitle(title);
         mobileNotification.setContent(content);
+
+        log.info("Sending mobile notification to the entire group");
         sendMulticastNotification(mobileNotification, tokens);
     }
 
