@@ -143,7 +143,8 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
                 "Pending until: " + event.getPendingUntil();
 
         Map<String, String> data = new HashMap<>();
-        data.put("event", event.getGroupId());
+        data.put("eventId", event.getId());
+        data.put("type", String.valueOf(event.getEventType()));
 
 
         MobileNotification mobileNotification = new MobileNotification();
