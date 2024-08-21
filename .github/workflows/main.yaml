@@ -19,14 +19,29 @@ jobs:
           distribution: 'oracle'
           java-version: 17.0.11
 
-      - name: Create application.properties
+      - name: Create configuration files
         run: |
-          echo "${{ secrets.APPLICATION_PROPERTIES }}" > src/main/resources/application.properties     
-
-      - name: Create Firebase config file
-        run: |
+          set -e
           mkdir -p src/main/resources
+          echo "Created src/main/resources directory"
+
+          echo "${{ secrets.APPLICATION_PROPERTIES }}" > src/main/resources/application.properties
+          if [ $? -eq 0 ]; then
+            echo "Successfully created application.properties"
+          else
+            echo "Failed to create application.properties"
+            exit 1
+          fi
+
           echo '${{ secrets.FIREBASE_CONFIG }}' > src/main/resources/firebase-adminsdk.json
+          if [ $? -eq 0 ]; then
+            echo "Successfully created firebase-config.json"
+          else
+            echo "Failed to create firebase-config.json"
+            exit 1
+          fi
+
+          echo "Configuration files created successfully"     
 
       - name: Build and Test the app
         run:  mvn clean package
