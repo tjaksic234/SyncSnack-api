@@ -67,7 +67,10 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
                 .setNotification(notification)
                 .putAllData(mobileNotification.getData());
 
-        return firebaseMessaging.sendEachForMulticast(messageBuilder.build());
+        BatchResponse batchResponse = firebaseMessaging.sendEachForMulticast(messageBuilder.build());
+        //? logging the batch results
+        logBatchResults(batchResponse, tokens);
+        return batchResponse;
     }
 
     @Override
@@ -137,7 +140,6 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
                 "Description: " +
                 event.getDescription() +
                 "\n" +
-                "Created: " + event.getCreatedAt() + "\n" +
                 "Pending until: " + event.getPendingUntil();
 
         Map<String, String> data = new HashMap<>();
@@ -164,5 +166,17 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
                 .build();
     }
 
+    private void logBatchResults(BatchResponse batchResponse, List<String> tokens) {
+        int successCount = 0;
+        for (int i = 0; i < batchResponse.getResponses().size(); i++) {
+            if (batchResponse.getResponses().get(i).isSuccessful()) {
+                successCount++;
+            } else {
+                log.warn("Failed to send notification to token: {}. Error: {}",
+                        tokens.get(i), batchResponse.getResponses().get(i).getException().getMessage());
+            }
+        }
+        log.info("Batch result: {} successful, {} failed", successCount, tokens.size() - successCount);
+    }
 
 }
