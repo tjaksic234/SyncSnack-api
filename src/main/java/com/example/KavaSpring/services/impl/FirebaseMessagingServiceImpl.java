@@ -111,8 +111,8 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
         String content = contentBuilder.toString();
 
         Map<String, String> data = new HashMap<>();
-        data.put("orderId", orderNotification.getOrderId());
-        data.put("eventId", order.getEventId());
+        data.put("eventId", orderNotification.getEventId());
+        data.put("screen", "all-orders");
 
         MobileNotification mobileNotification = new MobileNotification();
         mobileNotification.setTitle(title);
@@ -144,7 +144,7 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
 
         Map<String, String> data = new HashMap<>();
         data.put("eventId", event.getId());
-        data.put("type", String.valueOf(event.getEventType()));
+        data.put("screen", "event_details");
 
 
         MobileNotification mobileNotification = new MobileNotification();
