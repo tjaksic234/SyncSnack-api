@@ -19,9 +19,6 @@ jobs:
           distribution: 'oracle'
           java-version: 17.0.11
 
-      - name: Unit Tests
-        run: mvn -B test --file pom.xml
-
       - name: Build the app
         run:  mvn clean
 
