@@ -19,8 +19,8 @@ jobs:
           distribution: 'oracle'
           java-version: 17.0.11
 
-      - name: Build the app
-        run:  mvn clean
+      - name: Build and Test the app
+        run:  mvn clean package
 
       - name: Build Docker Image
         uses: docker/build-push-action@v6
