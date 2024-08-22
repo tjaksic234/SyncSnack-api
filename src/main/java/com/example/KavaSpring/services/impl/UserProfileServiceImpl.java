@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -354,6 +355,53 @@ public class UserProfileServiceImpl implements UserProfileService {
 
         log.info("Fetched the user stats successfully");
         return stats;
+    }
+
+    @Override
+    public List<MonthlyOrderStatsDto> fetchMonthlyOrderStats() {
+        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+        String userProfileId = userProfile.getId();
+
+        LocalDateTime currentDate = LocalDateTime.now();
+        LocalDateTime minTime = currentDate.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).minusYears(1);
+        LocalDateTime maxTime = currentDate.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).minusNanos(1);
+
+        List<MonthlyOrderStatsDto> monthlyStats = new ArrayList<>();
+
+        Criteria criteria = new Criteria().andOperator(
+                Criteria.where("userProfileId").is(userProfileId),
+                Criteria.where("createdAt").gte(minTime).lt(maxTime)
+        );
+
+        MatchOperation matchOperation = Aggregation.match(criteria);
+
+        ProjectionOperation project1 = Aggregation.project()
+                .and(DateOperators.dateOf("createdAt").year()).as("year")
+                .and(DateOperators.dateOf("createdAt").month()).as("month");
+
+        GroupOperation groupOperation = Aggregation.group("year", "month").count().as("count");
+
+        ProjectionOperation project2 = Aggregation.project()
+                .and("_id.year").as("year")
+                .and("_id.month").as("month")
+                .andInclude("count")
+                .andExclude("_id");
+
+
+        SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "year")
+                .and(Sort.by(Sort.Direction.DESC, "month")));
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                matchOperation,
+                project1,
+                groupOperation,
+                project2,
+                sortOperation
+        );
+
+        AggregationResults<MonthlyOrderStatsDto> results = mongoTemplate.aggregate(aggregation, "orders", MonthlyOrderStatsDto.class);
+
+        return results.getMappedResults();
     }
 
 }

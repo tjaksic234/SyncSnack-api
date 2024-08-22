@@ -18,4 +18,5 @@ public interface UserProfileService {
     void calculateScore();
     void updateFcmToken(String token);
     List<UserProfileStats> getUserProfileStats();
+    List<MonthlyOrderStatsDto> fetchMonthlyOrderStats();
 }

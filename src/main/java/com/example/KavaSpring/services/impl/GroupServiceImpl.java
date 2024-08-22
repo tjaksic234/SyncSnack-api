@@ -38,6 +38,7 @@ public class GroupServiceImpl implements GroupService {
     private final ConverterService converterService;
 
     private final PasswordEncoder passwordEncoder;
+
     private final MongoTemplate mongoTemplate;
 
 

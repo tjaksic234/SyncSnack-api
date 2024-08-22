@@ -146,4 +146,15 @@ public class UserProfileController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @GetMapping("monthly-summary/orders")
+    public ResponseEntity<List<MonthlyOrderStatsDto>> getMonthlyOrderStats() {
+        try {
+            log.info("Fetching monthly order stats");
+            return ResponseEntity.ok(userProfileService.fetchMonthlyOrderStats());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

@@ -23,24 +23,22 @@ jobs:
         run: |
           set -e
           mkdir -p src/main/resources
-          echo "Created src/main/resources directory"
 
           echo "${{ secrets.APPLICATION_PROPERTIES }}" > src/main/resources/application.properties
           if [ $? -eq 0 ]; then
-            echo "Successfully created application.properties"
+            echo "Successfully created app config file"
           else
-            echo "Failed to create application.properties"
+            echo "Failed to create app config file"
             exit 1
           fi
 
           echo '${{ secrets.FIREBASE_CONFIG }}' > src/main/resources/firebase-adminsdk.json
           if [ $? -eq 0 ]; then
-            echo "Successfully created firebase-config.json"
+            echo "Successfully created firebase json file"
           else
-            echo "Failed to create firebase-config.json"
+            echo "Failed to create firebase json file"
             exit 1
           fi
-
           echo "Configuration files created successfully"     
 
       - name: Build and Test the app
