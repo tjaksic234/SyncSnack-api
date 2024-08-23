@@ -13,6 +13,7 @@ import com.example.KavaSpring.repository.GroupRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.repository.UserRepository;
 import com.example.KavaSpring.security.utils.Helper;
+import com.example.KavaSpring.security.utils.StatisticUtils;
 import com.example.KavaSpring.services.AmazonS3Service;
 import com.example.KavaSpring.services.UserProfileService;
 import lombok.AllArgsConstructor;
@@ -358,15 +359,16 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
-    public List<MonthlyOrderStatsDto> fetchMonthlyOrderStats() {
+    public List<MonthlyStatsDto> fetchMonthlyStats(String collection) {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
         String userProfileId = userProfile.getId();
 
         LocalDateTime currentDate = LocalDateTime.now();
-        LocalDateTime minTime = currentDate.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).minusYears(1);
-        LocalDateTime maxTime = currentDate.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).minusNanos(1);
+        LocalDateTime maxTime = currentDate.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).minusMinutes(1).withNano(0);
+        LocalDateTime minTime = currentDate.minusYears(1).withHour(0).withMinute(0).withSecond(0).withDayOfMonth(1).withNano(0);
 
-        List<MonthlyOrderStatsDto> monthlyStats = new ArrayList<>();
+        log.info("maxTime: {}", maxTime);
+        log.info("minTime: {}", minTime);
 
         Criteria criteria = new Criteria().andOperator(
                 Criteria.where("userProfileId").is(userProfileId),
@@ -388,8 +390,7 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .andExclude("_id");
 
 
-        SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "year")
-                .and(Sort.by(Sort.Direction.DESC, "month")));
+        SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.ASC, "year", "month"));
 
         Aggregation aggregation = Aggregation.newAggregation(
                 matchOperation,
@@ -399,9 +400,10 @@ public class UserProfileServiceImpl implements UserProfileService {
                 sortOperation
         );
 
-        AggregationResults<MonthlyOrderStatsDto> results = mongoTemplate.aggregate(aggregation, "orders", MonthlyOrderStatsDto.class);
+        AggregationResults<MonthlyStatsDto> results = mongoTemplate.aggregate(aggregation, collection, MonthlyStatsDto.class);
 
-        return results.getMappedResults();
+        log.info("Fetched monthly stats for {}", collection);
+        return StatisticUtils.fillMissingMonths(results.getMappedResults(), minTime, maxTime);
     }
 
 }

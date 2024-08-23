@@ -147,11 +147,11 @@ public class UserProfileController {
         }
     }
 
-    @GetMapping("monthly-summary/orders")
-    public ResponseEntity<List<MonthlyOrderStatsDto>> getMonthlyOrderStats() {
+    @GetMapping("monthly-summary/{collection}")
+    public ResponseEntity<List<MonthlyStatsDto>> getMonthlyOrderStats(@PathVariable String collection) {
         try {
-            log.info("Fetching monthly order stats");
-            return ResponseEntity.ok(userProfileService.fetchMonthlyOrderStats());
+            log.info("Fetching monthly stats");
+            return ResponseEntity.ok(userProfileService.fetchMonthlyStats(collection));
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MonthlyOrderStatsDto {
+public class MonthlyStatsDto {
     private int year;
     private int month;
     private int count;
