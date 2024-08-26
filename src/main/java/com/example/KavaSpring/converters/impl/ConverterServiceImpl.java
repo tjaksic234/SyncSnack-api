@@ -152,6 +152,7 @@ public class ConverterServiceImpl implements ConverterService {
         orderDto.setUserProfileId(order.getUserProfileId());
         orderDto.setStatus(order.getStatus());
         orderDto.setAdditionalOptions(order.getAdditionalOptions());
+        orderDto.setRating(order.getRating());
         orderDto.setCreatedAt(order.getCreatedAt());
         return orderDto;
     }
