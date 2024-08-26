@@ -302,7 +302,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
-    public List<UserProfileStats> getUserProfileStats() {
+    public List<UserProfileStats> getUserProfileOrderStats() {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
         List<UserProfileStats> stats = new ArrayList<>();
 
@@ -313,7 +313,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
         ProjectionOperation projectOrderStatusCount = Aggregation.project()
                 .andExclude("_id")
-                .and("_id").as("status")
+                .and("_id").as("orderStatus")
                 .andInclude("count");
 
         Aggregation aggregateOrderStatusCount = Aggregation.newAggregation(
@@ -354,7 +354,33 @@ public class UserProfileServiceImpl implements UserProfileService {
 
         stats.addAll(countTypeResults.getMappedResults());
 
-        log.info("Fetched the user stats successfully");
+        log.info("Fetched the user order stats successfully");
+        return stats;
+    }
+
+    @Override
+    public List<UserProfileStats> getUserProfileEventStats() {
+        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+
+        MatchOperation matchOperation = Aggregation.match(Criteria.where("userProfileId").is(userProfile.getId()));
+        GroupOperation groupOperation = Aggregation.group("status", "eventType").count().as("count");
+        ProjectionOperation projectionOperation = Aggregation.project()
+                .and("$_id.status").as("eventStatus")
+                .and("$_id.eventType").as("type")
+                .andExclude("_id")
+                .andInclude("count");
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                matchOperation,
+                groupOperation,
+                projectionOperation
+        );
+
+        AggregationResults<UserProfileStats> results = mongoTemplate.aggregate(aggregation, "events", UserProfileStats.class);
+
+        List<UserProfileStats> stats = new ArrayList<>(results.getMappedResults());
+
+        log.info("Fetched the user event stats successfully");
         return stats;
     }
 

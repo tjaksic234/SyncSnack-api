@@ -136,16 +136,28 @@ public class UserProfileController {
         }
     }
 
-    @GetMapping("stats")
-    public ResponseEntity<List<UserProfileStats>> getUserProfileStats() {
+    @GetMapping("orders/stats")
+    public ResponseEntity<List<UserProfileStats>> getUserProfileOrderStats() {
         try {
-            log.info("Fetching stats for the user");
-            return ResponseEntity.ok(userProfileService.getUserProfileStats());
+            log.info("Fetching order stats for the user");
+            return ResponseEntity.ok(userProfileService.getUserProfileOrderStats());
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @GetMapping("events/stats")
+    public ResponseEntity<List<UserProfileStats>> getUserProfileEventStats() {
+        try {
+            log.info("Fetching event stats for the user");
+            return ResponseEntity.ok(userProfileService.getUserProfileEventStats());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
 
     @GetMapping("monthly-summary/{collection}")
     public ResponseEntity<List<MonthlyStatsDto>> getMonthlyOrderStats(@PathVariable String collection) {
