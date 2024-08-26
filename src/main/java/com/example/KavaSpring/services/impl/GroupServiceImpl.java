@@ -5,10 +5,7 @@ import com.example.KavaSpring.exceptions.GroupAlreadyExistsException;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.models.dao.Group;
 import com.example.KavaSpring.models.dao.UserProfile;
-import com.example.KavaSpring.models.dto.GroupDto;
-import com.example.KavaSpring.models.dto.GroupOrderCountDto;
-import com.example.KavaSpring.models.dto.GroupRequest;
-import com.example.KavaSpring.models.dto.GroupResponse;
+import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.repository.GroupRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.security.utils.Helper;
@@ -133,6 +130,24 @@ public class GroupServiceImpl implements GroupService {
 
         log.info("Fetched the group order count successfully");
         return results.getMappedResults();
+    }
+
+    @Override
+    public void editGroupInfo(GroupEditRequest request) {
+        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+
+        Optional<Group> groupOptional = groupRepository.getById(userProfile.getGroupId());
+
+        if (groupOptional.isEmpty()) {
+            throw new NotFoundException("No group associated with the provided id");
+        }
+
+        Group group = groupOptional.get();
+
+        group.setName(request.getName());
+        group.setDescription(request.getDescription());
+        groupRepository.save(group);
+        log.info("Group info successfully edited");
     }
 
 

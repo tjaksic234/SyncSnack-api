@@ -3,10 +3,7 @@ package com.example.KavaSpring.api;
 import com.example.KavaSpring.config.openapi.ShowAPI;
 import com.example.KavaSpring.exceptions.GroupAlreadyExistsException;
 import com.example.KavaSpring.exceptions.NotFoundException;
-import com.example.KavaSpring.models.dto.GroupDto;
-import com.example.KavaSpring.models.dto.GroupOrderCountDto;
-import com.example.KavaSpring.models.dto.GroupRequest;
-import com.example.KavaSpring.models.dto.GroupResponse;
+import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.services.GroupService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -67,6 +64,17 @@ public class GroupController {
         } catch (IllegalStateException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PatchMapping("edit")
+    public ResponseEntity<String> editGroupInfo(@RequestBody GroupEditRequest request) {
+        try {
+            log.info("Editing group info");
+            groupService.editGroupInfo(request);
+            return ResponseEntity.ok("Success");
+        } catch (NotFoundException e) {
+            return ResponseEntity.notFound().build();
         }
     }
 }
