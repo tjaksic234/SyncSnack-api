@@ -58,13 +58,13 @@ public class AuthServiceImpl implements AuthService {
 
     private final PasswordResetRequestRepository passwordResetRequestRepository;
 
-    @Value("${BACKEND_URL}")
+    @Value("${backend.url.dev}")
     private String BACKEND_URL;
 
-    @Value("${FRONTEND_URL}")
+    @Value("${frontend.url.dev}")
     private String FRONTEND_URL;
 
-    @Value("${EMAIL_FROM}")
+    @Value("${spring.sendgrid.email-from}")
     private String EMAIL_FROM;
 
     @Override

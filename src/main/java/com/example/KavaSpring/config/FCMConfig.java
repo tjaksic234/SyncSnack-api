@@ -12,7 +12,7 @@ import org.springframework.core.io.ClassPathResource;
 
 @Configuration
 public class FCMConfig {
-    @Value("${app.firebase-configuration-file}")
+    @Value("${fcm.firebase-configuration-file}")
     private String firebaseConfigPath;
 
     @Bean

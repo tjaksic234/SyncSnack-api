@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 public class EmailTemplates {
 
-    @Value("${FRONTEND_URL}")
+    @Value("${frontend.url.dev}")
     private static String FRONTEND_URL;
 
     public static String confirmationEmail(String recipient, String verificationUrl) {
