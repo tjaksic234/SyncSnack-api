@@ -72,21 +72,22 @@ public class AuthServiceImpl implements AuthService {
         UserDto userDto = new UserDto();
 
         if (authentication != null && authentication.getPrincipal() != null && authentication.getPrincipal() instanceof UserDetailsImpl) {
+             Optional<User> user = userRepository.findByEmail(((UserDetailsImpl) authentication.getPrincipal()).getEmail());
              UserProfile userProfile = userProfileRepository.getUserProfileByUserId(((UserDetailsImpl) authentication.getPrincipal()).getId());
-            if (userProfile != null) {
+            if (userProfile != null && user.isPresent()) {
                 userDto.setUserProfileId(userProfile.getId());
                 userDto.setFirstName(userProfile.getFirstName());
                 userDto.setLastName(userProfile.getLastName());
                 userDto.setProfileUri(userProfile.getPhotoUri());
                 userDto.setGroupId(userProfile.getGroupId());
                 userDto.setVerified(true);
+                userDto.setRoles(user.get().getRoles());
             } else  {
                 userDto.setVerified(false);
                 log.error("The user does not have a setup profile");
             }
             log.info("The user id -----> {}", ((UserDetailsImpl) authentication.getPrincipal()).getId());
             userDto.setEmail(((UserDetailsImpl) authentication.getPrincipal()).getEmail());
-
             log.info("User successfully \"{}\" fetched.", userDto);
 
             return userDto;
