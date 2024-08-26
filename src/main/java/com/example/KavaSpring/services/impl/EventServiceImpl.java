@@ -187,13 +187,17 @@ public class EventServiceImpl implements EventService {
         }
 
         List<Order> orders = orderRepository.findAllByEventId(id);
-        orders.forEach(order -> {
-            order.setStatus(orderStatus);
-            orderRepository.save(order);
-        });
+        long updatedOrdersCount = 0;
+        for (Order order : orders) {
+            if (order.getStatus() == OrderStatus.IN_PROGRESS) {
+                order.setStatus(orderStatus);
+                orderRepository.save(order);
+                updatedOrdersCount++;
+            }
+        }
 
         log.info("Event status updated successfully");
-        log.info("Updated {} orders for event: {} to status: {}", orders.size(), id, orderStatus);
+        log.info("Updated {} orders for event: {} to status: {}", updatedOrdersCount, id, orderStatus);
         return "Event status updated successfully";
     }
 

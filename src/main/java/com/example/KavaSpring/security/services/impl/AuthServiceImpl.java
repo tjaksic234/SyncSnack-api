@@ -9,6 +9,7 @@ import com.example.KavaSpring.models.dao.User;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dao.VerificationInvitation;
 import com.example.KavaSpring.models.dto.UserDto;
+import com.example.KavaSpring.models.enums.Role;
 import com.example.KavaSpring.repository.PasswordResetRequestRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.repository.UserRepository;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -103,7 +105,6 @@ public class AuthServiceImpl implements AuthService {
                 request.getPassword()
         ));
 
-
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -137,10 +138,8 @@ public class AuthServiceImpl implements AuthService {
         User user = new User();
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-
+        user.setRoles(List.of(Role.USER));
         userRepository.save(user);
-
-
 
         //? Send verification email
         sendVerificationEmail(user);
