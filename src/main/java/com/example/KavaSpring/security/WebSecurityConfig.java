@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -24,13 +25,12 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @AllArgsConstructor
 public class WebSecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
-
     private final AuthTokenFilter authTokenFilter;
-
 
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
@@ -56,12 +56,10 @@ public class WebSecurityConfig {
                         .requestMatchers("api/groups/create").permitAll()
                         .requestMatchers("api/groups/join").permitAll()
                         .requestMatchers("api/users/**").permitAll()
-                        .requestMatchers("api/profiles/{id}").permitAll() //! privremeno
+                        .requestMatchers("api/profiles/{id}").permitAll() //! temporary
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/ws").permitAll()
                         .anyRequest().authenticated());
-                     //   .anyRequest().permitAll());
-                    // ? za testiranje web socketa
         http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

@@ -8,6 +8,7 @@ import com.example.KavaSpring.services.GroupService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -68,6 +69,7 @@ public class GroupController {
     }
 
     @PatchMapping("edit")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> editGroupInfo(@RequestBody GroupEditRequest request) {
         try {
             log.info("Editing group info");

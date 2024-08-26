@@ -17,7 +17,6 @@ import org.springframework.web.util.WebUtils;
 import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
-import java.util.Map;
 
 @Component
 public class JwtUtils {
@@ -34,18 +33,15 @@ public class JwtUtils {
     private String jwtCookieName;
 
     public String generateJwtToken(Authentication authentication) {
-
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
-
 
         return Jwts.builder()
                 .subject(userPrincipal.getEmail())
                 .issuedAt(new Date())
                 .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(key())
-                .addClaims(Map.of(
-                        "userId", userPrincipal.getId()
-                ))
+                .claim("userId", userPrincipal.getId())
+                .claim("roles", userPrincipal.getAuthorities())
                 .compact();
     }
 
