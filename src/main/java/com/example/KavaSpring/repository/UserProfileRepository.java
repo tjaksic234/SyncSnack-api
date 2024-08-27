@@ -15,5 +15,4 @@ public interface UserProfileRepository extends MongoRepository<UserProfile, Stri
     boolean existsById(String id);
     Optional<UserProfile> findById(String id);
     List<UserProfile> findByGroupIdAndFcmTokenIsNotNull(String groupId);
-
 }

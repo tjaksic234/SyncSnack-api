@@ -3,6 +3,7 @@ package com.example.KavaSpring.api;
 import com.example.KavaSpring.config.openapi.ShowAPI;
 import com.example.KavaSpring.exceptions.GroupAlreadyExistsException;
 import com.example.KavaSpring.exceptions.NotFoundException;
+import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.services.GroupService;
 import lombok.AllArgsConstructor;
@@ -77,6 +78,17 @@ public class GroupController {
             return ResponseEntity.ok("Success");
         } catch (NotFoundException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("top-scorer")
+    public ResponseEntity<UserProfile> getTopScorer() {
+        try {
+            log.info("Fetching top scorer in the group");
+            return ResponseEntity.ok(groupService.getTopScorer());
+        } catch (IllegalStateException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 }

@@ -12,6 +12,7 @@ import com.example.KavaSpring.security.utils.Helper;
 import com.example.KavaSpring.services.GroupService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -148,6 +149,53 @@ public class GroupServiceImpl implements GroupService {
         group.setDescription(request.getDescription());
         groupRepository.save(group);
         log.info("Group info successfully edited");
+    }
+
+    @Override
+    public UserProfile getTopScorer() {
+        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+        String groupId = userProfile.getGroupId();
+
+        if (groupId.isEmpty()) {
+            throw new IllegalStateException("No group id associated with the user profile");
+        }
+
+        MatchOperation matchOperation = Aggregation.match(Criteria.where("groupId").is(groupId));
+
+        AddFieldsOperation convertToString = Aggregation.addFields()
+                .addField("_id")
+                .withValueOf(ConvertOperators.ToString.toString("$_id"))
+                .build();
+
+        LookupOperation lookupOperation = Aggregation.lookup("orders", "_id", "userProfileId", "orders");
+
+        AddFieldsOperation addOrderCountField = Aggregation.addFields()
+                .addField("orderCount")
+                .withValueOf(ArrayOperators.Size.lengthOfArray("$orders"))
+                .build();
+
+        SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "score", "orderCount"));
+
+        LimitOperation limitOperation = Aggregation.limit(1);
+
+        ProjectionOperation projectionOperation = Aggregation.project()
+                .andExclude("orderCount")
+                .andExclude("orders");
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                matchOperation,
+                convertToString,
+                lookupOperation,
+                addOrderCountField,
+                sortOperation,
+                limitOperation,
+                projectionOperation
+        );
+
+        AggregationResults<UserProfile> results = mongoTemplate.aggregate(aggregation, "userProfiles", UserProfile.class);
+
+        log.info("Fetched the top scorer");
+        return results.getUniqueMappedResult();
     }
 
 
