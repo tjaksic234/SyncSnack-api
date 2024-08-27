@@ -19,6 +19,7 @@ import com.example.KavaSpring.security.services.AuthService;
 import com.example.KavaSpring.security.utils.EmailTemplates;
 import com.example.KavaSpring.security.utils.Helper;
 import com.example.KavaSpring.security.utils.JwtUtils;
+import com.example.KavaSpring.services.AmazonS3Service;
 import com.example.KavaSpring.services.SendGridEmailService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -57,6 +59,8 @@ public class AuthServiceImpl implements AuthService {
     private final SendGridEmailService sendGridEmailService;
 
     private final PasswordResetRequestRepository passwordResetRequestRepository;
+
+    private final AmazonS3Service amazonS3Service;
 
     @Value("${backend.url.dev}")
     private String BACKEND_URL;
@@ -164,8 +168,10 @@ public class AuthServiceImpl implements AuthService {
                 + "&verificationCode=" + verificationCode
                 + "&userId=" + user.getId();
 
+        URL companyLogoUrl = amazonS3Service.generatePresignedUrl("profilePhotos/syncsnack.png");
+
         //? sending the email
-        sendGridEmailService.sendHtml(EMAIL_FROM, user.getEmail(), "Verification email", EmailTemplates.confirmationEmail(user.getEmail(), verificationUrl));
+        sendGridEmailService.sendHtml(EMAIL_FROM, user.getEmail(), "Verification email", EmailTemplates.confirmationEmail(user.getEmail(), verificationUrl, companyLogoUrl));
 
     }
 

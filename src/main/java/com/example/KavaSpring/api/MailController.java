@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URL;
+
 @RestController
 @RequestMapping("api/mails")
 @Slf4j
@@ -21,10 +23,11 @@ public class MailController {
     public ResponseEntity<String> sendMail(
             @RequestParam String from,
             @RequestParam String to,
-            @RequestParam String subject) {
+            @RequestParam String subject,
+            @RequestParam URL companyLogoUrl) {
         try {
             log.info("Sending mail with SendGrid");
-            sendGridEmailService.sendHtml(from, to, subject, EmailTemplates.confirmationEmail(to, "dfajvsfdvfhbjsdfgbhu"));
+            sendGridEmailService.sendHtml(from, to, subject, EmailTemplates.confirmationEmail(to, "dfajvsfdvfhbjsdfgbhu", companyLogoUrl));
             return ResponseEntity.ok("Email sent successfully");
         } catch (Exception e) {
             log.error(e.getMessage());
