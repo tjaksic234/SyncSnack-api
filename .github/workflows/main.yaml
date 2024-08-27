@@ -24,7 +24,7 @@ jobs:
           set -e
           mkdir -p src/main/resources
 
-          echo "${{ secrets.APPLICATION_PROPERTIES }}" > src/main/resources/application.properties
+          echo "${{ secrets.ENV_FILE }}" > src/main/resources/application.yaml
           if [ $? -eq 0 ]; then
             echo "Successfully created app config file"
           else
