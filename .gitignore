@@ -32,12 +32,10 @@ build/
 ### VS Code ###
 .vscode/
 
-##  Environment variable configuration files ##
-/src/main/resources/application.properties
-
 ## environment variable for asset links and firebase in flutter
 /src/main/resources/static/*
-/src/main/resources/*
+/src/main/resources/firebase-adminsdk.json
+
 ## environment variables
 .env
 

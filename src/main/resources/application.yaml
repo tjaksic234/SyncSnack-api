@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: ${SPRING_APPLICATION_NAME}
+  config:
+    import: optional:file:.env[.properties]
+  data:
+    mongodb:
+      uri: ${SPRING_MONGODB_URI}
+      auto-index-creation: true
+  sendgrid:
+    api-key: ${SENDGRID_API_KEY}
+    email-from: ${SENDGRID_EMAIL_FROM}
+frontend:
+  url:
+    dev: ${FRONTEND_URL_DEV}
+    prod: ${FRONTEND_URL_PROD}
+backend:
+  url:
+    dev: ${BACKEND_URL_DEV}
+    prod: ${BACKEND_URL_PROD}
+jwt:
+  cookie-name: ${JWT_COOKIE_NAME}
+  secret: ${JWT_SECRET}
+  expiration-ms: ${JWT_EXPIRATION_MS}
+springdoc:
+  swagger-ui:
+    path: ${SWAGGER_UI_PATH}
+aws:
+    access-key: ${S3_ACCESS_KEY}
+    secret-key: ${S3_SECRET_KEY}
+    bucket-name: ${S3_BUCKET_NAME}
+fcm:
+  firebase-configuration-file: "firebase-adminsdk.json"
