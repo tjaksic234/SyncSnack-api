@@ -1,6 +1,5 @@
 package com.example.KavaSpring.services;
 
-import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.*;
 
 import java.util.List;
@@ -11,5 +10,5 @@ public interface GroupService {
     GroupResponse joinGroup(GroupRequest request);
     List<GroupOrderCountDto> countGroupOrders();
     void editGroupInfo(GroupEditRequest request);
-    UserProfile getTopScorer();
+    GroupMemberResponse getTopScorer();
 }

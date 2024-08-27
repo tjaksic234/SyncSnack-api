@@ -23,15 +23,8 @@ jobs:
         run: |
           set -e
           mkdir -p src/main/resources
-
-          echo "${{ secrets.ENV_FILE }}" > src/main/resources/application.yaml
-          if [ $? -eq 0 ]; then
-            echo "Successfully created app config file"
-          else
-            echo "Failed to create app config file"
-            exit 1
-          fi
-
+          
+          
           echo '${{ secrets.FIREBASE_CONFIG }}' > src/main/resources/firebase-adminsdk.json
           if [ $? -eq 0 ]; then
             echo "Successfully created firebase json file"

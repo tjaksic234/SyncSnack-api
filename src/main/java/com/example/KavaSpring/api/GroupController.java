@@ -82,7 +82,7 @@ public class GroupController {
     }
 
     @GetMapping("top-scorer")
-    public ResponseEntity<UserProfile> getTopScorer() {
+    public ResponseEntity<GroupMemberResponse> getTopScorer() {
         try {
             log.info("Fetching top scorer in the group");
             return ResponseEntity.ok(groupService.getTopScorer());

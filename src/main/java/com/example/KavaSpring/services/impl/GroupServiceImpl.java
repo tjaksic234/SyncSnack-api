@@ -152,7 +152,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public UserProfile getTopScorer() {
+    public GroupMemberResponse getTopScorer() {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
         String groupId = userProfile.getGroupId();
 
@@ -179,8 +179,13 @@ public class GroupServiceImpl implements GroupService {
         LimitOperation limitOperation = Aggregation.limit(1);
 
         ProjectionOperation projectionOperation = Aggregation.project()
-                .andExclude("orderCount")
-                .andExclude("orders");
+                .and("photoUri").as("photoUrl")
+                .and("_id").as("userProfileId")
+                .andInclude("firstName")
+                .andInclude("lastName")
+                .andInclude("groupId")
+                .andInclude("score")
+                .andInclude("orderCount");
 
         Aggregation aggregation = Aggregation.newAggregation(
                 matchOperation,
@@ -192,10 +197,12 @@ public class GroupServiceImpl implements GroupService {
                 projectionOperation
         );
 
-        AggregationResults<UserProfile> results = mongoTemplate.aggregate(aggregation, "userProfiles", UserProfile.class);
+        AggregationResults<UserProfileExpandedResponse> results = mongoTemplate.aggregate(aggregation, "userProfiles", UserProfileExpandedResponse.class);
+
+        GroupMemberResponse groupMemberResponse = converterService.convertToGroupMemberResponse(results.getUniqueMappedResult());
 
         log.info("Fetched the top scorer");
-        return results.getUniqueMappedResult();
+        return groupMemberResponse;
     }
 
 
