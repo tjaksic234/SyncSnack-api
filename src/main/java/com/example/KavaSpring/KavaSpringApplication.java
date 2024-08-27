@@ -9,10 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @EnableMongoAuditing
 public class KavaSpringApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(KavaSpringApplication.class, args);
 	}
-
-
 }

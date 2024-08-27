@@ -10,6 +10,7 @@ import com.example.KavaSpring.security.utils.JwtUtils;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -22,6 +23,9 @@ import org.springframework.web.bind.annotation.*;
 @ShowAPI
 @RequestMapping("api/auth")
 public class AuthenticationController {
+
+    @Value("${frontend.url.dev}")
+    private String FRONTEND_URL;
 
     private final AuthService authService;
 
@@ -81,7 +85,7 @@ public class AuthenticationController {
         try {
             log.info("Verify user started");
             authService.verifyUser(invitationId, verificationCode);
-            return ResponseEntity.ok(EmailTemplates.emailVerified(userId));
+            return ResponseEntity.ok(EmailTemplates.emailVerified(userId, FRONTEND_URL));
         } catch (IllegalStateException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().body("Verification failed: " + e.getMessage());
