@@ -38,4 +38,6 @@ build/
 ## environment variable for asset links and firebase in flutter
 /src/main/resources/static/*
 /src/main/resources/*
+## environment variables
+.env
 
