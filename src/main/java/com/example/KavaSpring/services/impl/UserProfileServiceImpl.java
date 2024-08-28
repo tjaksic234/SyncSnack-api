@@ -184,7 +184,7 @@ public class UserProfileServiceImpl implements UserProfileService {
 
         LookupOperation lookupOperation = Aggregation.lookup("orders", "_id", "userProfileId", "orderDetails");
 
-        UnwindOperation unwindOperation = Aggregation.unwind("orderDetails", true);
+        UnwindOperation unwindOperation = Aggregation.unwind("orderDetails");
 
         GroupOperation groupOperation =  Aggregation.group("_id")
                 .first("_id").as("userProfileId")
