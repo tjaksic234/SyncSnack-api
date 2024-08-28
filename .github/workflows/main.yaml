@@ -22,7 +22,7 @@ jobs:
       - name: Create configuration files
         run: |
           set -e
-           echo '${{ secrets.ENV_FILE }}' > .env
+          echo '${{ secrets.ENV_FILE }}' > .env
           if [ $? -eq 0 ]; then
             echo "Successfully created .env file"
           else
