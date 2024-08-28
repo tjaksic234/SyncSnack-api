@@ -22,8 +22,13 @@ jobs:
       - name: Create configuration files
         run: |
           set -e
-          mkdir -p src/main/resources
-          
+           echo '${{ secrets.ENV_FILE }}' > .env
+          if [ $? -eq 0 ]; then
+            echo "Successfully created .env file"
+          else
+            echo "Failed to create .env file"
+            exit 1
+          fi
           
           echo '${{ secrets.FIREBASE_CONFIG }}' > src/main/resources/firebase-adminsdk.json
           if [ $? -eq 0 ]; then
