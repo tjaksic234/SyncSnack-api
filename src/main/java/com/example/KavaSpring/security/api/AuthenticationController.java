@@ -98,9 +98,12 @@ public class AuthenticationController {
             log.info("Changing password for user");
             authService.changePassword(request);
             return ResponseEntity.ok("Password changed successfully");
-        } catch (RuntimeException e) {
+        } catch (InvalidPasswordException e) {
             log.error(e.getMessage());
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } catch (NotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 

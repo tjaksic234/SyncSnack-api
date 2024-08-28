@@ -1,9 +1,6 @@
 package com.example.KavaSpring.security.services.impl;
 
-import com.example.KavaSpring.exceptions.EntityNotFoundException;
-import com.example.KavaSpring.exceptions.NotFoundException;
-import com.example.KavaSpring.exceptions.UnverifiedUserException;
-import com.example.KavaSpring.exceptions.UserAlreadyExistsException;
+import com.example.KavaSpring.exceptions.*;
 import com.example.KavaSpring.models.dao.PasswordResetToken;
 import com.example.KavaSpring.models.dao.User;
 import com.example.KavaSpring.models.dao.UserProfile;
@@ -205,13 +202,13 @@ public class AuthServiceImpl implements AuthService {
 
         if (user.isPresent() && user.get().isVerified()) {
             if (!passwordEncoder.matches(request.getOldPassword(), user.get().getPassword())) {
-                throw new RuntimeException("Wrong old password");
+                throw new InvalidPasswordException("Wrong old password");
             }
             user.get().setPassword(passwordEncoder.encode(request.getPassword()));
             userRepository.save(user.get());
             log.info("Password changed successfully");
         } else {
-            throw new RuntimeException("Error occurred when fetching user");
+            throw new NotFoundException("Error occurred when fetching user");
         }
     }
 

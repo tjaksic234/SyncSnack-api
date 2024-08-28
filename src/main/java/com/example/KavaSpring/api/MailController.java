@@ -19,6 +19,7 @@ public class MailController {
 
     private final SendGridEmailService sendGridEmailService;
 
+    //? controller for testing the sendgrid mail service
     @PostMapping("/verify")
     public ResponseEntity<String> sendMail(
             @RequestParam String from,
@@ -27,7 +28,7 @@ public class MailController {
             @RequestParam URL companyLogoUrl) {
         try {
             log.info("Sending mail with SendGrid");
-            sendGridEmailService.sendHtml(from, to, subject, EmailTemplates.confirmationEmail(to, "dfajvsfdvfhbjsdfgbhu", companyLogoUrl));
+            sendGridEmailService.sendHtml(from, to, subject, EmailTemplates.confirmationEmail(to, "lmao", companyLogoUrl));
             return ResponseEntity.ok("Email sent successfully");
         } catch (Exception e) {
             log.error(e.getMessage());
