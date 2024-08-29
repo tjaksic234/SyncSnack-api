@@ -70,7 +70,7 @@ public class GroupController {
     }
 
     @PatchMapping("edit")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    //@PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> editGroupInfo(@RequestBody GroupEditRequest request) {
         try {
             log.info("Editing group info");

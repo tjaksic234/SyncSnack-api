@@ -4,7 +4,6 @@ import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.exceptions.NotValidEnumException;
 import com.example.KavaSpring.models.dao.Event;
-import com.example.KavaSpring.models.dao.GroupMembership;
 import com.example.KavaSpring.models.dao.Order;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.*;
@@ -12,7 +11,6 @@ import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.models.enums.EventType;
 import com.example.KavaSpring.models.enums.OrderStatus;
 import com.example.KavaSpring.repository.EventRepository;
-import com.example.KavaSpring.repository.GroupMembershipRepository;
 import com.example.KavaSpring.repository.OrderRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.security.utils.Helper;
@@ -59,24 +57,26 @@ public class EventServiceImpl implements EventService {
 
     private final FirebaseMessagingService firebaseMessagingService;
 
-    private final GroupMembershipRepository groupMembershipRepository;
 
     @Override
     public EventResponse createEvent(EventRequest request) {
         List<EventStatus> activeStatuses = Arrays.asList(EventStatus.PENDING, EventStatus.IN_PROGRESS);
-        String userProfileId = Helper.getLoggedInUserProfileId();
+        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
 
-        if (eventRepository.existsByUserProfileIdAndStatusIn(Helper.getLoggedInUserProfileId(), activeStatuses)) {
+        if (userProfile == null) {
+            throw new NotFoundException("No UserProfile associated with the id");
+        }
+
+        if (eventRepository.existsByUserProfileIdAndStatusIn(userProfile.getId(), activeStatuses)) {
             throw new IllegalStateException("User already has an active event (PENDING or IN_PROGRESS)");
         }
 
-        GroupMembership groupMembership = groupMembershipRepository.findByUserProfileIdAndActiveIsTrue(userProfileId);
 
         Event event = new Event();
-        event.setUserProfileId(userProfileId);
+        event.setUserProfileId(userProfile.getId());
         event.setTitle(request.getTitle());
         event.setDescription(request.getDescription());
-        event.setGroupId(groupMembership.getGroupId());
+        event.setGroupId(userProfile.getGroupId());
         event.setEventType(request.getEventType());
         event.setPendingUntil(LocalDateTime.now().plusMinutes(request.getPendingTime()));
         eventRepository.save(event);
@@ -107,8 +107,6 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventExpandedResponse> filterEvents(EventSearchRequest request) {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
-        GroupMembership groupMembership = groupMembershipRepository.findByUserProfileIdAndActiveIsTrue(Helper.getLoggedInUserProfileId());
-        String groupId = groupMembership.getGroupId();
         List<Criteria> criteriaList = new ArrayList<>();
 
         if (request.getStatus() != null) {
@@ -119,7 +117,7 @@ public class EventServiceImpl implements EventService {
             criteriaList.add(Criteria.where("eventType").is(request.getEventType()));
         }
 
-        criteriaList.add(Criteria.where("groupId").is(groupId));
+        criteriaList.add(Criteria.where("groupId").is(userProfile.getGroupId()));
         criteriaList.add(Criteria.where("userProfileId").ne(userProfile.getId()));
 
         Criteria combinedCriteria = new Criteria().andOperator(criteriaList.toArray(new Criteria[0]));
@@ -206,12 +204,11 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventDto getActiveEvent() {
-        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
         List<EventStatus> statuses = new ArrayList<>();
         statuses.add(EventStatus.PENDING);
         statuses.add(EventStatus.IN_PROGRESS);
 
-        Event event = eventRepository.getEventByUserProfileIdAndStatusIn(userProfile.getId(), statuses);
+        Event event = eventRepository.getEventByUserProfileIdAndStatusIn(Helper.getLoggedInUserProfileId(), statuses);
 
         if (event == null) {
             throw new NotFoundException("No active event found");

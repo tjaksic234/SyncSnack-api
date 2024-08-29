@@ -87,6 +87,7 @@ public class GroupServiceImpl implements GroupService {
         Group group = groupRepository.findByName(request.getName())
                 .orElseThrow(() -> new NotFoundException("Group not found"));
 
+
         if (!passwordEncoder.matches(request.getPassword(), group.getPassword())) {
             throw new IllegalArgumentException("Invalid password");
         }
@@ -95,6 +96,13 @@ public class GroupServiceImpl implements GroupService {
         response.setGroupId(group.getId());
         response.setName(request.getName());
 
+        //? Saving the relation between a group and the profile
+        GroupMembership groupMembership = new GroupMembership();
+        groupMembership.setUserProfileId(Helper.getLoggedInUserProfileId());
+        groupMembership.setGroupId(group.getId());
+
+        groupMembershipRepository.save(groupMembership);
+
         log.info("Group join successful");
         return response;
     }
@@ -102,18 +110,9 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public List<GroupOrderCountDto> countGroupOrders() {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
-        String groupId = userProfile.getGroupId();
 
-        AddFieldsOperation convertUserProfileIdToObjectId = Aggregation.addFields()
-                .addField("userProfileId")
-                .withValueOf(ConvertOperators.ToObjectId.toObjectId("$userProfileId"))
-                .build();
-
-        LookupOperation lookupOperation = Aggregation.lookup("userProfiles", "userProfileId", "_id", "userProfile");
-
-        UnwindOperation unwindOperation = Aggregation.unwind("userProfile");
-
-        MatchOperation matchByGroupId = Aggregation.match(Criteria.where("userProfile.groupId").is(groupId));
+        // TODO finish this
+        MatchOperation matchByGroupId = Aggregation.match(Criteria.where("groupId").is(userProfile.getGroupId()));
 
         GroupOperation groupByOrderStatus = Aggregation.group("status").count().as("value");
 
@@ -123,9 +122,6 @@ public class GroupServiceImpl implements GroupService {
                 .andExclude("_id");
 
         Aggregation aggregation = Aggregation.newAggregation(
-                convertUserProfileIdToObjectId,
-                lookupOperation,
-                unwindOperation,
                 matchByGroupId,
                 groupByOrderStatus,
                 projectionOperation
@@ -211,6 +207,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public void setActiveGroup(String groupId) {
+        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
         //? Deactivating all groups for the user
         List<GroupMembership> memberships = groupMembershipRepository.findAllByUserProfileId(Helper.getLoggedInUserProfileId());
         memberships.forEach(m -> m.setActive(false));
@@ -221,8 +218,10 @@ public class GroupServiceImpl implements GroupService {
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("No group discovered with the provided group id"));
         activeGroup.setActive(true);
+        userProfile.setGroupId(activeGroup.getGroupId());
 
         groupMembershipRepository.saveAll(memberships);
+        userProfileRepository.save(userProfile);
     }
 
 
