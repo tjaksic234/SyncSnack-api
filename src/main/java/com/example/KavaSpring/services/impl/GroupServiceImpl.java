@@ -4,8 +4,10 @@ import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.GroupAlreadyExistsException;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.models.dao.Group;
+import com.example.KavaSpring.models.dao.GroupMembership;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.*;
+import com.example.KavaSpring.repository.GroupMembershipRepository;
 import com.example.KavaSpring.repository.GroupRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.security.utils.Helper;
@@ -38,6 +40,8 @@ public class GroupServiceImpl implements GroupService {
     private final PasswordEncoder passwordEncoder;
 
     private final MongoTemplate mongoTemplate;
+
+    private final GroupMembershipRepository groupMembershipRepository;
 
 
     @Override
@@ -203,6 +207,22 @@ public class GroupServiceImpl implements GroupService {
 
         log.info("Fetched the top scorer");
         return groupMemberResponse;
+    }
+
+    @Override
+    public void setActiveGroup(String groupId) {
+        //? Deactivating all groups for the user
+        List<GroupMembership> memberships = groupMembershipRepository.findAllByUserProfileId(Helper.getLoggedInUserProfileId());
+        memberships.forEach(m -> m.setActive(false));
+
+        //? Activating the specific group
+        GroupMembership activeGroup = memberships.stream()
+                .filter(m -> m.getGroupId().equals(groupId))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("No group discovered with the provided group id"));
+        activeGroup.setActive(true);
+
+        groupMembershipRepository.saveAll(memberships);
     }
 
 

@@ -11,4 +11,5 @@ public interface GroupService {
     List<GroupOrderCountDto> countGroupOrders();
     void editGroupInfo(GroupEditRequest request);
     GroupMemberResponse getTopScorer();
+    void setActiveGroup(String groupId);
 }

@@ -1,6 +1,5 @@
 package com.example.KavaSpring.models.dto;
 
-import com.example.KavaSpring.models.enums.Role;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,8 +16,7 @@ public class UserDto {
     private String email;
     private String firstName;
     private String lastName;
-    private String groupId;
     private String profileUri;
     private boolean isVerified;
-    private List<Role> roles;
+    private List<GroupMembershipDto> groupMembershipData;
 }

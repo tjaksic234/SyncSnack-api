@@ -1,16 +1,12 @@
 package com.example.KavaSpring.security.services.impl;
 
+import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.*;
-import com.example.KavaSpring.models.dao.PasswordResetToken;
-import com.example.KavaSpring.models.dao.User;
-import com.example.KavaSpring.models.dao.UserProfile;
-import com.example.KavaSpring.models.dao.VerificationInvitation;
+import com.example.KavaSpring.models.dao.*;
+import com.example.KavaSpring.models.dto.GroupMembershipDto;
 import com.example.KavaSpring.models.dto.UserDto;
 import com.example.KavaSpring.models.enums.Role;
-import com.example.KavaSpring.repository.PasswordResetRequestRepository;
-import com.example.KavaSpring.repository.UserProfileRepository;
-import com.example.KavaSpring.repository.UserRepository;
-import com.example.KavaSpring.repository.VerificationInvitationRepository;
+import com.example.KavaSpring.repository.*;
 import com.example.KavaSpring.security.api.dto.*;
 import com.example.KavaSpring.security.services.AuthService;
 import com.example.KavaSpring.security.utils.EmailTemplates;
@@ -31,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -59,6 +56,12 @@ public class AuthServiceImpl implements AuthService {
 
     private final AmazonS3Service amazonS3Service;
 
+    private final GroupMembershipRepository groupMembershipRepository;
+
+    private final GroupRepository groupRepository;
+
+    private final ConverterService converterService;
+
     @Value("${backend.url.dev}")
     private String BACKEND_URL;
 
@@ -74,29 +77,43 @@ public class AuthServiceImpl implements AuthService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDto userDto = new UserDto();
 
-        if (authentication != null && authentication.getPrincipal() != null && authentication.getPrincipal() instanceof UserDetailsImpl) {
-             Optional<User> user = userRepository.findByEmail(((UserDetailsImpl) authentication.getPrincipal()).getEmail());
-             UserProfile userProfile = userProfileRepository.getUserProfileByUserId(((UserDetailsImpl) authentication.getPrincipal()).getId());
-            if (userProfile != null && user.isPresent()) {
-                userDto.setUserProfileId(userProfile.getId());
-                userDto.setFirstName(userProfile.getFirstName());
-                userDto.setLastName(userProfile.getLastName());
-                userDto.setProfileUri(userProfile.getPhotoUri());
-                userDto.setGroupId(userProfile.getGroupId());
-                userDto.setVerified(true);
-                userDto.setRoles(user.get().getRoles());
-            } else  {
-                userDto.setVerified(false);
-                log.error("The user does not have a setup profile");
-            }
-            log.info("The user id -----> {}", ((UserDetailsImpl) authentication.getPrincipal()).getId());
-            userDto.setEmail(((UserDetailsImpl) authentication.getPrincipal()).getEmail());
-            log.info("User successfully \"{}\" fetched.", userDto);
+        if (authentication != null && authentication.getPrincipal() != null && authentication.getPrincipal() instanceof UserDetailsImpl userDetails) {
+            User user = userRepository.findByEmail(userDetails.getEmail())
+                    .orElseThrow(() -> new IllegalStateException("User not found"));
+            UserProfile userProfile = userProfileRepository.getUserProfileById(userDetails.getUserProfileId())
+                    .orElseThrow(() -> new IllegalStateException("There was an issue with the retrieved user profile"));
 
+
+            userDto.setUserProfileId(userProfile.getId());
+            userDto.setFirstName(userProfile.getFirstName());
+            userDto.setLastName(userProfile.getLastName());
+            userDto.setProfileUri(userProfile.getPhotoUri());
+            userDto.setVerified(true);
+            userDto.setEmail(((UserDetailsImpl) authentication.getPrincipal()).getEmail());
+
+            List<GroupMembership> groupMemberships = groupMembershipRepository.findAllByUserProfileId(userProfile.getId());
+            List<GroupMembershipDto> groupMembershipDtoData = new ArrayList<>();
+
+            for (GroupMembership membership : groupMemberships) {
+                Group group = groupRepository.findById(membership.getGroupId())
+                        .orElseThrow(() -> new RuntimeException("Group not found"));
+
+                GroupMembershipDto groupMembershipDto = new GroupMembershipDto();
+                groupMembershipDto.setGroupId(group.getId());
+                groupMembershipDto.setActive(membership.isActive());
+                groupMembershipDto.setRoles(membership.getRoles());
+
+                groupMembershipDtoData.add(groupMembershipDto);
+            }
+            userDto.setGroupMembershipData(groupMembershipDtoData);
+
+
+            log.info("User successfully \"{}\" fetched.", userDto);
             return userDto;
+        } else {
+            log.error("User not found in security context");
+            throw new IllegalStateException("User not found in security context");
         }
-        log.info("User not found.");
-        throw new RuntimeException("User not found.");
     }
 
     @Override

@@ -91,4 +91,17 @@ public class GroupController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @PostMapping("set-active")
+    public ResponseEntity<?> setActiveGroup(@RequestParam String groupId) {
+        try {
+            log.info("Setting the active group for user profile");
+            groupService.setActiveGroup(groupId);
+            return ResponseEntity.ok("Group set as active successfully");
+        } catch (NotFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

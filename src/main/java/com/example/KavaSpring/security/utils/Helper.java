@@ -2,13 +2,16 @@ package com.example.KavaSpring.security.utils;
 
 import com.example.KavaSpring.models.dto.SimpleIdEmailDto;
 import com.example.KavaSpring.security.services.impl.UserDetailsImpl;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 @Slf4j
+@AllArgsConstructor
 public class Helper {
+
     public static SimpleIdEmailDto getLoggedSimpleUserIdEmail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() != null && authentication.getPrincipal() instanceof UserDetailsImpl userDetails) {
@@ -29,9 +32,15 @@ public class Helper {
         return null;
     }
 
+    public static String getLoggedInUserProfileId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() != null && authentication.getPrincipal() instanceof UserDetailsImpl) {
+            return (((UserDetailsImpl) authentication.getPrincipal()).getUserProfileId());
+        }
+        return null;
+    }
+
     public static String generateRandomString() {
         return RandomStringUtils.randomAlphanumeric(20);
     }
-
-
 }
