@@ -15,6 +15,7 @@ import java.util.HashMap;
 public class OrderEventInfoDto {
     private String orderId;
     private String eventId;
+    private String groupId;
     private EventType eventType;
     private OrderStatus status;
     private HashMap<String, Object> additionalOptions;

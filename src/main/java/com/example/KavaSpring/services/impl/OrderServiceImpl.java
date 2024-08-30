@@ -16,7 +16,6 @@ import com.example.KavaSpring.security.utils.Helper;
 import com.example.KavaSpring.services.FirebaseMessagingService;
 import com.example.KavaSpring.services.OrderService;
 import com.example.KavaSpring.services.WebSocketService;
-import com.google.firebase.messaging.FirebaseMessagingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -100,7 +99,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderEventInfoDto> getAllOrdersFromUserProfile(Pageable pageable, int rating, OrderStatus status, EventType eventType, String search) {
+    public List<OrderEventInfoDto> getAllOrdersFromUserProfile(String groupId, Pageable pageable, int rating,
+                                                               OrderStatus status, EventType eventType, String search) {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
         List<AggregationOperation> operations = new ArrayList<>();
 
@@ -110,6 +110,8 @@ public class OrderServiceImpl implements OrderService {
         }
 
         Criteria criteria = Criteria.where("userProfileId").is(userProfile.getId());
+
+        criteria.and("groupId").is(groupId);
 
         if (rating != 0) {
             criteria.and("rating").is(rating);
@@ -122,6 +124,7 @@ public class OrderServiceImpl implements OrderService {
         if (search != null && !search.isEmpty()) {
             criteria.and("additionalOptions.description").regex(search, "i");
         }
+
 
 
         MatchOperation matchOperation = Aggregation.match(criteria);
@@ -149,6 +152,7 @@ public class OrderServiceImpl implements OrderService {
         ProjectionOperation projectionOperation = Aggregation.project()
                 .and("_id").as("orderId")
                 .and("eventId").as("eventId")
+                .and("groupId").as("groupId")
                 .and("eventDetails.eventType").as("eventType")
                 .and("status").as("status")
                 .and("additionalOptions").as("additionalOptions")
@@ -182,19 +186,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderActivityResponse> getOrdersByActivityStatus(boolean isActive) {
-        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+    public List<OrderActivityResponse> getOrdersByActivityStatus(String groupId, boolean isActive) {
 
-        if (userProfile == null) {
-            throw new NotFoundException("User profile is null");
-        }
+        Criteria criteria = Criteria.where("userProfileId").is(Helper.getLoggedInUserProfileId());
+        criteria.and("groupId").is(groupId);
 
-        if (userProfile.getId() == null) {
-            throw new IllegalStateException("User profile id is null");
-        }
-
-        MatchOperation matchUserOrders  = Aggregation.match(Criteria.where("userProfileId").is(userProfile.getId()));
-
+        MatchOperation matchOrders  = Aggregation.match(criteria);
 
         AddFieldsOperation convertEventIdToObjectId  = Aggregation.addFields()
                 .addField("eventId")
@@ -226,7 +223,7 @@ public class OrderServiceImpl implements OrderService {
         SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "event.createdAt"));
 
         Aggregation aggregation = Aggregation.newAggregation(
-                matchUserOrders,
+                matchOrders,
                 convertEventIdToObjectId,
                 lookupOperation,
                 unwindOperation,
@@ -242,7 +239,6 @@ public class OrderServiceImpl implements OrderService {
                 .stream()
                 .map(converterService::convertToOrderActiveResponse)
                 .collect(Collectors.toList());
-
     }
 
     @Override
@@ -261,7 +257,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderExpandedResponse> getActiveOrdersByEventId(String id) {
-
         eventRepository.findById(id).orElseThrow(() -> new NotFoundException("No event associated with the given eventId"));
 
         MatchOperation matchOrdersByEventId = Aggregation.match(Criteria.where("eventId").is(id));
@@ -317,12 +312,10 @@ public class OrderServiceImpl implements OrderService {
         if (order.get().getRating() > 0) {
             throw new OrderAlreadyRatedException("The order is already rated");
         }
-
         order.get().setRating(rating);
         orderRepository.save(order.get());
-        log.info("Order successfully rated");
 
+        log.info("Order successfully rated");
         return "Order successfully rated";
     }
-
 }

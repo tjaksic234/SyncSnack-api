@@ -68,14 +68,9 @@ public class EventServiceImpl implements EventService {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
         groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("Group not found"));
 
-        if (userProfile == null) {
-            throw new NotFoundException("No UserProfile associated with the id");
+        if (eventRepository.existsByUserProfileIdAndGroupIdAndStatusIn(userProfile.getId(), groupId, activeStatuses)) {
+            throw new IllegalStateException("User already has an active event (PENDING or IN_PROGRESS) for this group");
         }
-
-        if (eventRepository.existsByUserProfileIdAndStatusIn(userProfile.getId(), activeStatuses)) {
-            throw new IllegalStateException("User already has an active event (PENDING or IN_PROGRESS)");
-        }
-
 
         Event event = new Event();
         event.setUserProfileId(userProfile.getId());
@@ -90,11 +85,11 @@ public class EventServiceImpl implements EventService {
         webSocketService.notifyGroupMembers(event);
 
         //? notifying the group of the created event on mobile through firebase
-        try {
+   /*     try {
             firebaseMessagingService.notifyGroupOfNewEvent(event);
         } catch (FirebaseMessagingException e) {
             throw new RuntimeException(e);
-        }
+        }*/
 
         log.info("Event created");
         return converterService.convertToEventResponse(request);

@@ -12,5 +12,5 @@ import java.util.Optional;
 public interface EventRepository extends MongoRepository<Event, String> {
     Optional<Event> getById(String id);
     Event getEventByUserProfileIdAndStatusIn(String id, List<EventStatus> statuses);
-    boolean existsByUserProfileIdAndStatusIn(String userProfileId, List<EventStatus> statuses);
+    boolean existsByUserProfileIdAndGroupIdAndStatusIn(String userProfileId, String groupId, List<EventStatus> statuses);
 }

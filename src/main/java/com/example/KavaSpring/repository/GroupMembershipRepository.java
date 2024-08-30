@@ -6,6 +6,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 
 public interface GroupMembershipRepository extends MongoRepository<GroupMembership, String> {
-    List<GroupMembership> findAllByUserProfileId(String id);
-    GroupMembership findByUserProfileIdAndActiveIsTrue(String id);
+    List<GroupMembership> findAllByUserProfileId(String userProfileId);
+    GroupMembership findByUserProfileIdAndGroupId(String userProfileId, String groupId);
 }

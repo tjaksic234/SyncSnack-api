@@ -83,7 +83,6 @@ public class AuthServiceImpl implements AuthService {
             UserProfile userProfile = userProfileRepository.getUserProfileById(userDetails.getUserProfileId())
                     .orElseThrow(() -> new IllegalStateException("There was an issue with the retrieved user profile"));
 
-
             userDto.setUserProfileId(userProfile.getId());
             userDto.setFirstName(userProfile.getFirstName());
             userDto.setLastName(userProfile.getLastName());
@@ -100,7 +99,6 @@ public class AuthServiceImpl implements AuthService {
 
                 GroupMembershipDto groupMembershipDto = new GroupMembershipDto();
                 groupMembershipDto.setGroupId(group.getId());
-                groupMembershipDto.setActive(membership.isActive());
                 groupMembershipDto.setRoles(membership.getRoles());
 
                 groupMembershipDtoData.add(groupMembershipDto);

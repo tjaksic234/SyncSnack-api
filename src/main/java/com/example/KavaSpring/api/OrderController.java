@@ -52,6 +52,7 @@ public class OrderController {
 
     @GetMapping("all")
     public ResponseEntity<List<OrderEventInfoDto>> getAllOrdersFromUserProfile (
+            @RequestHeader(value = "groupId") String groupId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "0") int rating,
@@ -61,7 +62,8 @@ public class OrderController {
     ) {
         try {
             log.info("Fetching all orders from user profile");
-            List<OrderEventInfoDto> orders = orderService.getAllOrdersFromUserProfile(PageRequest.of(page, size), rating, status, eventType, search);
+            List<OrderEventInfoDto> orders = orderService.getAllOrdersFromUserProfile(groupId, PageRequest.of(page, size),
+                    rating, status, eventType, search);
             return ResponseEntity.ok(orders);
         } catch (NotFoundException e) {
             log.error(e.getMessage());
@@ -71,10 +73,12 @@ public class OrderController {
 
 
     @PostMapping("activity")
-    public ResponseEntity<List<OrderActivityResponse>> getOrdersByActivityStatus(@RequestParam boolean isActive) {
+    public ResponseEntity<List<OrderActivityResponse>> getOrdersByActivityStatus(
+            @RequestHeader(value = "groupId") String groupId,
+            @RequestParam boolean isActive) {
         try {
             log.info("Fetching active orders for user profile");
-            List<OrderActivityResponse> activeOrders = orderService.getOrdersByActivityStatus(isActive);
+            List<OrderActivityResponse> activeOrders = orderService.getOrdersByActivityStatus(groupId, isActive);
             if (activeOrders == null || activeOrders.isEmpty()) {
                 log.info("No active orders found for user profile");
                 return ResponseEntity.noContent().build();

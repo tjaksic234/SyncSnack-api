@@ -185,6 +185,7 @@ public class ConverterServiceImpl implements ConverterService {
         OrderEventInfoDto orderEventInfoDto = new OrderEventInfoDto();
         orderEventInfoDto.setOrderId(dto.getOrderId());
         orderEventInfoDto.setEventId(dto.getEventId());
+        orderEventInfoDto.setGroupId(dto.getGroupId());
         orderEventInfoDto.setEventType(dto.getEventType());
         orderEventInfoDto.setStatus(dto.getStatus());
         orderEventInfoDto.setAdditionalOptions(dto.getAdditionalOptions());
