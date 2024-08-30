@@ -8,7 +8,6 @@ import com.example.KavaSpring.models.dao.GroupMembership;
 import com.example.KavaSpring.models.dao.User;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.*;
-import com.example.KavaSpring.models.enums.SortCondition;
 import com.example.KavaSpring.repository.GroupMembershipRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.repository.UserRepository;
@@ -18,7 +17,6 @@ import com.example.KavaSpring.services.AmazonS3Service;
 import com.example.KavaSpring.services.UserProfileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
@@ -156,74 +154,6 @@ public class UserProfileServiceImpl implements UserProfileService {
         UserProfileEditResponse response = new UserProfileEditResponse();
         response.setPhotoUrl(converterService.convertPhotoUriToUrl(userProfile.getPhotoUri()));
         return response;
-    }
-
-    @Override
-    public List<GroupMemberResponse> getLeaderboard(String groupId, SortCondition condition, Pageable pageable) {
-        Criteria criteria = Criteria.where("groupId").is(groupId);
-        criteria.and("score").gt(0);
-
-        MatchOperation matchByGroup = Aggregation.match(criteria);
-
-        AddFieldsOperation convertToObjectId = Aggregation.addFields()
-                .addField("userProfileId")
-                .withValue(ConvertOperators.ToObjectId.toObjectId("$userProfileId"))
-                .build();
-
-        LookupOperation lookupUserProfiles = Aggregation.lookup("userProfiles", "userProfileId", "_id", "userProfile");
-
-        UnwindOperation unwindUserProfile = Aggregation.unwind("userProfile");
-
-        AddFieldsOperation convertToString = Aggregation.addFields()
-                .addField("userProfileId")
-                .withValue(ConvertOperators.ToString.toString("$userProfileId"))
-                .build();
-
-        LookupOperation lookupOrders = Aggregation.lookup("orders", "userProfileId", "userProfileId", "orderDetails");
-
-        UnwindOperation unwindOrderDetails = Aggregation.unwind("orderDetails", true);
-
-        GroupOperation groupOperation = Aggregation.group("userProfileId")
-                .first("userProfile._id").as("userProfileId")
-                .first("userProfile.firstName").as("firstName")
-                .first("userProfile.lastName").as("lastName")
-                .first("userProfile.photoUri").as("photoUrl")
-                .first("score").as("score")
-                .count().as("orderCount");
-
-        SortOperation sortOperation = switch (condition) {
-            case SCORE -> Aggregation.sort(Sort.by(Sort.Direction.DESC, "score"));
-            case ORDER_COUNT -> Aggregation.sort(Sort.by(Sort.Direction.DESC, "orderCount"));
-            case FIRSTNAME -> Aggregation.sort(Sort.by(Sort.Direction.ASC, "firstName"));
-        };
-
-        int pageNumber = pageable.getPageNumber();
-        int pageSize = pageable.getPageSize();
-
-        SkipOperation skipOperation = Aggregation.skip((long) pageNumber * pageSize);
-        LimitOperation limitOperation = Aggregation.limit(pageSize);
-
-        Aggregation aggregation = Aggregation.newAggregation(
-                matchByGroup,
-                convertToObjectId,
-                lookupUserProfiles,
-                unwindUserProfile,
-                convertToString,
-                lookupOrders,
-                unwindOrderDetails,
-                groupOperation,
-                sortOperation,
-                skipOperation,
-                limitOperation
-        );
-
-        AggregationResults<UserProfileExpandedResponse> results = mongoTemplate.aggregate(
-                aggregation, "groupMemberships", UserProfileExpandedResponse.class
-        );
-
-        return results.getMappedResults().stream()
-                .map(converterService::convertToGroupMemberResponse)
-                .toList();
     }
 
     @Override

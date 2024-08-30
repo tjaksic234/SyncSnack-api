@@ -4,9 +4,11 @@ import com.example.KavaSpring.config.openapi.ShowAPI;
 import com.example.KavaSpring.exceptions.GroupAlreadyExistsException;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.models.dto.*;
+import com.example.KavaSpring.models.enums.SortCondition;
 import com.example.KavaSpring.services.GroupService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,6 +55,22 @@ public class GroupController {
         } catch (IllegalArgumentException e) {
             log.error(e.getMessage());
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("leaderboard")
+    public ResponseEntity<List<GroupMemberResponse>> getLeaderboard(
+            @RequestHeader(value = "groupId") String groupId,
+            @RequestParam SortCondition sortCondition,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "4") int size
+    ) {
+        try {
+            log.info("Fetching leaderboard for group");
+            return ResponseEntity.ok(groupService.getLeaderboard(groupId, sortCondition, PageRequest.of(page, size)));
+        } catch (IllegalStateException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 

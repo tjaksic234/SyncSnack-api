@@ -6,12 +6,10 @@ import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.exceptions.UnverifiedUserException;
 import com.example.KavaSpring.exceptions.UserProfileExistsException;
 import com.example.KavaSpring.models.dto.*;
-import com.example.KavaSpring.models.enums.SortCondition;
 import com.example.KavaSpring.services.UserProfileService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -94,22 +92,6 @@ public class UserProfileController {
         } catch (RuntimeException e) {
             log.error(e.getMessage());
             return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @GetMapping("leaderboard")
-    public ResponseEntity<List<GroupMemberResponse>> getLeaderboard(
-            @RequestHeader(value = "groupId") String groupId,
-            @RequestParam SortCondition sortCondition,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "4") int size
-    ) {
-        try {
-            log.info("Fetching leaderboard for group");
-            return ResponseEntity.ok(userProfileService.getLeaderboard(groupId, sortCondition, PageRequest.of(page, size)));
-        } catch (IllegalStateException e) {
-            log.error(e.getMessage());
-            return ResponseEntity.badRequest().build();
         }
     }
 
