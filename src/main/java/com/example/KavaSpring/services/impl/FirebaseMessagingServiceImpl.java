@@ -3,11 +3,13 @@ package com.example.KavaSpring.services.impl;
 import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.models.dao.Event;
+import com.example.KavaSpring.models.dao.GroupMembership;
 import com.example.KavaSpring.models.dao.Order;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.MobileNotification;
 import com.example.KavaSpring.models.dto.OrderNotification;
 import com.example.KavaSpring.repository.EventRepository;
+import com.example.KavaSpring.repository.GroupMembershipRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.services.FirebaseMessagingService;
 import com.google.firebase.messaging.*;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -32,6 +35,8 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
     private final EventRepository eventRepository;
 
     private final ConverterService converterService;
+
+    private final GroupMembershipRepository groupMembershipRepository;
 
     @Override
     public String sendNotification(MobileNotification mobileNotification, String token) throws FirebaseMessagingException {
@@ -127,12 +132,17 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
 
     @Override
     public void notifyGroupOfNewEvent(Event event) throws FirebaseMessagingException {
-        List<UserProfile> userProfilesWithTokens = userProfileRepository.findByGroupIdAndFcmTokenIsNotNull(event.getGroupId());
-        List<String> tokens = new ArrayList<>();
+        List<GroupMembership> groupMembershipList = groupMembershipRepository.findAllByGroupId(event.getGroupId());
 
-        for (UserProfile userProfile : userProfilesWithTokens) {
-            tokens.add(userProfile.getFcmToken());
-        }
+        List<String> groupMemberIds = groupMembershipList.stream()
+                .map(GroupMembership::getUserProfileId)
+                .toList();
+
+        List<String> tokens = userProfileRepository.findByFcmTokenIsNotNull().stream()
+                .filter(profile -> groupMemberIds.contains(profile.getId()))
+                .map(UserProfile::getFcmToken)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
 
         String title = "New event created for your group";
         String content = "New Event: " + event.getTitle() + "\n\n" +

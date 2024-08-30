@@ -98,7 +98,7 @@ public class UserProfileController {
     }
 
     @GetMapping("leaderboard")
-    public ResponseEntity<List<GroupMemberResponse>> getGroupMembers(
+    public ResponseEntity<List<GroupMemberResponse>> getLeaderboard(
             @RequestHeader(value = "groupId") String groupId,
             @RequestParam SortCondition sortCondition,
             @RequestParam(defaultValue = "0") int page,
@@ -106,7 +106,7 @@ public class UserProfileController {
     ) {
         try {
             log.info("Fetching leaderboard for group");
-            return ResponseEntity.ok(userProfileService.getGroupMembers(groupId, sortCondition, PageRequest.of(page, size)));
+            return ResponseEntity.ok(userProfileService.getLeaderboard(groupId, sortCondition, PageRequest.of(page, size)));
         } catch (IllegalStateException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();

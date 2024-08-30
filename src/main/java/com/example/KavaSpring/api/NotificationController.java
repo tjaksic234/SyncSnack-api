@@ -8,10 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,11 +23,12 @@ public class NotificationController {
 
     @GetMapping("recipient")
     public ResponseEntity<?> getAllNotifications(
+            @RequestHeader(value = "groupId") String groupId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "3") int size
     ) {
         try {
-            List<Notification> notifications = notificationService.getAllNotifications(PageRequest.of(page, size));
+            List<Notification> notifications = notificationService.getAllNotifications(groupId, PageRequest.of(page, size));
             if (notifications.isEmpty()) {
                 log.info("No notifications found");
                 return ResponseEntity

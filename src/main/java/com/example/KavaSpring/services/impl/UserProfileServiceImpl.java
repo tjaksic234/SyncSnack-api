@@ -23,8 +23,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -161,13 +159,12 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
-    public List<GroupMemberResponse> getGroupMembers(String groupId, SortCondition condition, Pageable pageable) {
+    public List<GroupMemberResponse> getLeaderboard(String groupId, SortCondition condition, Pageable pageable) {
         Criteria criteria = Criteria.where("groupId").is(groupId);
         criteria.and("score").gt(0);
 
         MatchOperation matchByGroup = Aggregation.match(criteria);
 
-        //? Aggregation for retrieving group members and their order counts
         AddFieldsOperation convertToObjectId = Aggregation.addFields()
                 .addField("userProfileId")
                 .withValue(ConvertOperators.ToObjectId.toObjectId("$userProfileId"))
@@ -231,7 +228,6 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     public void updateProfileScores(String groupId) {
-        //? Aggregation for calculating the score of the group members
         MatchOperation matchByGroup = Aggregation.match(Criteria.where("groupId").is(groupId));
 
         AddFieldsOperation convertIdToString = Aggregation.addFields()
@@ -281,7 +277,6 @@ public class UserProfileServiceImpl implements UserProfileService {
     public void updateFcmToken(String token) {
         UserProfile userProfile = userProfileRepository.findByUserId(Helper.getLoggedInUserId())
                 .orElseThrow(() -> new IllegalStateException("Bad userProfile retrieved"));
-
         userProfile.setFcmToken(token);
         userProfileRepository.save(userProfile);
         log.info("FcmToken successfully updated for the user profile");

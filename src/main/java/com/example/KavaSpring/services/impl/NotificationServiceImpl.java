@@ -32,7 +32,7 @@ public class NotificationServiceImpl implements NotificationService {
     private final ConverterService converterService;
 
     @Override
-    public List<Notification> getAllNotifications(Pageable pageable) {
+    public List<Notification> getAllNotifications(String groupId, Pageable pageable) {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
         List<Notification> notifications = new ArrayList<>();
 
@@ -46,7 +46,7 @@ public class NotificationServiceImpl implements NotificationService {
                         Criteria.where("notificationType").is("ORDER")
                                 .and("recipientUserProfileId").is(userProfile.getId()),
                         Criteria.where("notificationType").is("EVENT")
-                                .and("groupId").is(userProfile.getGroupId())
+                                .and("groupId").is(groupId)
                                 .and("userProfileId").ne(userProfile.getId())
                 )
         );

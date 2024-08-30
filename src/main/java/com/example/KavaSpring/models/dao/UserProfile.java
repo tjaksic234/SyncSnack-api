@@ -33,10 +33,6 @@ public class UserProfile {
     @Size(max = 50)
     private String lastName;
 
-    @NotBlank
-    @Size(max = 50)
-    private String groupId;
-
     private String photoUri;
 
     private String fcmToken;

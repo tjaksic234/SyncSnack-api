@@ -32,7 +32,6 @@ public class ConverterServiceImpl implements ConverterService {
     public UserProfileDto convertToUserProfileDto(UserProfile userProfile) {
         UserProfileDto userProfileDto = new UserProfileDto();
         userProfileDto.setUserId(userProfile.getUserId());
-        userProfileDto.setGroupId(userProfile.getGroupId());
         userProfileDto.setFirstName(userProfile.getFirstName());
         userProfileDto.setLastName(userProfile.getLastName());
         if (userProfile.getPhotoUri() != null && !userProfile.getPhotoUri().isEmpty()) {

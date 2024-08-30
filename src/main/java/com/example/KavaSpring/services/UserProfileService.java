@@ -13,7 +13,7 @@ public interface UserProfileService {
     UserProfileDto getProfileById(String id);
     byte[] downloadUserProfilePhoto() throws IOException;
     UserProfileEditResponse editUserProfile(String firstName, String lastName, MultipartFile photoFile);
-    List<GroupMemberResponse> getGroupMembers(String groupId, SortCondition condition, Pageable pageable);
+    List<GroupMemberResponse> getLeaderboard(String groupId, SortCondition condition, Pageable pageable);
     void updateProfileScores(String groupId);
     void updateFcmToken(String token);
     List<UserProfileStats> getUserProfileOrderStats();

@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface GroupMembershipRepository extends MongoRepository<GroupMembership, String> {
     List<GroupMembership> findAllByUserProfileId(String userProfileId);
+    List<GroupMembership> findAllByGroupId(String groupId);
     GroupMembership findByUserProfileIdAndGroupId(String userProfileId, String groupId);
 }
