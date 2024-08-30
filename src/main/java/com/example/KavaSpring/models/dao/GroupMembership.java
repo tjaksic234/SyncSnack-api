@@ -1,8 +1,8 @@
 package com.example.KavaSpring.models.dao;
 
 import com.example.KavaSpring.models.enums.Role;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,10 +32,10 @@ public class GroupMembership {
     @Size(max = 50)
     private String groupId;
 
-    List<Role> roles = new ArrayList<>(List.of(Role.USER));
+    @NotNull
+    private float score;
 
-    @NotBlank
-    private boolean active = false;
+    List<Role> roles = new ArrayList<>(List.of(Role.USER));
 
     @CreatedDate
     private LocalDateTime createdAt;

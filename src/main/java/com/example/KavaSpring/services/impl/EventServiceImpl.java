@@ -85,11 +85,11 @@ public class EventServiceImpl implements EventService {
         webSocketService.notifyGroupMembers(event);
 
         //? notifying the group of the created event on mobile through firebase
-   /*     try {
+        try {
             firebaseMessagingService.notifyGroupOfNewEvent(event);
         } catch (FirebaseMessagingException e) {
             throw new RuntimeException(e);
-        }*/
+        }
 
         log.info("Event created");
         return converterService.convertToEventResponse(request);

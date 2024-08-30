@@ -12,6 +12,5 @@ import java.util.List;
 @NoArgsConstructor
 public class GroupMembershipDto {
     private String groupId;
-    private boolean active;
     private List<Role> roles;
 }

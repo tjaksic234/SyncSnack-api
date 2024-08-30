@@ -37,8 +37,6 @@ public class UserProfile {
     @Size(max = 50)
     private String groupId;
 
-    private float score;
-
     private String photoUri;
 
     private String fcmToken;

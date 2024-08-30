@@ -9,5 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ScoreCalculationDto {
     private String userProfileId;
+    private String groupId;
     private float score;
 }

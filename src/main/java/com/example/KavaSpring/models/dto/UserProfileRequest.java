@@ -10,14 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserProfileRequest {
-
     @NotBlank
     @Size(max = 50)
     private String userId;
-
-    @NotBlank
-    @Size(max = 50)
-    private String groupId;
 
     @NotBlank
     @Size(max = 50)

@@ -1,15 +1,15 @@
 package com.example.KavaSpring.services.impl;
 
 import com.example.KavaSpring.converters.ConverterService;
-import com.example.KavaSpring.exceptions.EntityNotFoundException;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.exceptions.UnverifiedUserException;
 import com.example.KavaSpring.exceptions.UserProfileExistsException;
+import com.example.KavaSpring.models.dao.GroupMembership;
 import com.example.KavaSpring.models.dao.User;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.models.enums.SortCondition;
-import com.example.KavaSpring.repository.GroupRepository;
+import com.example.KavaSpring.repository.GroupMembershipRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.repository.UserRepository;
 import com.example.KavaSpring.security.utils.Helper;
@@ -44,13 +44,13 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     private final UserRepository userRepository;
 
-    private final GroupRepository groupRepository;
-
     private final ConverterService converterService;
 
     private final AmazonS3Service amazonS3Service;
 
     private final MongoTemplate mongoTemplate;
+
+    private final GroupMembershipRepository groupMembershipRepository;
 
 
     @Override
@@ -68,17 +68,10 @@ public class UserProfileServiceImpl implements UserProfileService {
             throw new UserProfileExistsException("The User Profile already exists");
         }
 
-        if (!groupRepository.existsById(request.getGroupId())) {
-            log.error("groupId: {}",request.getGroupId());
-            throw new NotFoundException("The group with the given id does not exist");
-        }
-
         UserProfile userProfile = new UserProfile();
         userProfile.setUserId(request.getUserId());
-        userProfile.setGroupId(request.getGroupId());
         userProfile.setFirstName(request.getFirstName());
         userProfile.setLastName(request.getLastName());
-
 
         if (photoFile != null) {
             try {
@@ -168,41 +161,38 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
-    public List<GroupMemberResponse> getGroupMembers(SortCondition condition, Pageable pageable) {
-        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
-        String groupId = userProfile.getGroupId();
-        List<GroupMemberResponse> groupMembers = new ArrayList<>();
+    public List<GroupMemberResponse> getGroupMembers(String groupId, SortCondition condition, Pageable pageable) {
+        Criteria criteria = Criteria.where("groupId").is(groupId);
+        criteria.and("score").gt(0);
 
-        if (groupId.isEmpty()) {
-            throw new IllegalStateException("Bad groupId value present in the user profile");
-        }
+        MatchOperation matchByGroup = Aggregation.match(criteria);
 
-        MatchOperation matchUserProfilesByGroupId = Aggregation.match(Criteria.where("groupId").is(groupId));
+        //? Aggregation for retrieving group members and their order counts
+        AddFieldsOperation convertToObjectId = Aggregation.addFields()
+                .addField("userProfileId")
+                .withValue(ConvertOperators.ToObjectId.toObjectId("$userProfileId"))
+                .build();
 
-        AddFieldsOperation convertToStringId = Aggregation.addFields().addField("_id")
-                .withValue(ConvertOperators.ToString.toString("$_id")).build();
+        LookupOperation lookupUserProfiles = Aggregation.lookup("userProfiles", "userProfileId", "_id", "userProfile");
 
-        LookupOperation lookupOperation = Aggregation.lookup("orders", "_id", "userProfileId", "orderDetails");
+        UnwindOperation unwindUserProfile = Aggregation.unwind("userProfile");
 
-        UnwindOperation unwindOperation = Aggregation.unwind("orderDetails");
+        AddFieldsOperation convertToString = Aggregation.addFields()
+                .addField("userProfileId")
+                .withValue(ConvertOperators.ToString.toString("$userProfileId"))
+                .build();
 
-        GroupOperation groupOperation =  Aggregation.group("_id")
-                .first("_id").as("userProfileId")
-                .first("firstName").as("firstName")
-                .first("lastName").as("lastName")
+        LookupOperation lookupOrders = Aggregation.lookup("orders", "userProfileId", "userProfileId", "orderDetails");
+
+        UnwindOperation unwindOrderDetails = Aggregation.unwind("orderDetails", true);
+
+        GroupOperation groupOperation = Aggregation.group("userProfileId")
+                .first("userProfile._id").as("userProfileId")
+                .first("userProfile.firstName").as("firstName")
+                .first("userProfile.lastName").as("lastName")
+                .first("userProfile.photoUri").as("photoUrl")
                 .first("score").as("score")
-                .first("photoUri").as("photoUri")
                 .count().as("orderCount");
-
-
-        ProjectionOperation projectionOperation = Aggregation.project()
-                .and("photoUri").as("photoUrl")
-                .andInclude("userProfileId")
-                .andInclude("firstName")
-                .andInclude("lastName")
-                .andInclude("groupId")
-                .andInclude("score")
-                .andInclude("orderCount");
 
         SortOperation sortOperation = switch (condition) {
             case SCORE -> Aggregation.sort(Sort.by(Sort.Direction.DESC, "score"));
@@ -216,85 +206,81 @@ public class UserProfileServiceImpl implements UserProfileService {
         SkipOperation skipOperation = Aggregation.skip((long) pageNumber * pageSize);
         LimitOperation limitOperation = Aggregation.limit(pageSize);
 
-        Aggregation userProfileAggregation = Aggregation.newAggregation(
-                matchUserProfilesByGroupId,
-                convertToStringId,
-                lookupOperation,
-                unwindOperation,
+        Aggregation aggregation = Aggregation.newAggregation(
+                matchByGroup,
+                convertToObjectId,
+                lookupUserProfiles,
+                unwindUserProfile,
+                convertToString,
+                lookupOrders,
+                unwindOrderDetails,
                 groupOperation,
-                projectionOperation,
                 sortOperation,
                 skipOperation,
                 limitOperation
         );
 
-        List<UserProfileExpandedResponse> userProfiles = mongoTemplate.aggregate(userProfileAggregation, "userProfiles", UserProfileExpandedResponse.class).getMappedResults();
+        AggregationResults<UserProfileExpandedResponse> results = mongoTemplate.aggregate(
+                aggregation, "groupMemberships", UserProfileExpandedResponse.class
+        );
 
-        for (UserProfileExpandedResponse userProfileResponse : userProfiles) {
-            GroupMemberResponse groupMember = converterService.convertToGroupMemberResponse(userProfileResponse);
-            groupMembers.add(groupMember);
-        }
-        return groupMembers;
+        return results.getMappedResults().stream()
+                .map(converterService::convertToGroupMemberResponse)
+                .toList();
     }
 
     @Override
-    public void calculateScore() {
-        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+    public void updateProfileScores(String groupId) {
+        //? Aggregation for calculating the score of the group members
+        MatchOperation matchByGroup = Aggregation.match(Criteria.where("groupId").is(groupId));
 
-        if (userProfile == null) {
-            throw new EntityNotFoundException("The userProfile was not found");
-        }
+        AddFieldsOperation convertIdToString = Aggregation.addFields()
+                .addField("_id").withValue(ConvertOperators.ToString.toString("$_id"))
+                .build();
 
+        LookupOperation lookupOrdersScore = Aggregation.lookup("orders", "_id", "eventId", "orders");
 
-        //? average score calculation logic
-        MatchOperation matchGroup = Aggregation.match(Criteria.where("groupId").is(userProfile.getGroupId()));
+        UnwindOperation unwindOrders = Aggregation.unwind("orders");
 
-        AddFieldsOperation addStringId = Aggregation.addFields().addField("_id")
-                .withValue(ConvertOperators.ToString.toString("$_id")).build();
+        MatchOperation matchRatedOrders = Aggregation.match(Criteria.where("orders.rating").ne(0));
 
-        LookupOperation lookupOperation = Aggregation.lookup("orders", "_id", "eventId", "orders");
-
-        UnwindOperation unwindOperation = Aggregation.unwind("orders");
-
-        MatchOperation matchRating = Aggregation.match(Criteria.where("orders.rating").ne(0));
-
-        GroupOperation groupAndCalculateScore = Aggregation.group("userProfileId")
+        GroupOperation groupByProfile = Aggregation.group("userProfileId")
                 .avg("orders.rating").as("score");
 
-        ProjectionOperation projectionOperation = Aggregation.project()
-                .and("_id").as("userProfileId")
+        ProjectionOperation projectFields = Aggregation.project()
+                .and("$_id").as("userProfileId")
                 .and("score").as("score")
                 .andExclude("_id");
 
         Aggregation aggregation = Aggregation.newAggregation(
-                matchGroup,
-                addStringId,
-                lookupOperation,
-                unwindOperation,
-                matchRating,
-                groupAndCalculateScore,
-                projectionOperation
+                matchByGroup,
+                convertIdToString,
+                lookupOrdersScore,
+                unwindOrders,
+                matchRatedOrders,
+                groupByProfile,
+                projectFields
         );
 
         AggregationResults<ScoreCalculationDto> results = mongoTemplate.aggregate(aggregation, "events", ScoreCalculationDto.class);
 
-        List<ScoreCalculationDto> userScores = results.getMappedResults();
+        List<ScoreCalculationDto> profileScores = results.getMappedResults();
+        log.info("Results: {}", profileScores);
 
-        for (ScoreCalculationDto score: userScores) {
-            Query query = new Query(Criteria.where("_id").is(score.getUserProfileId()));
-            Update update = new Update().set("score", score.getScore());
-            mongoTemplate.updateFirst(query, update, UserProfile.class);
+        for (ScoreCalculationDto scoreDto : profileScores) {
+            GroupMembership membership = groupMembershipRepository.findByUserProfileIdAndGroupId(scoreDto.getUserProfileId(), groupId);
+            membership.setScore(scoreDto.getScore());
+            groupMembershipRepository.save(membership);
         }
-        log.info("Scores successfully updated");
+
+        log.info("Updated scores for group: {}. Number of profiles updated: {}", groupId, profileScores.size());
     }
+
 
     @Override
     public void updateFcmToken(String token) {
-        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
-
-        if (userProfile == null) {
-            throw new NotFoundException("No user profile found with the provided user id");
-        }
+        UserProfile userProfile = userProfileRepository.findByUserId(Helper.getLoggedInUserId())
+                .orElseThrow(() -> new IllegalStateException("Bad userProfile retrieved"));
 
         userProfile.setFcmToken(token);
         userProfileRepository.save(userProfile);

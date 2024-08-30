@@ -97,26 +97,27 @@ public class UserProfileController {
         }
     }
 
-    @GetMapping("group")
+    @GetMapping("leaderboard")
     public ResponseEntity<List<GroupMemberResponse>> getGroupMembers(
+            @RequestHeader(value = "groupId") String groupId,
             @RequestParam SortCondition sortCondition,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "4") int size
     ) {
         try {
-            log.info("Fetching group members");
-            return ResponseEntity.ok(userProfileService.getGroupMembers(sortCondition, PageRequest.of(page, size)));
+            log.info("Fetching leaderboard for group");
+            return ResponseEntity.ok(userProfileService.getGroupMembers(groupId, sortCondition, PageRequest.of(page, size)));
         } catch (IllegalStateException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
 
-    @PatchMapping("scores")
-    public ResponseEntity<Void> updateUserProfileScores() {
+    @PatchMapping("update-scores")
+    public ResponseEntity<Void> updateUserProfileScores(@RequestHeader(value = "groupId") String groupId) {
         try {
             log.info("Updating user profile scores started");
-            userProfileService.calculateScore();
+            userProfileService.updateProfileScores(groupId);
             return ResponseEntity.ok().build();
         } catch (EntityNotFoundException e) {
             log.error(e.getMessage());
@@ -130,7 +131,7 @@ public class UserProfileController {
             log.info("Updating fcm token");
             userProfileService.updateFcmToken(token);
             return ResponseEntity.ok("UserProfile fcmToken successfully updated");
-        } catch (NotFoundException e) {
+        } catch (IllegalStateException e) {
             log.error(e.getMessage());
             return ResponseEntity.notFound().build();
         }

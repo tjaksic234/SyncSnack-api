@@ -32,7 +32,6 @@ public class ConverterServiceImpl implements ConverterService {
     public UserProfileDto convertToUserProfileDto(UserProfile userProfile) {
         UserProfileDto userProfileDto = new UserProfileDto();
         userProfileDto.setUserId(userProfile.getUserId());
-        userProfileDto.setScore(userProfile.getScore());
         userProfileDto.setGroupId(userProfile.getGroupId());
         userProfileDto.setFirstName(userProfile.getFirstName());
         userProfileDto.setLastName(userProfile.getLastName());
@@ -47,7 +46,6 @@ public class ConverterServiceImpl implements ConverterService {
     public UserProfileResponse convertToUserProfileResponse(UserProfileRequest request) {
         UserProfileResponse response = new UserProfileResponse();
         response.setUserId(request.getUserId());
-        response.setGroupId(request.getGroupId());
         response.setFirstName(request.getFirstName());
         response.setLastName(request.getLastName());
         return response;
