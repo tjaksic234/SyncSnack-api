@@ -8,8 +8,7 @@ public interface GroupService {
     GroupResponse createGroup(GroupRequest request);
     GroupDto getGroupById(String id);
     GroupResponse joinGroup(GroupRequest request);
-    List<GroupOrderCountDto> countGroupOrders();
-    void editGroupInfo(GroupEditRequest request);
-    GroupMemberResponse getTopScorer();
-    void setActiveGroup(String groupId);
+    List<GroupOrderCountDto> countGroupOrders(String groupId);
+    void editGroupInfo(String groupId, GroupEditRequest request);
+    GroupMemberResponse getTopScorer(String groupId);
 }

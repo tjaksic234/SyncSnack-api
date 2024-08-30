@@ -6,9 +6,9 @@ import com.example.KavaSpring.models.enums.EventStatus;
 import java.util.List;
 
 public interface EventService {
-    EventResponse createEvent(EventRequest request);
+    EventResponse createEvent(String groupId, EventRequest request);
     EventExpandedResponse getEventById(String id);
-    List<EventExpandedResponse> filterEvents(EventSearchRequest request);
+    List<EventExpandedResponse> filterEvents(String groupId, EventSearchRequest request);
     void updateEventsJob();
     String updateEventStatus(String id, EventStatus status);
     EventDto getActiveEvent();

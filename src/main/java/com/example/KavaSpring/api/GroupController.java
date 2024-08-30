@@ -3,13 +3,11 @@ package com.example.KavaSpring.api;
 import com.example.KavaSpring.config.openapi.ShowAPI;
 import com.example.KavaSpring.exceptions.GroupAlreadyExistsException;
 import com.example.KavaSpring.exceptions.NotFoundException;
-import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.services.GroupService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -59,10 +57,10 @@ public class GroupController {
     }
 
     @GetMapping("count")
-    public ResponseEntity<List<GroupOrderCountDto>> countGroupOrders() {
+    public ResponseEntity<List<GroupOrderCountDto>> countGroupOrders(@RequestHeader(value = "groupId") String groupId) {
         try {
             log.info("Fetching group order count");
-            return ResponseEntity.ok(groupService.countGroupOrders());
+            return ResponseEntity.ok(groupService.countGroupOrders(groupId));
         } catch (IllegalStateException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
@@ -70,11 +68,10 @@ public class GroupController {
     }
 
     @PatchMapping("edit")
-    //@PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<String> editGroupInfo(@RequestBody GroupEditRequest request) {
+    public ResponseEntity<String> editGroupInfo(@RequestHeader(value = "groupId") String groupId, @RequestBody GroupEditRequest request) {
         try {
             log.info("Editing group info");
-            groupService.editGroupInfo(request);
+            groupService.editGroupInfo(groupId, request);
             return ResponseEntity.ok("Success");
         } catch (NotFoundException e) {
             return ResponseEntity.notFound().build();
@@ -82,26 +79,13 @@ public class GroupController {
     }
 
     @GetMapping("top-scorer")
-    public ResponseEntity<GroupMemberResponse> getTopScorer() {
+    public ResponseEntity<GroupMemberResponse> getTopScorer(@RequestHeader(value = "groupId") String groupId) {
         try {
             log.info("Fetching top scorer in the group");
-            return ResponseEntity.ok(groupService.getTopScorer());
+            return ResponseEntity.ok(groupService.getTopScorer(groupId));
         } catch (IllegalStateException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
-
-    @PostMapping("set-active")
-    public ResponseEntity<?> setActiveGroup(@RequestParam String groupId) {
-        try {
-            log.info("Setting the active group for user profile");
-            groupService.setActiveGroup(groupId);
-            return ResponseEntity.ok("Group set as active successfully");
-        } catch (NotFoundException e) {
-            log.error(e.getMessage());
-            return ResponseEntity.notFound().build();
-        }
-    }
-
 }

@@ -2,6 +2,7 @@ package com.example.KavaSpring.services.impl;
 
 import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.GroupAlreadyExistsException;
+import com.example.KavaSpring.exceptions.NoGroupFoundException;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.models.dao.Group;
 import com.example.KavaSpring.models.dao.GroupMembership;
@@ -46,7 +47,6 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public GroupResponse createGroup(GroupRequest request) {
-
          Optional<Group> groupOptional = groupRepository.findByName(request.getName());
 
          if(groupOptional.isPresent()) {
@@ -56,7 +56,6 @@ public class GroupServiceImpl implements GroupService {
                  throw new GroupAlreadyExistsException("Group name already exists: " + request.getName());
              }
          }
-
          //? Kreiranje group objekta koji se sprema u bazu
          Group group = new Group();
          group.setName(request.getName());
@@ -108,11 +107,9 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public List<GroupOrderCountDto> countGroupOrders() {
-        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+    public List<GroupOrderCountDto> countGroupOrders(String groupId) {
 
-        // TODO finish this
-        MatchOperation matchByGroupId = Aggregation.match(Criteria.where("groupId").is(userProfile.getGroupId()));
+        MatchOperation matchByGroupId = Aggregation.match(Criteria.where("groupId").is(groupId));
 
         GroupOperation groupByOrderStatus = Aggregation.group("status").count().as("value");
 
@@ -134,17 +131,8 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public void editGroupInfo(GroupEditRequest request) {
-        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
-
-        Optional<Group> groupOptional = groupRepository.getById(userProfile.getGroupId());
-
-        if (groupOptional.isEmpty()) {
-            throw new NotFoundException("No group associated with the provided id");
-        }
-
-        Group group = groupOptional.get();
-
+    public void editGroupInfo(String groupId, GroupEditRequest request) {
+        Group group = groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group found"));
         group.setName(request.getName());
         group.setDescription(request.getDescription());
         groupRepository.save(group);
@@ -152,77 +140,65 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public GroupMemberResponse getTopScorer() {
-        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
-        String groupId = userProfile.getGroupId();
-
-        if (groupId.isEmpty()) {
-            throw new IllegalStateException("No group id associated with the user profile");
-        }
+    public GroupMemberResponse getTopScorer(String groupId) {
+        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group found"));
 
         MatchOperation matchOperation = Aggregation.match(Criteria.where("groupId").is(groupId));
 
-        AddFieldsOperation convertToString = Aggregation.addFields()
-                .addField("_id")
-                .withValueOf(ConvertOperators.ToString.toString("$_id"))
+        AddFieldsOperation convertToObjectId = Aggregation.addFields()
+                .addField("userProfileId")
+                .withValue(ConvertOperators.ToObjectId.toObjectId("$userProfileId"))
                 .build();
 
-        LookupOperation lookupOperation = Aggregation.lookup("orders", "_id", "userProfileId", "orders");
+        LookupOperation lookupUserProfile = Aggregation.lookup("userProfiles", "userProfileId", "_id", "userProfile");
+        UnwindOperation unwindUserProfile = Aggregation.unwind("userProfile");
+
+        AddFieldsOperation convertToString = Aggregation.addFields()
+                .addField("userProfileId")
+                .withValue(ConvertOperators.ToString.toString("$userProfileId"))
+                .build();
+
+        LookupOperation lookupOrders = Aggregation.lookup("orders", "userProfileId", "userProfileId", "orders");
 
         AddFieldsOperation addOrderCountField = Aggregation.addFields()
                 .addField("orderCount")
                 .withValueOf(ArrayOperators.Size.lengthOfArray("$orders"))
                 .build();
 
-        SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "score", "orderCount"));
+        SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "userProfile.score"));
 
         LimitOperation limitOperation = Aggregation.limit(1);
 
         ProjectionOperation projectionOperation = Aggregation.project()
-                .and("photoUri").as("photoUrl")
-                .and("_id").as("userProfileId")
-                .andInclude("firstName")
-                .andInclude("lastName")
-                .andInclude("groupId")
-                .andInclude("score")
-                .andInclude("orderCount");
+                .andExclude("_id")
+                .and("userProfile.photoUri").as("photoUrl")
+                .and("userProfileId").as("userProfileId")
+                .and("userProfile.firstName").as("firstName")
+                .and("userProfile.lastName").as("lastName")
+                .and("groupId").as("groupId")
+                .and("userProfile.score").as("score")
+                .and("orderCount").as("orderCount");
 
         Aggregation aggregation = Aggregation.newAggregation(
                 matchOperation,
+                convertToObjectId,
+                lookupUserProfile,
+                unwindUserProfile,
                 convertToString,
-                lookupOperation,
+                lookupOrders,
                 addOrderCountField,
                 sortOperation,
                 limitOperation,
                 projectionOperation
         );
 
-        AggregationResults<UserProfileExpandedResponse> results = mongoTemplate.aggregate(aggregation, "userProfiles", UserProfileExpandedResponse.class);
+        AggregationResults<UserProfileExpandedResponse> results = mongoTemplate.aggregate(
+                aggregation, "groupMemberships", UserProfileExpandedResponse.class
+        );
 
         GroupMemberResponse groupMemberResponse = converterService.convertToGroupMemberResponse(results.getUniqueMappedResult());
 
         log.info("Fetched the top scorer");
         return groupMemberResponse;
     }
-
-    @Override
-    public void setActiveGroup(String groupId) {
-        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
-        //? Deactivating all groups for the user
-        List<GroupMembership> memberships = groupMembershipRepository.findAllByUserProfileId(Helper.getLoggedInUserProfileId());
-        memberships.forEach(m -> m.setActive(false));
-
-        //? Activating the specific group
-        GroupMembership activeGroup = memberships.stream()
-                .filter(m -> m.getGroupId().equals(groupId))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("No group discovered with the provided group id"));
-        activeGroup.setActive(true);
-        userProfile.setGroupId(activeGroup.getGroupId());
-
-        groupMembershipRepository.saveAll(memberships);
-        userProfileRepository.save(userProfile);
-    }
-
-
 }

@@ -1,6 +1,7 @@
 package com.example.KavaSpring.services.impl;
 
 import com.example.KavaSpring.converters.ConverterService;
+import com.example.KavaSpring.exceptions.NoGroupFoundException;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.exceptions.NotValidEnumException;
 import com.example.KavaSpring.models.dao.Event;
@@ -11,6 +12,7 @@ import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.models.enums.EventType;
 import com.example.KavaSpring.models.enums.OrderStatus;
 import com.example.KavaSpring.repository.EventRepository;
+import com.example.KavaSpring.repository.GroupRepository;
 import com.example.KavaSpring.repository.OrderRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.security.utils.Helper;
@@ -57,11 +59,14 @@ public class EventServiceImpl implements EventService {
 
     private final FirebaseMessagingService firebaseMessagingService;
 
+    private final GroupRepository groupRepository;
+
 
     @Override
-    public EventResponse createEvent(EventRequest request) {
+    public EventResponse createEvent(String groupId, EventRequest request) {
         List<EventStatus> activeStatuses = Arrays.asList(EventStatus.PENDING, EventStatus.IN_PROGRESS);
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("Group not found"));
 
         if (userProfile == null) {
             throw new NotFoundException("No UserProfile associated with the id");
@@ -76,7 +81,7 @@ public class EventServiceImpl implements EventService {
         event.setUserProfileId(userProfile.getId());
         event.setTitle(request.getTitle());
         event.setDescription(request.getDescription());
-        event.setGroupId(userProfile.getGroupId());
+        event.setGroupId(groupId);
         event.setEventType(request.getEventType());
         event.setPendingUntil(LocalDateTime.now().plusMinutes(request.getPendingTime()));
         eventRepository.save(event);
@@ -105,8 +110,9 @@ public class EventServiceImpl implements EventService {
 
 
     @Override
-    public List<EventExpandedResponse> filterEvents(EventSearchRequest request) {
+    public List<EventExpandedResponse> filterEvents(String groupId, EventSearchRequest request) {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("Group not found"));
         List<Criteria> criteriaList = new ArrayList<>();
 
         if (request.getStatus() != null) {
@@ -117,7 +123,7 @@ public class EventServiceImpl implements EventService {
             criteriaList.add(Criteria.where("eventType").is(request.getEventType()));
         }
 
-        criteriaList.add(Criteria.where("groupId").is(userProfile.getGroupId()));
+        criteriaList.add(Criteria.where("groupId").is(groupId));
         criteriaList.add(Criteria.where("userProfileId").ne(userProfile.getId()));
 
         Criteria combinedCriteria = new Criteria().andOperator(criteriaList.toArray(new Criteria[0]));

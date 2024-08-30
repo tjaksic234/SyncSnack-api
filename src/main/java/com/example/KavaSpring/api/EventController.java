@@ -25,10 +25,10 @@ public class EventController {
     private final EventService eventService;
 
     @PostMapping("create")
-    public ResponseEntity<EventResponse> createEvent(@RequestBody EventRequest request) {
+    public ResponseEntity<EventResponse> createEvent(@RequestHeader(value = "groupId") String groupId, @RequestBody EventRequest request) {
         try {
             log.info("Create a event requested");
-            return ResponseEntity.ok(eventService.createEvent(request));
+            return ResponseEntity.ok(eventService.createEvent(groupId, request));
         } catch (EventAlreadyExistsException | IllegalStateException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
@@ -53,10 +53,11 @@ public class EventController {
     }
 
     @PostMapping("filter")
-    public ResponseEntity<List<EventExpandedResponse>> filterEvents(@RequestBody EventSearchRequest request) {
+    public ResponseEntity<List<EventExpandedResponse>> filterEvents(
+            @RequestHeader(value = "groupId") String groupId, @RequestBody EventSearchRequest request) {
         try {
             log.info("Search for events started");
-            return ResponseEntity.ok(eventService.filterEvents(request));
+            return ResponseEntity.ok(eventService.filterEvents(groupId, request));
         } catch (NotValidEnumException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
