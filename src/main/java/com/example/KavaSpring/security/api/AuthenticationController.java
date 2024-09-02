@@ -44,10 +44,9 @@ public class AuthenticationController {
 
     @PostMapping("login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-
         try {
+            log.info("Log in started");
             LoginResponse response = authService.login(request);
-            log.info("Success login with: \"{}\"", request.getEmail());
             ResponseCookie cookie = jwtUtils.createJwtCookie(response.getAccessToken());
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, cookie.toString())
@@ -58,7 +57,7 @@ public class AuthenticationController {
         } catch (UnverifiedUserException e) {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        } catch (EntityNotFoundException e) {
+        } catch (NotFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.notFound().build();
         }

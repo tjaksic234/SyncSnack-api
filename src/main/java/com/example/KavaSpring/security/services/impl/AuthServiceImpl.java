@@ -73,7 +73,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public UserDto fetchMe() {
-        log.info("Fetch me started");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDto userDto = new UserDto();
 
@@ -121,8 +120,12 @@ public class AuthServiceImpl implements AuthService {
                 request.getPassword()
         ));
 
+        log.info("Authentication object: {}", authentication);
+
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        log.info("User from from user repo: {}", user);
 
         if (!user.isVerified()) {
             sendVerificationEmail(user);
@@ -131,7 +134,7 @@ public class AuthServiceImpl implements AuthService {
 
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(user.getId());
         if (userProfile == null) {
-            throw new EntityNotFoundException("User profile not found. Please set up your profile.");
+            throw new NotFoundException("User profile not found. Please set up your profile.");
         }
 
         LoginResponse response = new LoginResponse();
@@ -142,6 +145,7 @@ public class AuthServiceImpl implements AuthService {
 
         response.setAccessToken(token);
 
+        log.info("Success login with: \"{}\"", request.getEmail());
         return response;
     }
 
