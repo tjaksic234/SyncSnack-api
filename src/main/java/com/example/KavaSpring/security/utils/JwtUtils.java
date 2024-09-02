@@ -41,7 +41,6 @@ public class JwtUtils {
                 .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(key())
                 .claim("userId", userPrincipal.getId())
-                .claim("roles", userPrincipal.getAuthorities())
                 .compact();
     }
 
