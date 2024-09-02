@@ -88,6 +88,9 @@ public class GroupServiceImpl implements GroupService {
         Group group = groupRepository.findByName(request.getName())
                 .orElseThrow(() -> new NotFoundException("Group not found"));
 
+        UserProfile userProfile = userProfileRepository.findByUserId(Helper.getLoggedInUserId())
+                .orElseThrow(() -> new NotFoundException("No user profile found when joining a group"));
+
 
         if (!passwordEncoder.matches(request.getPassword(), group.getPassword())) {
             throw new IllegalArgumentException("Invalid password");
@@ -99,7 +102,7 @@ public class GroupServiceImpl implements GroupService {
 
         //? Saving the relation between a group and the profile
         GroupMembership groupMembership = new GroupMembership();
-        groupMembership.setUserProfileId(Helper.getLoggedInUserProfileId());
+        groupMembership.setUserProfileId(userProfile.getId());
         groupMembership.setGroupId(group.getId());
 
         groupMembershipRepository.save(groupMembership);
