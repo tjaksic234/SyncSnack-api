@@ -14,4 +14,5 @@ public interface GroupService {
     List<GroupOrderCountDto> countGroupOrders(String groupId);
     void editGroupInfo(String groupId, GroupEditRequest request);
     GroupMemberResponse getTopScorer(String groupId);
+    List<GroupDto> getProfileGroups();
 }

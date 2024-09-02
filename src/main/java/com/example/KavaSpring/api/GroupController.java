@@ -106,4 +106,15 @@ public class GroupController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @GetMapping("me")
+    public ResponseEntity<List<GroupDto>> getProfileGroups() {
+        try {
+            log.info("Fetching user profile groups");
+            return ResponseEntity.ok(groupService.getProfileGroups());
+        } catch (IllegalStateException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

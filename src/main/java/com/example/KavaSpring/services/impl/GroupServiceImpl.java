@@ -274,4 +274,41 @@ public class GroupServiceImpl implements GroupService {
         log.info("Fetched the top scorer");
         return groupMemberResponse;
     }
+
+    @Override
+    public List<GroupDto> getProfileGroups() {
+
+        if (Helper.getLoggedInUserProfileId() == null) {
+            throw new IllegalStateException("Bad user profile id present");
+        }
+
+        MatchOperation matchOperation = Aggregation.match(Criteria.where("userProfileId").is(Helper.getLoggedInUserProfileId()));
+
+        AddFieldsOperation addFieldsOperation = Aggregation.addFields()
+                .addField("groupId")
+                .withValueOf(ConvertOperators.ToObjectId.toObjectId("$groupId"))
+                .build();
+
+        LookupOperation lookupOperation = Aggregation.lookup("groups", "groupId", "_id", "group");
+
+        UnwindOperation unwindOperation = Aggregation.unwind("group");
+
+        ProjectionOperation projectionOperation = Aggregation.project()
+                .and("group._id").as("groupId")
+                .and("group.name").as("name")
+                .and("group.description").as("description")
+                .andExclude("_id");
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                matchOperation,
+                addFieldsOperation,
+                lookupOperation,
+                unwindOperation,
+                projectionOperation
+        );
+
+        AggregationResults<GroupDto> results = mongoTemplate.aggregate(aggregation, "groupMemberships", GroupDto.class);
+
+        return results.getMappedResults();
+    }
 }
