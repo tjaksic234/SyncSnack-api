@@ -102,7 +102,7 @@ public class GroupServiceImpl implements GroupService {
         response.setName(request.getName());
 
         GroupMembership existingMembership = groupMembershipRepository.findByUserProfileIdAndGroupId(userProfile.getId(), group.getId());
-        if (existingMembership == null) {
+        if (existingMembership != null) {
             throw new IllegalStateException("User is already a member of this group");
         }
 
