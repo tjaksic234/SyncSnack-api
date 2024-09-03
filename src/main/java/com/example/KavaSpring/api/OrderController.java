@@ -26,10 +26,13 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("create")
-    public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest request) {
+    public ResponseEntity<OrderResponse> createOrder(
+            @RequestHeader String groupId,
+            @RequestBody OrderRequest request
+    ) {
         try {
             log.info("Creating order");
-            return ResponseEntity.ok(orderService.createOrder(request));
+            return ResponseEntity.ok(orderService.createOrder(groupId, request));
         } catch (NotFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.notFound().build();

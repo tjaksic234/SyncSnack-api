@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface OrderService {
-    OrderResponse createOrder(OrderRequest request);
+    OrderResponse createOrder(String groupId, OrderRequest request);
     OrderDto getOrderById(String id);
     List<OrderEventInfoDto> getAllOrdersFromUserProfile(String groupId, Pageable pageable, int rating, OrderStatus status, EventType eventType, String search);
     List<OrderActivityResponse> getOrdersByActivityStatus(String groupId, boolean isActive);

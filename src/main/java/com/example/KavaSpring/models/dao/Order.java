@@ -33,6 +33,9 @@ public class Order {
     @NotBlank
     private String eventId;
 
+    @NotBlank
+    private String groupId;
+
     private HashMap<String, Object> additionalOptions = new HashMap<>() {{
         put("description", "");
     }};

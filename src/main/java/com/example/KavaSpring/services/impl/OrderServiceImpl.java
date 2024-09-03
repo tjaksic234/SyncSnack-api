@@ -50,7 +50,7 @@ public class OrderServiceImpl implements OrderService {
     private final FirebaseMessagingService firebaseMessagingService;
 
     @Override
-    public OrderResponse createOrder(OrderRequest request) {
+    public OrderResponse createOrder(String groupId, OrderRequest request) {
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
         boolean existsEvent = eventRepository.existsById(request.getEventId());
 
@@ -72,6 +72,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = new Order();
         order.setUserProfileId(userProfile.getId());
         order.setEventId(request.getEventId());
+        order.setGroupId(groupId);
         order.setAdditionalOptions(request.getAdditionalOptions());
         orderRepository.save(order);
 
