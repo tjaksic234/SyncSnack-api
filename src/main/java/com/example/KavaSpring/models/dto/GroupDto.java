@@ -11,4 +11,5 @@ public class GroupDto {
     private String groupId;
     private String name;
     private String description;
+    private String photoUrl;
 }

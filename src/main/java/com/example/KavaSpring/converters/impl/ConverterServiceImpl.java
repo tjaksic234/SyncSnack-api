@@ -53,8 +53,14 @@ public class ConverterServiceImpl implements ConverterService {
     @Override
     public GroupDto convertToGroupDto(Group group) {
         GroupDto groupDto = new GroupDto();
+        groupDto.setGroupId(group.getId());
         groupDto.setName(group.getName());
         groupDto.setDescription(group.getDescription());
+        if (group.getPhotoUri() != null && !group.getPhotoUri().isEmpty()) {
+            groupDto.setPhotoUrl(convertPhotoUriToUrl(group.getPhotoUri()));
+        } else {
+            groupDto.setPhotoUrl(null);
+        }
         return groupDto;
     }
 

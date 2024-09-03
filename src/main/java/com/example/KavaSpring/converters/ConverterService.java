@@ -4,7 +4,6 @@ import com.example.KavaSpring.models.dao.*;
 import com.example.KavaSpring.models.dto.*;
 
 public interface ConverterService {
-
     UserDto convertToUserDto(User user);
     UserProfileDto convertToUserProfileDto(UserProfile userProfile);
     UserProfileResponse convertToUserProfileResponse(UserProfileRequest request);

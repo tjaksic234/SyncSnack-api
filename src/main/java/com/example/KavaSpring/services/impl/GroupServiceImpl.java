@@ -330,10 +330,11 @@ public class GroupServiceImpl implements GroupService {
         UnwindOperation unwindOperation = Aggregation.unwind("group");
 
         ProjectionOperation projectionOperation = Aggregation.project()
-                .and("group._id").as("groupId")
+                .andExclude("_id")
+                .and("group._id").as("_id")
                 .and("group.name").as("name")
                 .and("group.description").as("description")
-                .andExclude("_id");
+                .and("group.photoUri").as("photoUri");
 
         Aggregation aggregation = Aggregation.newAggregation(
                 matchOperation,
@@ -343,8 +344,10 @@ public class GroupServiceImpl implements GroupService {
                 projectionOperation
         );
 
-        AggregationResults<GroupDto> results = mongoTemplate.aggregate(aggregation, "groupMemberships", GroupDto.class);
+        AggregationResults<Group> results = mongoTemplate.aggregate(aggregation, "groupMemberships", Group.class);
 
-        return results.getMappedResults();
+        return results.getMappedResults().stream()
+                .map(converterService::convertToGroupDto)
+                .toList();
     }
 }
