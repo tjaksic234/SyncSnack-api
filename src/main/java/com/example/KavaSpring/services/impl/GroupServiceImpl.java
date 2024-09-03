@@ -88,7 +88,9 @@ public class GroupServiceImpl implements GroupService {
         Group group = groupRepository.findByName(request.getName())
                 .orElseThrow(() -> new NotFoundException("Group not found"));
 
-        UserProfile userProfile = userProfileRepository.findByUserId(Helper.getLoggedInUserId())
+        String userId = Helper.getLoggedInUserId() == null ? request.getUserId() : null;
+
+        UserProfile userProfile = userProfileRepository.findByUserId(userId)
                 .orElseThrow(() -> new NotFoundException("No user profile found when joining a group"));
 
         if (!passwordEncoder.matches(request.getPassword(), group.getPassword())) {
