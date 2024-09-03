@@ -52,7 +52,7 @@ public class GroupController {
         } catch (NotFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.notFound().build();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalStateException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
         }

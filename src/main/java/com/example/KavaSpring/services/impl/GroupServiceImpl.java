@@ -91,14 +91,18 @@ public class GroupServiceImpl implements GroupService {
         UserProfile userProfile = userProfileRepository.findByUserId(Helper.getLoggedInUserId())
                 .orElseThrow(() -> new NotFoundException("No user profile found when joining a group"));
 
-
         if (!passwordEncoder.matches(request.getPassword(), group.getPassword())) {
-            throw new IllegalArgumentException("Invalid password");
+            throw new IllegalStateException("Invalid password");
         }
 
         GroupResponse response = new GroupResponse();
         response.setGroupId(group.getId());
         response.setName(request.getName());
+
+        GroupMembership existingMembership = groupMembershipRepository.findByUserProfileIdAndGroupId(userProfile.getId(), group.getId());
+        if (existingMembership == null) {
+            throw new IllegalStateException("User is already a member of this group");
+        }
 
         //? Saving the relation between a group and the profile
         GroupMembership groupMembership = new GroupMembership();
