@@ -213,7 +213,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public GroupEditResponse editGroupInfo(String groupId, GroupEditRequest request, MultipartFile photoFile) {
+    public GroupEditResponse editGroupInfo(String groupId, String name, String description, MultipartFile photoFile) {
         Group group = groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group found"));
 
         if (photoFile != null) {
@@ -232,12 +232,12 @@ public class GroupServiceImpl implements GroupService {
             }
         }
 
-        if (request.getName() != null && !request.getName().trim().isEmpty()) {
-            group.setName(request.getName());
+        if (name != null && name.trim().isEmpty()) {
+            group.setName(name);
         }
 
-        if (request.getDescription() != null && !request.getDescription().trim().isEmpty()) {
-            group.setDescription(request.getDescription());
+        if (description != null && !description.trim().isEmpty()) {
+            group.setDescription(description);
         }
 
         groupRepository.save(group);

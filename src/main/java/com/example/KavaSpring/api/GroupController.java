@@ -90,12 +90,13 @@ public class GroupController {
     @PatchMapping(value = "edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<GroupEditResponse> editGroupInfo(
             @RequestHeader(value = "groupId") String groupId,
-            @RequestPart(value = "info") GroupEditRequest request,
+            @RequestPart(value = "name", required = false) String name,
+            @RequestPart(value = "description", required = false) String description,
             @RequestPart(value = "file", required = false) MultipartFile file
     ) {
         try {
             log.info("Editing group info");
-            return ResponseEntity.ok(groupService.editGroupInfo(groupId, request, file));
+            return ResponseEntity.ok(groupService.editGroupInfo(groupId, name, description, file));
         } catch (NotFoundException e) {
             return ResponseEntity.notFound().build();
         }
