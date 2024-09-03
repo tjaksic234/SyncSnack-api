@@ -139,7 +139,6 @@ public class UserProfileServiceImpl implements UserProfileService {
             }
         }
 
-
         if (firstName != null && !firstName.trim().isEmpty()) {
             userProfile.setFirstName(firstName);
         }

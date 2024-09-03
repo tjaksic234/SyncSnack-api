@@ -18,12 +18,10 @@ import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.security.utils.Helper;
 import com.example.KavaSpring.services.EventService;
 import com.example.KavaSpring.services.FirebaseMessagingService;
-import com.example.KavaSpring.services.RabbitMQService;
 import com.example.KavaSpring.services.WebSocketService;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
@@ -63,12 +61,6 @@ public class EventServiceImpl implements EventService {
 
     private final GroupRepository groupRepository;
 
-
-    //* rabbit template
-    private final RabbitTemplate rabbitTemplate;
-    private final RabbitMQService rabbitMQService;
-
-
     @Override
     public EventResponse createEvent(String groupId, EventRequest request) {
         List<EventStatus> activeStatuses = Arrays.asList(EventStatus.PENDING, EventStatus.IN_PROGRESS);
@@ -90,9 +82,6 @@ public class EventServiceImpl implements EventService {
 
         //? notifying the group members through websocket
         webSocketService.notifyGroupMembers(event);
-
-        //* current implementation of rabbitMQ message queues
-       // rabbitMQService.notifyGroupMembers(event);
 
         //? notifying the group of the created event on mobile through firebase
         try {

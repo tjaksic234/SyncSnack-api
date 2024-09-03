@@ -9,8 +9,10 @@ import com.example.KavaSpring.services.GroupService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -85,12 +87,15 @@ public class GroupController {
         }
     }
 
-    @PatchMapping("edit")
-    public ResponseEntity<String> editGroupInfo(@RequestHeader(value = "groupId") String groupId, @RequestBody GroupEditRequest request) {
+    @PatchMapping(value = "edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<GroupEditResponse> editGroupInfo(
+            @RequestHeader(value = "groupId") String groupId,
+            @RequestPart(value = "info") GroupEditRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file
+    ) {
         try {
             log.info("Editing group info");
-            groupService.editGroupInfo(groupId, request);
-            return ResponseEntity.ok("Success");
+            return ResponseEntity.ok(groupService.editGroupInfo(groupId, request, file));
         } catch (NotFoundException e) {
             return ResponseEntity.notFound().build();
         }
@@ -117,4 +122,5 @@ public class GroupController {
             return ResponseEntity.badRequest().build();
         }
     }
+
 }

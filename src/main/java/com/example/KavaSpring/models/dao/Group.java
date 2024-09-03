@@ -29,6 +29,8 @@ public class Group {
     @Size(max = 120)
     private String password;
 
+    private String photoUri;
+
     @CreatedDate
     private LocalDateTime createdAt;
 

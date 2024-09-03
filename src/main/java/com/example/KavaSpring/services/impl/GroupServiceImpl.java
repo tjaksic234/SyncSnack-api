@@ -13,6 +13,7 @@ import com.example.KavaSpring.repository.GroupMembershipRepository;
 import com.example.KavaSpring.repository.GroupRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.security.utils.Helper;
+import com.example.KavaSpring.services.AmazonS3Service;
 import com.example.KavaSpring.services.GroupService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,9 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,6 +49,8 @@ public class GroupServiceImpl implements GroupService {
 
     private final GroupMembershipRepository groupMembershipRepository;
 
+    private final AmazonS3Service amazonS3Service;
+
 
     @Override
     public GroupResponse createGroup(GroupRequest request) {
@@ -58,14 +63,12 @@ public class GroupServiceImpl implements GroupService {
                  throw new GroupAlreadyExistsException("Group name already exists: " + request.getName());
              }
          }
-         //? Kreiranje group objekta koji se sprema u bazu
          Group group = new Group();
          group.setName(request.getName());
          group.setDescription(request.getDescription());
          group.setPassword(passwordEncoder.encode(request.getPassword()));
          groupRepository.save(group);
 
-         //? Kreiranje group response objekta
         GroupResponse response = new GroupResponse();
         response.setGroupId(group.getId());
         response.setName(request.getName());
@@ -210,12 +213,39 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public void editGroupInfo(String groupId, GroupEditRequest request) {
+    public GroupEditResponse editGroupInfo(String groupId, GroupEditRequest request, MultipartFile photoFile) {
         Group group = groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group found"));
-        group.setName(request.getName());
-        group.setDescription(request.getDescription());
+
+        if (photoFile != null) {
+            try {
+                String fileName = groupId;
+                String path = "groupPhotos";
+
+                amazonS3Service.updateFileInS3(path, fileName, photoFile.getInputStream());
+
+                group.setPhotoUri(path + "/" + fileName);
+
+                log.info("Group photo updated successfully");
+            } catch (IOException e) {
+                log.error("Error updating the group photo", e);
+                throw new RuntimeException("Failed to update the group photo", e);
+            }
+        }
+
+        if (request.getName() != null && !request.getName().trim().isEmpty()) {
+            group.setName(request.getName());
+        }
+
+        if (request.getDescription() != null && !request.getDescription().trim().isEmpty()) {
+            group.setDescription(request.getDescription());
+        }
+
         groupRepository.save(group);
+
         log.info("Group info successfully edited");
+        GroupEditResponse response = new GroupEditResponse();
+        response.setPhotoUrl(converterService.convertPhotoUriToUrl(group.getPhotoUri()));
+        return response;
     }
 
     @Override

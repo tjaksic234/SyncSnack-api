@@ -3,6 +3,7 @@ package com.example.KavaSpring.services;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.models.enums.SortCondition;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ public interface GroupService {
     GroupResponse joinGroup(GroupRequest request);
     List<GroupMemberResponse> getLeaderboard(String groupId, SortCondition condition, Pageable pageable);
     List<GroupOrderCountDto> countGroupOrders(String groupId);
-    void editGroupInfo(String groupId, GroupEditRequest request);
+    GroupEditResponse editGroupInfo(String groupId, GroupEditRequest request, MultipartFile photoFile);
     GroupMemberResponse getTopScorer(String groupId);
     List<GroupDto> getProfileGroups();
 }
