@@ -1,6 +1,7 @@
 package com.example.KavaSpring.api;
 
 import com.example.KavaSpring.config.openapi.ShowAPI;
+import com.example.KavaSpring.exceptions.NoGroupFoundException;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.exceptions.OrderAlreadyRatedException;
 import com.example.KavaSpring.models.dto.*;
@@ -33,7 +34,7 @@ public class OrderController {
         try {
             log.info("Creating order");
             return ResponseEntity.ok(orderService.createOrder(groupId, request));
-        } catch (NotFoundException e) {
+        } catch (NotFoundException | NoGroupFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.notFound().build();
         } catch (IllegalStateException e) {

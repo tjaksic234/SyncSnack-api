@@ -2,6 +2,7 @@ package com.example.KavaSpring.api;
 
 import com.example.KavaSpring.config.openapi.ShowAPI;
 import com.example.KavaSpring.exceptions.GroupAlreadyExistsException;
+import com.example.KavaSpring.exceptions.NoGroupFoundException;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.models.enums.SortCondition;
@@ -121,6 +122,19 @@ public class GroupController {
         } catch (IllegalStateException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("members")
+    public ResponseEntity<List<GroupMemberResponse>> getGroupMembers(
+            @RequestHeader(value = "groupId") String groupId
+    ) {
+        try {
+            log.info("Fetching all members of the group");
+            return ResponseEntity.ok(groupService.getGroupMembers(groupId));
+        } catch (NoGroupFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 

@@ -1,6 +1,7 @@
 package com.example.KavaSpring.services.impl;
 
 import com.example.KavaSpring.converters.ConverterService;
+import com.example.KavaSpring.exceptions.NoGroupFoundException;
 import com.example.KavaSpring.exceptions.OrderAlreadyRatedException;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.models.dao.Order;
@@ -10,6 +11,7 @@ import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.models.enums.EventType;
 import com.example.KavaSpring.models.enums.OrderStatus;
 import com.example.KavaSpring.repository.EventRepository;
+import com.example.KavaSpring.repository.GroupRepository;
 import com.example.KavaSpring.repository.OrderRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.security.utils.Helper;
@@ -49,8 +51,11 @@ public class OrderServiceImpl implements OrderService {
 
     private final FirebaseMessagingService firebaseMessagingService;
 
+    private final GroupRepository groupRepository;
+
     @Override
     public OrderResponse createOrder(String groupId, OrderRequest request) {
+        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
         boolean existsEvent = eventRepository.existsById(request.getEventId());
 

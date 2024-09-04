@@ -16,4 +16,5 @@ public interface GroupService {
     GroupEditResponse editGroupInfo(String groupId, String name, String description, MultipartFile photoFile);
     GroupMemberResponse getTopScorer(String groupId);
     List<GroupDto> getProfileGroups();
+    List<GroupMemberResponse> getGroupMembers(String groupId);
 }

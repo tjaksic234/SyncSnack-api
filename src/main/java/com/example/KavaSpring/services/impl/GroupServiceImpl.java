@@ -232,7 +232,7 @@ public class GroupServiceImpl implements GroupService {
             }
         }
 
-        if (name != null && name.trim().isEmpty()) {
+        if (name != null && !name.trim().isEmpty()) {
             group.setName(name);
         }
 
@@ -349,5 +349,13 @@ public class GroupServiceImpl implements GroupService {
         return results.getMappedResults().stream()
                 .map(converterService::convertToGroupDto)
                 .toList();
+    }
+
+    @Override
+    public List<GroupMemberResponse> getGroupMembers(String groupId) {
+        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
+
+
+        return List.of();
     }
 }
