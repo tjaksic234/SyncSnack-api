@@ -203,19 +203,13 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventDto getActiveEvent() {
+    public boolean getActiveEvent(String groupId) {
+        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
         List<EventStatus> statuses = new ArrayList<>();
         statuses.add(EventStatus.PENDING);
         statuses.add(EventStatus.IN_PROGRESS);
 
-        Event event = eventRepository.getEventByUserProfileIdAndStatusIn(Helper.getLoggedInUserProfileId(), statuses);
-
-        if (event == null) {
-            throw new NotFoundException("No active event found");
-        }
-
-        log.info("The retrieved active event: {}", event);
-        return converterService.convertToEventDto(event);
+        return eventRepository.existsByUserProfileIdAndGroupIdAndStatusIn(Helper.getLoggedInUserProfileId(), groupId, statuses);
     }
 
 
