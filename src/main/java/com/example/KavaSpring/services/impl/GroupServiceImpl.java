@@ -68,7 +68,7 @@ public class GroupServiceImpl implements GroupService {
          group.setDescription(request.getDescription());
          group.setPassword(passwordEncoder.encode(request.getPassword()));
          groupRepository.save(group);
-         
+
         //? Saving the relation of the profile and group
         GroupMembership groupMembership = new GroupMembership();
         groupMembership.setGroupId(group.getId());

@@ -5,11 +5,14 @@ import com.example.KavaSpring.exceptions.GroupAlreadyExistsException;
 import com.example.KavaSpring.exceptions.NoGroupFoundException;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.models.dto.*;
+import com.example.KavaSpring.models.enums.Role;
 import com.example.KavaSpring.models.enums.SortCondition;
+import com.example.KavaSpring.security.services.AuthService;
 import com.example.KavaSpring.services.GroupService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +28,8 @@ import java.util.List;
 public class GroupController {
 
     private final GroupService groupService;
+
+    private final AuthService authService;
 
     @PostMapping("create")
     public ResponseEntity<GroupResponse> createGroup(@RequestBody GroupRequest request) {
@@ -95,6 +100,7 @@ public class GroupController {
             @RequestPart(value = "description", required = false) String description,
             @RequestPart(value = "file", required = false) MultipartFile file
     ) {
+        if (!authService.hasRole(groupId, Role.ADMIN)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         try {
             log.info("Editing group info");
             return ResponseEntity.ok(groupService.editGroupInfo(groupId, name, description, file));

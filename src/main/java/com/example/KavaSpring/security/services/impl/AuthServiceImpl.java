@@ -1,6 +1,5 @@
 package com.example.KavaSpring.security.services.impl;
 
-import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.*;
 import com.example.KavaSpring.models.dao.*;
 import com.example.KavaSpring.models.dto.GroupMembershipDto;
@@ -60,8 +59,6 @@ public class AuthServiceImpl implements AuthService {
 
     private final GroupRepository groupRepository;
 
-    private final ConverterService converterService;
-
     @Value("${backend.url.dev}")
     private String BACKEND_URL;
 
@@ -77,7 +74,7 @@ public class AuthServiceImpl implements AuthService {
         UserDto userDto = new UserDto();
 
         if (authentication != null && authentication.getPrincipal() != null && authentication.getPrincipal() instanceof UserDetailsImpl userDetails) {
-            User user = userRepository.findByEmail(userDetails.getEmail())
+            userRepository.findByEmail(userDetails.getEmail())
                     .orElseThrow(() -> new IllegalStateException("User not found"));
             UserProfile userProfile = userProfileRepository.getUserProfileById(userDetails.getUserProfileId())
                     .orElseThrow(() -> new IllegalStateException("There was an issue with the retrieved user profile"));
@@ -287,7 +284,24 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public boolean hasRole(String groupId, Role... roles) {
+    public boolean hasRole(String groupId, Role... requiredRoles) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetailsImpl) {
+            String userProfileId = ((UserDetailsImpl) authentication.getPrincipal()).getUserProfileId();
+            GroupMembership groupMembership = groupMembershipRepository.findByUserProfileIdAndGroupId(userProfileId, groupId);
+            if (groupMembership == null) {
+                throw new UnauthorizedException("No membership for this group associated with the user profile");
+            }
+
+            List<Role> profileRoles = groupMembership.getRoles();
+
+            for (Role requiredRole : requiredRoles) {
+                if (profileRoles.contains(requiredRole)) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 

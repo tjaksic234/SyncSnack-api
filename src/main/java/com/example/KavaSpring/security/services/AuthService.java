@@ -14,5 +14,5 @@ public interface AuthService {
     void changePassword(PasswordChangeRequest request);
     void requestPasswordReset(PasswordResetRequest request);
     void resetPassword(PasswordResetRequest request);
-    boolean hasRole(String groupId, Role... roles);
+    boolean hasRole(String groupId, Role... requiredRoles);
 }
