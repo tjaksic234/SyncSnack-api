@@ -29,6 +29,9 @@ public class EventExpandedResponse {
     private String userProfileLastName;
 
     @NotBlank
+    private String photoUrl;
+
+    @NotBlank
     private String title;
 
     @NotBlank

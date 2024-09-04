@@ -110,6 +110,7 @@ public class ConverterServiceImpl implements ConverterService {
         if (userProfile.isPresent()) {
             response.setUserProfileFirstName(userProfile.get().getFirstName());
             response.setUserProfileLastName(userProfile.get().getLastName());
+            response.setPhotoUrl(convertPhotoUriToUrl(userProfile.get().getPhotoUri()));
         }
         response.setEventId(event.getId());
         response.setUserProfileId(event.getUserProfileId());
