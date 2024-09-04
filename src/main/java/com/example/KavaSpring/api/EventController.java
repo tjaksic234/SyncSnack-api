@@ -1,10 +1,7 @@
 package com.example.KavaSpring.api;
 
 import com.example.KavaSpring.config.openapi.ShowAPI;
-import com.example.KavaSpring.exceptions.EventAlreadyExistsException;
-import com.example.KavaSpring.exceptions.NotFoundException;
-import com.example.KavaSpring.exceptions.NotValidEnumException;
-import com.example.KavaSpring.exceptions.UnauthorizedException;
+import com.example.KavaSpring.exceptions.*;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.services.EventService;
@@ -32,7 +29,7 @@ public class EventController {
         } catch (EventAlreadyExistsException | IllegalStateException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
-        } catch (NotFoundException e) {
+        } catch (NotFoundException | NoGroupFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.notFound().build();
         }
@@ -61,6 +58,9 @@ public class EventController {
         } catch (NotValidEnumException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
+        } catch (NoGroupFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 

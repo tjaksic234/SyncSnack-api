@@ -79,6 +79,9 @@ public class GroupController {
         } catch (IllegalStateException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
+        } catch (NoGroupFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -90,6 +93,9 @@ public class GroupController {
         } catch (IllegalStateException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
+        } catch (NoGroupFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -104,7 +110,8 @@ public class GroupController {
         try {
             log.info("Editing group info");
             return ResponseEntity.ok(groupService.editGroupInfo(groupId, name, description, file));
-        } catch (NotFoundException e) {
+        } catch (NotFoundException | NoGroupFoundException e) {
+            log.error(e.getMessage());
             return ResponseEntity.notFound().build();
         }
     }
@@ -117,6 +124,9 @@ public class GroupController {
         } catch (IllegalStateException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
+        } catch (NoGroupFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 

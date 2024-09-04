@@ -1,6 +1,7 @@
 package com.example.KavaSpring.api;
 
 import com.example.KavaSpring.config.openapi.ShowAPI;
+import com.example.KavaSpring.exceptions.NoGroupFoundException;
 import com.example.KavaSpring.models.dao.Notification;
 import com.example.KavaSpring.services.NotificationService;
 import lombok.AllArgsConstructor;
@@ -44,5 +45,4 @@ public class NotificationController {
                     .body("An error occurred while fetching notifications: " + e.getMessage());
         }
     }
-
 }

@@ -106,7 +106,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderEventInfoDto> getAllOrdersFromUserProfile(String groupId, Pageable pageable, int rating,
-                                                               OrderStatus status, EventType eventType, String search) {
+                                                               OrderStatus status, EventType eventType, String search
+    ) {
+        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
         List<AggregationOperation> operations = new ArrayList<>();
 
@@ -193,7 +195,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderActivityResponse> getOrdersByActivityStatus(String groupId, boolean isActive) {
-
+        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
+        
         Criteria criteria = Criteria.where("userProfileId").is(Helper.getLoggedInUserProfileId());
         criteria.and("groupId").is(groupId);
 

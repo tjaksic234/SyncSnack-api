@@ -1,10 +1,7 @@
 package com.example.KavaSpring.api;
 
 import com.example.KavaSpring.config.openapi.ShowAPI;
-import com.example.KavaSpring.exceptions.EntityNotFoundException;
-import com.example.KavaSpring.exceptions.NotFoundException;
-import com.example.KavaSpring.exceptions.UnverifiedUserException;
-import com.example.KavaSpring.exceptions.UserProfileExistsException;
+import com.example.KavaSpring.exceptions.*;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.services.UserProfileService;
 import jakarta.validation.Valid;
@@ -104,6 +101,9 @@ public class UserProfileController {
         } catch (EntityNotFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
+        } catch (NoGroupFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 

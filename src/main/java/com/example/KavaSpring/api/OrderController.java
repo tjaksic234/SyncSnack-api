@@ -69,7 +69,7 @@ public class OrderController {
             List<OrderEventInfoDto> orders = orderService.getAllOrdersFromUserProfile(groupId, PageRequest.of(page, size),
                     rating, status, eventType, search);
             return ResponseEntity.ok(orders);
-        } catch (NotFoundException e) {
+        } catch (NotFoundException | NoGroupFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.notFound().build();
         }
@@ -92,7 +92,7 @@ public class OrderController {
         } catch (IllegalStateException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
-        } catch (NotFoundException e) {
+        } catch (NotFoundException | NoGroupFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.notFound().build();
         }

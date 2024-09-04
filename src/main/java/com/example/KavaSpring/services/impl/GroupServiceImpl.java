@@ -198,6 +198,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public List<GroupOrderCountDto> countGroupOrders(String groupId) {
+        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
 
         MatchOperation matchByGroupId = Aggregation.match(Criteria.where("groupId").is(groupId));
 
@@ -321,7 +322,6 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public List<GroupDto> getProfileGroups() {
-
         if (Helper.getLoggedInUserProfileId() == null) {
             throw new IllegalStateException("Bad user profile id present");
         }
