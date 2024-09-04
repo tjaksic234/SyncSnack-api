@@ -68,6 +68,13 @@ public class GroupServiceImpl implements GroupService {
          group.setDescription(request.getDescription());
          group.setPassword(passwordEncoder.encode(request.getPassword()));
          groupRepository.save(group);
+         
+        //? Saving the relation of the profile and group
+        GroupMembership groupMembership = new GroupMembership();
+        groupMembership.setGroupId(group.getId());
+        groupMembership.setUserProfileId(Helper.getLoggedInUserProfileId());
+        groupMembershipRepository.save(groupMembership);
+
 
         GroupResponse response = new GroupResponse();
         response.setGroupId(group.getId());
@@ -122,6 +129,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public List<LeaderboardResponse> getLeaderboard(String groupId, SortCondition condition, Pageable pageable) {
+        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
         Criteria criteria = Criteria.where("groupId").is(groupId);
         criteria.and("score").gt(0);
 
@@ -214,7 +222,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public GroupEditResponse editGroupInfo(String groupId, String name, String description, MultipartFile photoFile) {
-        Group group = groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group found"));
+        Group group = groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
 
         if (photoFile != null) {
             try {
@@ -250,7 +258,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public LeaderboardResponse getTopScorer(String groupId) {
-        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group found"));
+        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
 
         MatchOperation matchOperation = Aggregation.match(Criteria.where("groupId").is(groupId));
 

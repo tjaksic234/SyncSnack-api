@@ -63,9 +63,9 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventResponse createEvent(String groupId, EventRequest request) {
+        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
         List<EventStatus> activeStatuses = Arrays.asList(EventStatus.PENDING, EventStatus.IN_PROGRESS);
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
-        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("Group not found"));
 
         if (eventRepository.existsByUserProfileIdAndGroupIdAndStatusIn(userProfile.getId(), groupId, activeStatuses)) {
             throw new IllegalStateException("User already has an active event (PENDING or IN_PROGRESS) for this group");
@@ -105,8 +105,8 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventExpandedResponse> filterEvents(String groupId, EventSearchRequest request) {
+        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
-        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("Group not found"));
         List<Criteria> criteriaList = new ArrayList<>();
 
         if (request.getStatus() != null) {

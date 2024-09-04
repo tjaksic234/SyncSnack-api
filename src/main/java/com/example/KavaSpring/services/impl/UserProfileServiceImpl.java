@@ -1,6 +1,7 @@
 package com.example.KavaSpring.services.impl;
 
 import com.example.KavaSpring.converters.ConverterService;
+import com.example.KavaSpring.exceptions.NoGroupFoundException;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.exceptions.UnverifiedUserException;
 import com.example.KavaSpring.exceptions.UserProfileExistsException;
@@ -9,6 +10,7 @@ import com.example.KavaSpring.models.dao.User;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.repository.GroupMembershipRepository;
+import com.example.KavaSpring.repository.GroupRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.repository.UserRepository;
 import com.example.KavaSpring.security.utils.Helper;
@@ -47,6 +49,8 @@ public class UserProfileServiceImpl implements UserProfileService {
     private final MongoTemplate mongoTemplate;
 
     private final GroupMembershipRepository groupMembershipRepository;
+
+    private final GroupRepository groupRepository;
 
 
     @Override
@@ -157,6 +161,8 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     public void updateProfileScores(String groupId) {
+        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
+
         MatchOperation matchByGroup = Aggregation.match(Criteria.where("groupId").is(groupId));
 
         AddFieldsOperation convertIdToString = Aggregation.addFields()

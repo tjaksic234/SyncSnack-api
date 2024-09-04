@@ -286,4 +286,9 @@ public class AuthServiceImpl implements AuthService {
 
     }
 
+    @Override
+    public boolean hasRole(String groupId, Role... roles) {
+        return false;
+    }
+
 }

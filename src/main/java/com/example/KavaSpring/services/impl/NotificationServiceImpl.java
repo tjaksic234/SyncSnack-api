@@ -1,8 +1,10 @@
 package com.example.KavaSpring.services.impl;
 
 import com.example.KavaSpring.converters.ConverterService;
+import com.example.KavaSpring.exceptions.NoGroupFoundException;
 import com.example.KavaSpring.models.dao.Notification;
 import com.example.KavaSpring.models.dao.UserProfile;
+import com.example.KavaSpring.repository.GroupRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.security.utils.Helper;
 import com.example.KavaSpring.services.NotificationService;
@@ -31,8 +33,11 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final ConverterService converterService;
 
+    private final GroupRepository groupRepository;
+
     @Override
     public List<Notification> getAllNotifications(String groupId, Pageable pageable) {
+        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
         List<Notification> notifications = new ArrayList<>();
 
