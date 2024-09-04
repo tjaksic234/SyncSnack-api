@@ -8,8 +8,8 @@ public interface ConverterService {
     UserProfileDto convertToUserProfileDto(UserProfile userProfile);
     UserProfileResponse convertToUserProfileResponse(UserProfileRequest request);
     GroupDto convertToGroupDto(Group group);
-    GroupResponse convertToGroupResponse(GroupRequest request);
-    GroupMemberResponse convertToGroupMemberResponse(UserProfileExpandedResponse response);
+    LeaderboardResponse convertToLeaderboardResponse(UserProfileExpandedResponse response);
+    GroupMemberResponse convertToGroupMemberResponse(GroupMemberDto dto);
     EventDto convertToEventDto(Event event);
     EventResponse convertToEventResponse(EventRequest request);
     EventExpandedResponse convertToEventExpandedResponse(Event event);

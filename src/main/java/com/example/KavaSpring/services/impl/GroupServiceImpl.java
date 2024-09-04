@@ -121,7 +121,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public List<GroupMemberResponse> getLeaderboard(String groupId, SortCondition condition, Pageable pageable) {
+    public List<LeaderboardResponse> getLeaderboard(String groupId, SortCondition condition, Pageable pageable) {
         Criteria criteria = Criteria.where("groupId").is(groupId);
         criteria.and("score").gt(0);
 
@@ -184,7 +184,7 @@ public class GroupServiceImpl implements GroupService {
         );
 
         return results.getMappedResults().stream()
-                .map(converterService::convertToGroupMemberResponse)
+                .map(converterService::convertToLeaderboardResponse)
                 .toList();
     }
 
@@ -249,7 +249,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public GroupMemberResponse getTopScorer(String groupId) {
+    public LeaderboardResponse getTopScorer(String groupId) {
         groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group found"));
 
         MatchOperation matchOperation = Aggregation.match(Criteria.where("groupId").is(groupId));
@@ -305,10 +305,10 @@ public class GroupServiceImpl implements GroupService {
                 aggregation, "groupMemberships", UserProfileExpandedResponse.class
         );
 
-        GroupMemberResponse groupMemberResponse = converterService.convertToGroupMemberResponse(results.getUniqueMappedResult());
+        LeaderboardResponse leaderboardResponse = converterService.convertToLeaderboardResponse(results.getUniqueMappedResult());
 
         log.info("Fetched the top scorer");
-        return groupMemberResponse;
+        return leaderboardResponse;
     }
 
     @Override
@@ -355,7 +355,39 @@ public class GroupServiceImpl implements GroupService {
     public List<GroupMemberResponse> getGroupMembers(String groupId) {
         groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
 
+        MatchOperation matchOperation = Aggregation.match(Criteria.where("groupId").is(groupId));
 
-        return List.of();
+        AddFieldsOperation addFieldsOperation = Aggregation.addFields()
+                .addField("userProfileId")
+                .withValueOf(ConvertOperators.ToObjectId.toObjectId("$userProfileId"))
+                .build();
+
+        LookupOperation lookupOperation = Aggregation.lookup("userProfiles", "userProfileId", "_id", "userProfile");
+
+        UnwindOperation unwindOperation = Aggregation.unwind("userProfile");
+
+        ProjectionOperation projectionOperation = Aggregation.project()
+                .andExclude("_id")
+                .andInclude("userProfileId")
+                .andInclude("roles")
+                .and("userProfile.firstName").as("firstName")
+                .and("userProfile.lastName").as("lastName")
+                .and("userProfile.photoUri").as("photoUrl");
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                matchOperation,
+                addFieldsOperation,
+                lookupOperation,
+                unwindOperation,
+                projectionOperation
+        );
+
+        AggregationResults<GroupMemberDto> results = mongoTemplate.aggregate(aggregation,
+                "groupMemberships", GroupMemberDto.class);
+
+
+        return results.getMappedResults().stream()
+                .map(converterService::convertToGroupMemberResponse)
+                .toList();
     }
 }

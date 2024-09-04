@@ -34,10 +34,7 @@ public class ConverterServiceImpl implements ConverterService {
         userProfileDto.setUserId(userProfile.getUserId());
         userProfileDto.setFirstName(userProfile.getFirstName());
         userProfileDto.setLastName(userProfile.getLastName());
-        if (userProfile.getPhotoUri() != null && !userProfile.getPhotoUri().isEmpty()) {
-            URL presignedUrl = amazonS3Service.generatePresignedUrl(userProfile.getPhotoUri());
-            userProfileDto.setPhotoUrl(presignedUrl.toString());
-        }
+        userProfileDto.setPhotoUrl(convertPhotoUriToUrl(userProfile.getPhotoUri()));
         return userProfileDto;
     }
 
@@ -56,32 +53,29 @@ public class ConverterServiceImpl implements ConverterService {
         groupDto.setGroupId(group.getId());
         groupDto.setName(group.getName());
         groupDto.setDescription(group.getDescription());
-        if (group.getPhotoUri() != null && !group.getPhotoUri().isEmpty()) {
-            groupDto.setPhotoUrl(convertPhotoUriToUrl(group.getPhotoUri()));
-        } else {
-            groupDto.setPhotoUrl(null);
-        }
+        groupDto.setPhotoUrl(convertPhotoUriToUrl(group.getPhotoUri()));
         return groupDto;
     }
 
     @Override
-    public GroupResponse convertToGroupResponse(GroupRequest request) {
-        GroupResponse response = new GroupResponse();
-        response.setName(request.getName());
-        response.setDescription(request.getDescription());
-        return response;
+    public LeaderboardResponse convertToLeaderboardResponse(UserProfileExpandedResponse response) {
+        LeaderboardResponse leaderboardResponse = new LeaderboardResponse();
+        leaderboardResponse.setUserProfileId(response.getUserProfileId());
+        leaderboardResponse.setFirstName(response.getFirstName());
+        leaderboardResponse.setLastName(response.getLastName());
+        leaderboardResponse.setPhotoUrl(convertPhotoUriToUrl(response.getPhotoUrl()));
+        return leaderboardResponse;
     }
 
     @Override
-    public GroupMemberResponse convertToGroupMemberResponse(UserProfileExpandedResponse response) {
-        GroupMemberResponse groupMember = new GroupMemberResponse();
-        groupMember.setUserProfileId(response.getUserProfileId());
-        groupMember.setFirstName(response.getFirstName());
-        groupMember.setLastName(response.getLastName());
-        groupMember.setScore(response.getScore());
-        groupMember.setOrderCount(response.getOrderCount());
-        groupMember.setPhotoUrl(convertPhotoUriToUrl(response.getPhotoUrl()));
-        return groupMember;
+    public GroupMemberResponse convertToGroupMemberResponse(GroupMemberDto dto) {
+        GroupMemberResponse response = new GroupMemberResponse();
+        response.setUserProfileId(dto.getUserProfileId());
+        response.setFirstName(dto.getFirstName());
+        response.setLastName(dto.getLastName());
+        response.setRoles(dto.getRoles());
+        response.setPhotoUrl(convertPhotoUriToUrl(dto.getPhotoUrl()));
+        return response;
     }
 
     @Override
@@ -206,7 +200,6 @@ public class ConverterServiceImpl implements ConverterService {
             notification.setLastName(userProfile.get().getLastName());
         }
         userProfile.ifPresent(profile -> notification.setProfilePhoto(convertPhotoUriToUrl(profile.getPhotoUri())));
-
         notification.setOrderId(order.getId());
         notification.setUserProfileId(order.getUserProfileId());
         notification.setEventId(order.getEventId());
@@ -217,8 +210,12 @@ public class ConverterServiceImpl implements ConverterService {
 
     @Override
     public String convertPhotoUriToUrl(String photoUri) {
-        URL presignedUrl = amazonS3Service.generatePresignedUrl(photoUri);
-        return presignedUrl.toString();
+        if (photoUri != null && !photoUri.isEmpty()) {
+            URL presignedUrl = amazonS3Service.generatePresignedUrl(photoUri);
+            return presignedUrl.toString();
+        } else {
+            return null;
+        }
     }
 
     @Override

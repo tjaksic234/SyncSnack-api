@@ -11,7 +11,6 @@ public class UserProfileDto {
     private String userId;
     private String firstName;
     private String lastName;
-    private float score;
     private String groupId;
     private String photoUrl;
 }

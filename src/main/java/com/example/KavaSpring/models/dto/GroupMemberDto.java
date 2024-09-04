@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GroupMemberResponse {
+public class GroupMemberDto {
     private String userProfileId;
     private String firstName;
     private String lastName;

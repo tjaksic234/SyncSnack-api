@@ -1,19 +1,18 @@
 package com.example.KavaSpring.models.dto;
 
-import com.example.KavaSpring.models.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class GroupMemberResponse {
+@AllArgsConstructor
+
+public class LeaderboardResponse {
     private String userProfileId;
+    private String photoUrl;
     private String firstName;
     private String lastName;
-    private List<Role> roles;
-    private String photoUrl;
+    private float score;
+    private int orderCount;
 }

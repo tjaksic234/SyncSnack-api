@@ -62,7 +62,7 @@ public class GroupController {
     }
 
     @GetMapping("leaderboard")
-    public ResponseEntity<List<GroupMemberResponse>> getLeaderboard(
+    public ResponseEntity<List<LeaderboardResponse>> getLeaderboard(
             @RequestHeader(value = "groupId") String groupId,
             @RequestParam SortCondition sortCondition,
             @RequestParam(defaultValue = "0") int page,
@@ -104,7 +104,7 @@ public class GroupController {
     }
 
     @GetMapping("top-scorer")
-    public ResponseEntity<GroupMemberResponse> getTopScorer(@RequestHeader(value = "groupId") String groupId) {
+    public ResponseEntity<LeaderboardResponse> getTopScorer(@RequestHeader(value = "groupId") String groupId) {
         try {
             log.info("Fetching top scorer in the group");
             return ResponseEntity.ok(groupService.getTopScorer(groupId));

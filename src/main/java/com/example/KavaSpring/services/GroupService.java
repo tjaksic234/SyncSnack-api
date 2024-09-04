@@ -11,10 +11,10 @@ public interface GroupService {
     GroupResponse createGroup(GroupRequest request);
     GroupDto getGroupById(String id);
     GroupResponse joinGroup(GroupRequest request);
-    List<GroupMemberResponse> getLeaderboard(String groupId, SortCondition condition, Pageable pageable);
+    List<LeaderboardResponse> getLeaderboard(String groupId, SortCondition condition, Pageable pageable);
     List<GroupOrderCountDto> countGroupOrders(String groupId);
     GroupEditResponse editGroupInfo(String groupId, String name, String description, MultipartFile photoFile);
-    GroupMemberResponse getTopScorer(String groupId);
+    LeaderboardResponse getTopScorer(String groupId);
     List<GroupDto> getProfileGroups();
     List<GroupMemberResponse> getGroupMembers(String groupId);
 }
