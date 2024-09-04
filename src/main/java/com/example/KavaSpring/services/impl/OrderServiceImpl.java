@@ -196,7 +196,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderActivityResponse> getOrdersByActivityStatus(String groupId, boolean isActive) {
         groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
-        
+
         Criteria criteria = Criteria.where("userProfileId").is(Helper.getLoggedInUserProfileId());
         criteria.and("groupId").is(groupId);
 

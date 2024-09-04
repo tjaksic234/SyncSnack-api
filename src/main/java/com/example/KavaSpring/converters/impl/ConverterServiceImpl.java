@@ -63,6 +63,8 @@ public class ConverterServiceImpl implements ConverterService {
         leaderboardResponse.setUserProfileId(response.getUserProfileId());
         leaderboardResponse.setFirstName(response.getFirstName());
         leaderboardResponse.setLastName(response.getLastName());
+        leaderboardResponse.setScore(response.getScore());
+        leaderboardResponse.setOrderCount(response.getOrderCount());
         leaderboardResponse.setPhotoUrl(convertPhotoUriToUrl(response.getPhotoUrl()));
         return leaderboardResponse;
     }
