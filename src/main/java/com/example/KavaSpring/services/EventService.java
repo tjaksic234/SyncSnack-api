@@ -9,7 +9,7 @@ import java.util.List;
 public interface EventService {
     EventResponse createEvent(String groupId, EventRequest request);
     EventExpandedResponse getEventById(String id);
-    List<EventExpandedResponse> filterEvents(String groupId, Pageable pageable, String search, EventSearchRequest request);
+    List<EventExpandedResponse> filterEvents(String groupId, Pageable pageable, String search, EventFilterRequest request);
     void updateEventsJob();
     String updateEventStatus(String id, EventStatus status);
     boolean getActiveEvent(String groupId);

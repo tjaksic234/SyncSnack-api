@@ -56,7 +56,7 @@ public class EventController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "4") int size,
             @RequestParam(required = false) String search,
-            @RequestBody EventSearchRequest request
+            @RequestBody EventFilterRequest request
     ) {
         try {
             log.info("Search for events started");

@@ -1,23 +1,30 @@
 package com.example.KavaSpring.models.enums;
 
-import lombok.AllArgsConstructor;
-
+import java.time.temporal.TemporalAdjusters;
 import java.time.LocalDateTime;
+import java.time.DayOfWeek;
 
-@AllArgsConstructor
 public enum TimeFilter {
-    TODAY(0),
-    TOMORROW(1),
-    THIS_WEEK(7),
-    THIS_MONTH(30);
-
-    private final int days;
+    TODAY,
+    TOMORROW,
+    THIS_WEEK,
+    THIS_MONTH;
 
     public LocalDateTime getStartDate(LocalDateTime now) {
-        return now.minusDays(days).withHour(0).withMinute(0).withSecond(0);
+        return switch (this) {
+            case TODAY -> now.toLocalDate().atStartOfDay();
+            case TOMORROW -> now.toLocalDate().plusDays(1).atStartOfDay();
+            case THIS_WEEK -> now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+            case THIS_MONTH -> now.with(TemporalAdjusters.firstDayOfMonth());
+        };
     }
 
     public LocalDateTime getEndDate(LocalDateTime now) {
-        return this == TOMORROW ? now.withHour(0).withMinute(0).withSecond(0) : now;
+        return switch (this) {
+            case TODAY -> now.toLocalDate().plusDays(1).atStartOfDay();
+            case TOMORROW -> now.toLocalDate().plusDays(2).atStartOfDay();
+            case THIS_WEEK -> now.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+            case THIS_MONTH -> now.with(TemporalAdjusters.firstDayOfNextMonth());
+        };
     }
 }

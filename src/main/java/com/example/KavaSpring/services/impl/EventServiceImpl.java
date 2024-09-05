@@ -104,10 +104,9 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventExpandedResponse> filterEvents(String groupId, Pageable pageable,
-                                                    String search, EventSearchRequest request) {
+                                                    String search, EventFilterRequest request) {
         groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
-        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
-        List<Criteria> criteriaList = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
         int pageNumber = pageable.getPageNumber();
         int pageSize = pageable.getPageSize();
 
@@ -124,6 +123,12 @@ public class EventServiceImpl implements EventService {
 
         if (search != null && !search.isEmpty()) {
             criteria.and("title").regex(search, "i");
+        }
+
+        if (request.getTimeFilter() != null) {
+            LocalDateTime startTime = request.getTimeFilter().getStartDate(now);
+            LocalDateTime endTime = request.getTimeFilter().getEndDate(now);
+            criteria.and("pendingUntil").gte(startTime).lt(endTime);
         }
 
         MatchOperation matchOperation = Aggregation.match(criteria);
