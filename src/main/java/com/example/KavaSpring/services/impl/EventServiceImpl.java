@@ -38,7 +38,6 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -126,7 +125,7 @@ public class EventServiceImpl implements EventService {
             criteria.and("title").regex(search, "i");
         }
 
-        if (request.getTimeFilter() != null) {
+        if (request.getTimeFilter() != null && !request.getTimeFilter().toString().isEmpty()) {
             LocalDateTime startTime = request.getTimeFilter().getStartDate(now);
             LocalDateTime endTime = request.getTimeFilter().getEndDate(now);
             criteria.and("pendingUntil").gte(startTime).lt(endTime);
