@@ -8,8 +8,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 @EnableMongoAuditing
-public class KavaSpringApplication {
+public class SyncSnackSpringApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(KavaSpringApplication.class, args);
+		SpringApplication.run(SyncSnackSpringApplication.class, args);
 	}
 }

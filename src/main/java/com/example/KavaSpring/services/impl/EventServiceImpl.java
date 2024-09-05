@@ -22,6 +22,7 @@ import com.example.KavaSpring.services.WebSocketService;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
@@ -101,28 +102,31 @@ public class EventServiceImpl implements EventService {
         return converterService.convertToEventExpandedResponse(event);
     }
 
-
-
     @Override
-    public List<EventExpandedResponse> filterEvents(String groupId, EventSearchRequest request) {
+    public List<EventExpandedResponse> filterEvents(String groupId, Pageable pageable,
+                                                    String search, EventSearchRequest request) {
         groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
         UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
         List<Criteria> criteriaList = new ArrayList<>();
+        int pageNumber = pageable.getPageNumber();
+        int pageSize = pageable.getPageSize();
+
+        Criteria criteria = Criteria.where("groupId").is(groupId);
+        criteria.and("userProfileId").ne(Helper.getLoggedInUserProfileId());
 
         if (request.getStatus() != null) {
-            criteriaList.add(Criteria.where("status").is(request.getStatus()));
+            criteria.and("status").is(request.getStatus());
         }
 
         if (request.getEventType() != null && request.getEventType() != EventType.ALL) {
-            criteriaList.add(Criteria.where("eventType").is(request.getEventType()));
+            criteria.and("eventType").is(request.getEventType());
         }
 
-        criteriaList.add(Criteria.where("groupId").is(groupId));
-        criteriaList.add(Criteria.where("userProfileId").ne(userProfile.getId()));
+        if (search != null && !search.isEmpty()) {
+            criteria.and("title").regex(search, "i");
+        }
 
-        Criteria combinedCriteria = new Criteria().andOperator(criteriaList.toArray(new Criteria[0]));
-
-        MatchOperation matchOperation = Aggregation.match(combinedCriteria);
+        MatchOperation matchOperation = Aggregation.match(criteria);
 
         ProjectionOperation projectOperation = Aggregation.project()
                 .and("eventId").as("eventId")
@@ -137,10 +141,16 @@ public class EventServiceImpl implements EventService {
 
         SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "createdAt"));
 
+        SkipOperation skipOperation = Aggregation.skip((long) pageNumber * pageSize);
+        LimitOperation limitOperation = Aggregation.limit(pageSize);
+
+
         Aggregation aggregation = Aggregation.newAggregation(
                 matchOperation,
                 projectOperation,
-                sortOperation
+                sortOperation,
+                skipOperation,
+                limitOperation
         );
 
         AggregationResults<Event> results = mongoTemplate.aggregate(aggregation, "events", Event.class);
@@ -211,6 +221,4 @@ public class EventServiceImpl implements EventService {
 
         return eventRepository.existsByUserProfileIdAndGroupIdAndStatusIn(Helper.getLoggedInUserProfileId(), groupId, statuses);
     }
-
-
 }

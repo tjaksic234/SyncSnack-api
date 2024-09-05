@@ -8,6 +8,7 @@ import com.example.KavaSpring.models.dao.Group;
 import com.example.KavaSpring.models.dao.GroupMembership;
 import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.*;
+import com.example.KavaSpring.models.enums.Role;
 import com.example.KavaSpring.models.enums.SortCondition;
 import com.example.KavaSpring.repository.GroupMembershipRepository;
 import com.example.KavaSpring.repository.GroupRepository;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -73,6 +75,7 @@ public class GroupServiceImpl implements GroupService {
         GroupMembership groupMembership = new GroupMembership();
         groupMembership.setGroupId(group.getId());
         groupMembership.setUserProfileId(Helper.getLoggedInUserProfileId());
+        groupMembership.setRoles(new ArrayList<>(List.of(Role.PRESIDENT)));
         groupMembershipRepository.save(groupMembership);
 
 

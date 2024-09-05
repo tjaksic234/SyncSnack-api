@@ -106,7 +106,7 @@ public class GroupController {
             @RequestPart(value = "description", required = false) String description,
             @RequestPart(value = "file", required = false) MultipartFile file
     ) {
-        if (!authService.hasRole(groupId, Role.ADMIN)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (!authService.hasRole(groupId, Role.ADMIN, Role.PRESIDENT)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         try {
             log.info("Editing group info");
             return ResponseEntity.ok(groupService.editGroupInfo(groupId, name, description, file));

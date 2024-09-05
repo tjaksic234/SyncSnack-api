@@ -7,6 +7,7 @@ import com.example.KavaSpring.models.enums.EventStatus;
 import com.example.KavaSpring.services.EventService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,10 +52,15 @@ public class EventController {
 
     @PostMapping("filter")
     public ResponseEntity<List<EventExpandedResponse>> filterEvents(
-            @RequestHeader(value = "groupId") String groupId, @RequestBody EventSearchRequest request) {
+            @RequestHeader(value = "groupId") String groupId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "4") int size,
+            @RequestParam(required = false) String search,
+            @RequestBody EventSearchRequest request
+    ) {
         try {
             log.info("Search for events started");
-            return ResponseEntity.ok(eventService.filterEvents(groupId, request));
+            return ResponseEntity.ok(eventService.filterEvents(groupId, PageRequest.of(page, size), search, request));
         } catch (NotValidEnumException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
