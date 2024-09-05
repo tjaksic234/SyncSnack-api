@@ -12,5 +12,5 @@ public interface EventService {
     List<EventExpandedResponse> filterEvents(String groupId, Pageable pageable, String search, EventFilterRequest request);
     void updateEventsJob();
     String updateEventStatus(String id, EventStatus status);
-    boolean getActiveEvent(String groupId);
+    EventDto getActiveEvent(String groupId);
 }

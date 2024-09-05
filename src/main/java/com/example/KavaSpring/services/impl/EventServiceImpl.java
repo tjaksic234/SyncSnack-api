@@ -38,6 +38,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -218,12 +219,15 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public boolean getActiveEvent(String groupId) {
+    public EventDto getActiveEvent(String groupId) {
         groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
         List<EventStatus> statuses = new ArrayList<>();
         statuses.add(EventStatus.PENDING);
         statuses.add(EventStatus.IN_PROGRESS);
 
-        return eventRepository.existsByUserProfileIdAndGroupIdAndStatusIn(Helper.getLoggedInUserProfileId(), groupId, statuses);
+        Event event = eventRepository.findByUserProfileIdAndGroupIdAndStatusIn(Helper.getLoggedInUserProfileId(), groupId, statuses)
+                .orElseThrow(() -> new NotFoundException("No active event found"));
+
+        return converterService.convertToEventDto(event);
     }
 }

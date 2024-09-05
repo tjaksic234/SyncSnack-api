@@ -148,7 +148,7 @@ public class GroupController {
         try {
             log.info("Fetching all members of the group");
             return ResponseEntity.ok(groupService.getGroupMembers(groupId));
-        } catch (NoGroupFoundException e) {
+        } catch (NoGroupFoundException | NotFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.notFound().build();
         }

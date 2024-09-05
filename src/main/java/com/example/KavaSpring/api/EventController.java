@@ -85,7 +85,7 @@ public class EventController {
     }
 
     @GetMapping("active")
-    public ResponseEntity<?> getActiveEvent(@RequestHeader(value = "groupId") String groupId) {
+    public ResponseEntity<EventDto> getActiveEvent(@RequestHeader(value = "groupId") String groupId) {
         try {
             log.info("Fetching active event from UserProfile");
             return ResponseEntity.ok(eventService.getActiveEvent(groupId));
