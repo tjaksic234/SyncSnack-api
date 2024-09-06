@@ -1,6 +1,7 @@
 package com.example.KavaSpring.services;
 
 import com.example.KavaSpring.models.dto.*;
+import com.example.KavaSpring.models.enums.Role;
 import com.example.KavaSpring.models.enums.SortCondition;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,4 +19,5 @@ public interface GroupService {
     List<GroupDto> getProfileGroups();
     List<GroupMemberResponse> getGroupMembers(String groupId);
     void kickUserFromGroup(String groupId, String userProfileId);
+    void assignRoleToUser(String groupId, String userProfileId, Role role);
 }

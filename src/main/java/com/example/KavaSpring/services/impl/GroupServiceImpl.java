@@ -11,6 +11,7 @@ import com.example.KavaSpring.models.enums.Role;
 import com.example.KavaSpring.models.enums.SortCondition;
 import com.example.KavaSpring.repository.GroupMembershipRepository;
 import com.example.KavaSpring.repository.GroupRepository;
+import com.example.KavaSpring.security.services.AuthService;
 import com.example.KavaSpring.security.utils.Helper;
 import com.example.KavaSpring.services.AmazonS3Service;
 import com.example.KavaSpring.services.GroupService;
@@ -48,6 +49,8 @@ public class GroupServiceImpl implements GroupService {
     private final GroupMembershipRepository groupMembershipRepository;
 
     private final AmazonS3Service amazonS3Service;
+
+    private final AuthService authService;
 
 
     @Override
@@ -406,7 +409,37 @@ public class GroupServiceImpl implements GroupService {
             throw new IllegalStateException("Cannot kick the group PRESIDENT");
         }
 
+        boolean isCurrentUserPresident = authService.hasRole(groupId, Role.PRESIDENT);
+        boolean isTargetUserAdmin = membership.getRoles().contains(Role.ADMIN);
+
+        if (isTargetUserAdmin && !isCurrentUserPresident) {
+            throw new IllegalStateException("Only the PRESIDENT can kick an ADMIN");
+        }
+
         groupMembershipRepository.delete(membership);
-        log.info("User {} kicked from group {}", userProfileId, groupId);
+        log.info("User Profile {} kicked from group {}", userProfileId, groupId);
     }
+
+    @Override
+    public void assignRoleToUser(String groupId, String userProfileId, Role role) {
+        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
+
+        GroupMembership membership = groupMembershipRepository.findByUserProfileIdAndGroupId(userProfileId, groupId);
+        if (membership == null) {
+            throw new NotFoundException("User is not a member of this group");
+        }
+
+        if (role == Role.PRESIDENT) {
+            throw new IllegalArgumentException("Cannot assign PRESIDENT role");
+        }
+
+        if (!membership.getRoles().contains(role)) {
+            membership.getRoles().add(role);
+            groupMembershipRepository.save(membership);
+            log.info("Role {} assigned to user {} in group {}", role, userProfileId, groupId);
+        } else {
+            log.info("User {} already has role {} in group {}", userProfileId, role, groupId);
+        }
+    }
+
 }
