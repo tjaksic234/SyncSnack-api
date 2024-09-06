@@ -170,8 +170,8 @@ public class GroupController {
         }
     }
 
-    @PostMapping("assign-role")
-    public ResponseEntity<Void> assignRoleToUser(
+    @PostMapping("promote")
+    public ResponseEntity<Void> promoteUser(
             @RequestHeader(value = "groupId") String groupId,
             @RequestParam String userProfileId,
             @RequestParam Role role
@@ -179,7 +179,7 @@ public class GroupController {
         if (!authService.hasRole(groupId, Role.PRESIDENT)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         try {
             log.info("Promoting user");
-            groupService.assignRoleToUser(groupId, userProfileId, role);
+            groupService.promoteUser(groupId, userProfileId, role);
             return ResponseEntity.ok().build();
         } catch (NoGroupFoundException | NotFoundException e) {
             log.error(e.getMessage());

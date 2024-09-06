@@ -19,5 +19,5 @@ public interface GroupService {
     List<GroupDto> getProfileGroups();
     List<GroupMemberResponse> getGroupMembers(String groupId);
     void kickUserFromGroup(String groupId, String userProfileId);
-    void assignRoleToUser(String groupId, String userProfileId, Role role);
+    void promoteUser(String groupId, String userProfileId, Role role);
 }

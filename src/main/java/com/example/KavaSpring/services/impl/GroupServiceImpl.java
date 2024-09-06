@@ -421,7 +421,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public void assignRoleToUser(String groupId, String userProfileId, Role role) {
+    public void promoteUser(String groupId, String userProfileId, Role role) {
         groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
 
         GroupMembership membership = groupMembershipRepository.findByUserProfileIdAndGroupId(userProfileId, groupId);
