@@ -17,4 +17,5 @@ public interface GroupService {
     LeaderboardResponse getTopScorer(String groupId);
     List<GroupDto> getProfileGroups();
     List<GroupMemberResponse> getGroupMembers(String groupId);
+    void kickUserFromGroup(String groupId, String userProfileId);
 }

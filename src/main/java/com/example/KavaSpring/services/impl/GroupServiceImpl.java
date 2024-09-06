@@ -6,13 +6,11 @@ import com.example.KavaSpring.exceptions.NoGroupFoundException;
 import com.example.KavaSpring.exceptions.NotFoundException;
 import com.example.KavaSpring.models.dao.Group;
 import com.example.KavaSpring.models.dao.GroupMembership;
-import com.example.KavaSpring.models.dao.UserProfile;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.models.enums.Role;
 import com.example.KavaSpring.models.enums.SortCondition;
 import com.example.KavaSpring.repository.GroupMembershipRepository;
 import com.example.KavaSpring.repository.GroupRepository;
-import com.example.KavaSpring.repository.UserProfileRepository;
 import com.example.KavaSpring.security.utils.Helper;
 import com.example.KavaSpring.services.AmazonS3Service;
 import com.example.KavaSpring.services.GroupService;
@@ -40,8 +38,6 @@ import java.util.Optional;
 public class GroupServiceImpl implements GroupService {
 
     private final GroupRepository groupRepository;
-
-    private final UserProfileRepository userProfileRepository;
 
     private final ConverterService converterService;
 
@@ -101,11 +97,6 @@ public class GroupServiceImpl implements GroupService {
         Group group = groupRepository.findByName(request.getName())
                 .orElseThrow(() -> new NotFoundException("Group not found"));
 
-        String userId = Helper.getLoggedInUserId() == null ? request.getUserId() : null;
-
-        UserProfile userProfile = userProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new NotFoundException("No user profile found when joining a group"));
-
         if (!passwordEncoder.matches(request.getPassword(), group.getPassword())) {
             throw new IllegalStateException("Invalid password");
         }
@@ -114,14 +105,14 @@ public class GroupServiceImpl implements GroupService {
         response.setGroupId(group.getId());
         response.setName(request.getName());
 
-        GroupMembership existingMembership = groupMembershipRepository.findByUserProfileIdAndGroupId(userProfile.getId(), group.getId());
+        GroupMembership existingMembership = groupMembershipRepository.findByUserProfileIdAndGroupId(Helper.getLoggedInUserProfileId(), group.getId());
         if (existingMembership != null) {
             throw new IllegalStateException("User is already a member of this group");
         }
 
         //? Saving the relation between a group and the profile
         GroupMembership groupMembership = new GroupMembership();
-        groupMembership.setUserProfileId(userProfile.getId());
+        groupMembership.setUserProfileId(Helper.getLoggedInUserProfileId());
         groupMembership.setGroupId(group.getId());
 
         groupMembershipRepository.save(groupMembership);
@@ -400,5 +391,22 @@ public class GroupServiceImpl implements GroupService {
         return results.getMappedResults().stream()
                 .map(converterService::convertToGroupMemberResponse)
                 .toList();
+    }
+
+    @Override
+    public void kickUserFromGroup(String groupId, String userProfileId) {
+        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
+
+        GroupMembership membership = groupMembershipRepository.findByUserProfileIdAndGroupId(userProfileId, groupId);
+        if (membership == null) {
+            throw new NotFoundException("User is not member of this group");
+        }
+
+        if (membership.getRoles().contains(Role.PRESIDENT)) {
+            throw new IllegalStateException("Cannot kick the group PRESIDENT");
+        }
+
+        groupMembershipRepository.delete(membership);
+        log.info("User {} kicked from group {}", userProfileId, groupId);
     }
 }

@@ -57,9 +57,6 @@ public class GroupController {
         try {
             log.info("Join group started");
             return ResponseEntity.ok(groupService.joinGroup(request));
-        } catch (NotFoundException e) {
-            log.error(e.getMessage());
-            return ResponseEntity.notFound().build();
         } catch (IllegalStateException e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
@@ -151,6 +148,25 @@ public class GroupController {
         } catch (NoGroupFoundException | NotFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("kick")
+    public ResponseEntity<Void> kickUserFromGroup(
+            @RequestHeader(value = "groupId") String groupId,
+            @RequestParam String userProfileId
+    ) {
+        if (!authService.hasRole(groupId, Role.ADMIN, Role.PRESIDENT)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        try {
+            log.info("Kicking user from group");
+            groupService.kickUserFromGroup(groupId, userProfileId);
+            return ResponseEntity.ok().build();
+        } catch (NoGroupFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (IllegalStateException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 
