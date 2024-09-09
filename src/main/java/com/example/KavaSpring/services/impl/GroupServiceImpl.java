@@ -1,22 +1,19 @@
 package com.example.KavaSpring.services.impl;
 
 import com.example.KavaSpring.converters.ConverterService;
-import com.example.KavaSpring.exceptions.GroupAlreadyExistsException;
-import com.example.KavaSpring.exceptions.NoGroupFoundException;
-import com.example.KavaSpring.exceptions.NotFoundException;
-import com.example.KavaSpring.models.dao.Group;
-import com.example.KavaSpring.models.dao.GroupMembership;
+import com.example.KavaSpring.exceptions.*;
+import com.example.KavaSpring.models.dao.*;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.models.enums.Role;
 import com.example.KavaSpring.models.enums.SortCondition;
-import com.example.KavaSpring.repository.GroupMembershipRepository;
-import com.example.KavaSpring.repository.GroupRepository;
+import com.example.KavaSpring.repository.*;
 import com.example.KavaSpring.security.services.AuthService;
 import com.example.KavaSpring.security.utils.Helper;
 import com.example.KavaSpring.services.AmazonS3Service;
 import com.example.KavaSpring.services.GroupService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -28,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +35,9 @@ import java.util.Optional;
 @Slf4j
 @AllArgsConstructor
 public class GroupServiceImpl implements GroupService {
+
+    @Value("${backend.url.dev}")
+    private final String BACKEND_URL;
 
     private final GroupRepository groupRepository;
 
@@ -51,6 +52,8 @@ public class GroupServiceImpl implements GroupService {
     private final AmazonS3Service amazonS3Service;
 
     private final AuthService authService;
+
+    private final GroupInvitationRepository groupInvitationRepository;
 
 
     @Override
@@ -442,4 +445,42 @@ public class GroupServiceImpl implements GroupService {
         }
     }
 
+    @Override
+    public String generateInvitation(String groupId, String invitedBy) {
+        String code = Helper.generateRandomString();
+        GroupInvitation invitation = new GroupInvitation();
+        invitation.setGroupId(groupId);
+        invitation.setCode(code);
+        invitation.setInvitedBy(invitedBy);
+
+        groupInvitationRepository.save(invitation);
+
+        return String.format(BACKEND_URL + "/api/groups/joinViaInvitation/%s", code);
+    }
+
+    @Override
+    public void joinViaInvitation(String code) {
+        GroupInvitation invitation = groupInvitationRepository.findByCodeAndActiveIsTrue(code)
+                .orElseThrow(() -> new NotFoundException("Group invitation not found"));
+
+        if (invitation.getExpiresAt().isBefore(LocalDateTime.now())) {
+            invitation.setActive(false);
+            groupInvitationRepository.save(invitation);
+            throw new ExpiredInvitationException("This invitation has expired");
+        }
+
+        String groupId = invitation.getGroupId();
+
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new NoGroupFoundException("Group not found"));
+
+        if (groupMembershipRepository.findByUserProfileIdAndGroupId(Helper.getLoggedInUserProfileId(), groupId) != null) {
+            throw new AlreadyMemberException("You are already a member of this group");
+        }
+
+        GroupMembership membership = new GroupMembership();
+        membership.setUserProfileId(Helper.getLoggedInUserProfileId());
+        membership.setGroupId(groupId);
+        groupMembershipRepository.save(membership);
+    }
 }

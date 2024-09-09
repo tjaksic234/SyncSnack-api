@@ -20,4 +20,6 @@ public interface GroupService {
     List<GroupMemberResponse> getGroupMembers(String groupId);
     void kickUserFromGroup(String groupId, String userProfileId);
     void promoteUser(String groupId, String userProfileId, Role role);
+    String generateInvitation(String groupId, String invitedBy);
+    void joinViaInvitation(String code);
 }

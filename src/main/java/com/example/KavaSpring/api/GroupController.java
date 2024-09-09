@@ -1,9 +1,7 @@
 package com.example.KavaSpring.api;
 
 import com.example.KavaSpring.config.openapi.ShowAPI;
-import com.example.KavaSpring.exceptions.GroupAlreadyExistsException;
-import com.example.KavaSpring.exceptions.NoGroupFoundException;
-import com.example.KavaSpring.exceptions.NotFoundException;
+import com.example.KavaSpring.exceptions.*;
 import com.example.KavaSpring.models.dto.*;
 import com.example.KavaSpring.models.enums.Role;
 import com.example.KavaSpring.models.enums.SortCondition;
@@ -190,4 +188,29 @@ public class GroupController {
         }
     }
 
+    @PostMapping("sendInvitation")
+    public ResponseEntity<String> generateInvitation(@RequestHeader String groupId, @RequestParam String invitedBy) {
+        try {
+            log.info("Generating group invitation");
+            return ResponseEntity.ok(groupService.generateInvitation(groupId, invitedBy));
+        } catch (RuntimeException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("joinViaInvitation/{code}")
+    public ResponseEntity<Void> joinViaInvitation(@PathVariable String code) {
+        try {
+            log.info("Joining group through link");
+            groupService.joinViaInvitation(code);
+            return ResponseEntity.ok().build();
+        } catch (NotFoundException | NoGroupFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (ExpiredInvitationException | AlreadyMemberException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }
