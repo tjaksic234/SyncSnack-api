@@ -36,8 +36,8 @@ import java.util.Optional;
 @AllArgsConstructor
 public class GroupServiceImpl implements GroupService {
 
-    @Value("${backend.url.dev}")
-    private final String BACKEND_URL;
+    @Value("${frontend.url.dev}")
+    private final String FRONTEND_URL;
 
     private final GroupRepository groupRepository;
 
@@ -454,7 +454,7 @@ public class GroupServiceImpl implements GroupService {
         invitation.setInvitedBy(invitedBy);
 
         groupInvitationRepository.save(invitation);
-        return String.format(BACKEND_URL + "/api/groups/joinViaInvitation/%s", code);
+        return String.format(FRONTEND_URL + "/api/groups/join/%s", code);
     }
 
     @Override
@@ -468,7 +468,7 @@ public class GroupServiceImpl implements GroupService {
 
         String groupId = invitation.getGroupId();
 
-        Group group = groupRepository.findById(groupId)
+        groupRepository.findById(groupId)
                 .orElseThrow(() -> new NoGroupFoundException("Group not found"));
 
         if (groupMembershipRepository.findByUserProfileIdAndGroupId(Helper.getLoggedInUserProfileId(), groupId) != null) {
