@@ -454,7 +454,6 @@ public class GroupServiceImpl implements GroupService {
         invitation.setInvitedBy(invitedBy);
 
         groupInvitationRepository.save(invitation);
-
         return String.format(BACKEND_URL + "/api/groups/joinViaInvitation/%s", code);
     }
 
@@ -464,8 +463,6 @@ public class GroupServiceImpl implements GroupService {
                 .orElseThrow(() -> new NotFoundException("Group invitation not found"));
 
         if (invitation.getExpiresAt().isBefore(LocalDateTime.now())) {
-            invitation.setActive(false);
-            groupInvitationRepository.save(invitation);
             throw new ExpiredInvitationException("This invitation has expired");
         }
 
@@ -482,5 +479,8 @@ public class GroupServiceImpl implements GroupService {
         membership.setUserProfileId(Helper.getLoggedInUserProfileId());
         membership.setGroupId(groupId);
         groupMembershipRepository.save(membership);
+
+        invitation.setActive(false);
+        groupInvitationRepository.save(invitation);
     }
 }

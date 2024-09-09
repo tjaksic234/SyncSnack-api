@@ -57,6 +57,7 @@ public class WebSecurityConfig {
                         .requestMatchers("api/groups/join").permitAll()
                         .requestMatchers("api/users/**").permitAll()
                         .requestMatchers("api/profiles/{id}").permitAll() //! temporary
+                        .requestMatchers("api/groups/joinViaInvitation/{code}").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/ws").permitAll()
                         .anyRequest().authenticated());
