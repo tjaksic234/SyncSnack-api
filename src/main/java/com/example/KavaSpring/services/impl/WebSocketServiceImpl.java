@@ -2,10 +2,12 @@ package com.example.KavaSpring.services.impl;
 
 import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.models.dao.Event;
+import com.example.KavaSpring.models.dao.GroupMembership;
 import com.example.KavaSpring.models.dao.Order;
 import com.example.KavaSpring.models.dto.EventNotification;
 import com.example.KavaSpring.models.dto.OrderNotification;
 import com.example.KavaSpring.repository.EventRepository;
+import com.example.KavaSpring.repository.GroupMembershipRepository;
 import com.example.KavaSpring.repository.NotificationRepository;
 import com.example.KavaSpring.services.WebSocketService;
 import lombok.AllArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,6 +32,8 @@ public class WebSocketServiceImpl implements WebSocketService {
     private final ConverterService converterService;
 
     private final NotificationRepository notificationRepository;
+
+    private final GroupMembershipRepository groupMembershipRepository;
 
     @Override
     public void notifyEventUserProfile(Order order) {
@@ -55,8 +60,12 @@ public class WebSocketServiceImpl implements WebSocketService {
         //? saving the notification to the database
         notificationRepository.save(converterService.convertEventNotificationToNotification(eventNotification));
 
-        log.info("Notifying the group with a new event");
-        messagingTemplate.convertAndSend("/topic/groups/" + event.getGroupId(),
-                eventNotification);
+        List<GroupMembership> memberships = groupMembershipRepository.findAllByGroupId(event.getGroupId());
+
+        log.info("Notifying {} members of the group with a new event", memberships.size());
+        for (GroupMembership membership : memberships) {
+            String userProfileId = membership.getUserProfileId();
+            messagingTemplate.convertAndSend("/topic/users/" + userProfileId, eventNotification);
+        }
     }
 }

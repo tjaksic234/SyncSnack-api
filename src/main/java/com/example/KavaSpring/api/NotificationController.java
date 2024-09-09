@@ -38,11 +38,9 @@ public class NotificationController {
             }
             log.info("Retrieved {} notifications", notifications.size());
             return ResponseEntity.ok(notifications);
-        } catch (Exception e) {
-            log.error("Error occurred while fetching notifications", e);
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An error occurred while fetching notifications: " + e.getMessage());
+        } catch (NoGroupFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
         }
     }
 }
