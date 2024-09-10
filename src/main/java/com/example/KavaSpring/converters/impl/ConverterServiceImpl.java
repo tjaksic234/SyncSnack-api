@@ -29,16 +29,6 @@ public class ConverterServiceImpl implements ConverterService {
     }
 
     @Override
-    public UserProfileDto convertToUserProfileDto(UserProfile userProfile) {
-        UserProfileDto userProfileDto = new UserProfileDto();
-        userProfileDto.setUserId(userProfile.getUserId());
-        userProfileDto.setFirstName(userProfile.getFirstName());
-        userProfileDto.setLastName(userProfile.getLastName());
-        userProfileDto.setPhotoUrl(convertPhotoUriToUrl(userProfile.getPhotoUri()));
-        return userProfileDto;
-    }
-
-    @Override
     public UserProfileResponse convertToUserProfileResponse(UserProfileRequest request) {
         UserProfileResponse response = new UserProfileResponse();
         response.setUserId(request.getUserId());

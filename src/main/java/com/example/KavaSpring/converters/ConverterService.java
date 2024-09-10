@@ -5,7 +5,6 @@ import com.example.KavaSpring.models.dto.*;
 
 public interface ConverterService {
     UserDto convertToUserDto(User user);
-    UserProfileDto convertToUserProfileDto(UserProfile userProfile);
     UserProfileResponse convertToUserProfileResponse(UserProfileRequest request);
     GroupDto convertToGroupDto(Group group);
     LeaderboardResponse convertToLeaderboardResponse(UserProfileExpandedResponse response);

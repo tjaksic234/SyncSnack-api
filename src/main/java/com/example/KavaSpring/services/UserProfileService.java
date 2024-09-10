@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface UserProfileService {
     UserProfileResponse createUserProfile(UserProfileRequest request, MultipartFile photoFile) throws IOException;
-    UserProfileDto getProfileById(String id);
+    UserProfileDto getProfileById(String groupId, String id);
     byte[] downloadUserProfilePhoto() throws IOException;
     UserProfileEditResponse editUserProfile(String firstName, String lastName, MultipartFile photoFile);
     void updateProfileScores(String groupId);

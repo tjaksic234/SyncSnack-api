@@ -96,12 +96,22 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
-    public UserProfileDto getProfileById(String id) {
+    public UserProfileDto getProfileById(String groupId, String id) {
+        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group found"));
         UserProfile userProfile = userProfileRepository.getUserProfileById(id)
                 .orElseThrow(() -> new NotFoundException("User profile not found"));
+        GroupMembership membership = groupMembershipRepository.findByUserProfileIdAndGroupId(id, groupId);
+
+        UserProfileDto userProfileDto = new UserProfileDto();
+        userProfileDto.setUserId(userProfile.getUserId());
+        userProfileDto.setFirstName(userProfile.getFirstName());
+        userProfileDto.setLastName(userProfile.getLastName());
+        userProfileDto.setGroupId(membership.getGroupId());
+        userProfileDto.setPhotoUrl(converterService.convertPhotoUriToUrl(userProfile.getPhotoUri()));
+        userProfileDto.setScore(membership.getScore());
 
         log.info("Get profile by id finished");
-        return converterService.convertToUserProfileDto(userProfile);
+        return userProfileDto;
     }
 
     @Override

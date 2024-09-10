@@ -49,11 +49,14 @@ public class UserProfileController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<UserProfileDto> getProfileById(@PathVariable("id") String id) {
+    public ResponseEntity<UserProfileDto> getProfileById (
+            @RequestHeader("groupId") String groupId,
+            @PathVariable("id") String id
+    ) {
         try {
             log.info("Fetching profile by id");
-            return ResponseEntity.ok(userProfileService.getProfileById(id));
-        } catch (NotFoundException e) {
+            return ResponseEntity.ok(userProfileService.getProfileById(groupId, id));
+        } catch (NotFoundException | NoGroupFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.notFound().build();
         }
