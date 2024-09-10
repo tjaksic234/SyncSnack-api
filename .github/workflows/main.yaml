@@ -23,8 +23,8 @@ jobs:
         run: |
           echo '${{ secrets.ENV_FILE }}' > .env
           echo '${{ secrets.FIREBASE_CONFIG }}' > src/main/resources/firebase-adminsdk.json
-          mkdir -p src/main/resources/static/.well-known
-          echo '${{ secrets.ASSET_LINKS }}' > src/main/resources/static/.well-known/assetlinks.json
+          mkdir -p src/main/resources/.well-known
+          echo '${{ secrets.ASSET_LINKS }}' > src/main/resources/.well-known/assetlinks.json
 
       - name: Build and Test the app
         run:  mvn --batch-mode clean package
