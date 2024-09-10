@@ -33,7 +33,7 @@ build/
 .vscode/
 
 ## environment variable for asset links and firebase in flutter
-/src/main/resources/.well-known/assetlinks.json
+/src/main/resources/static/.well-known/assetlinks.json
 /src/main/resources/firebase-adminsdk.json
 
 ## environment variables
