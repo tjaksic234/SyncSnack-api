@@ -46,13 +46,11 @@ public class NotificationServiceImpl implements NotificationService {
 
 
         //? aggregation for the different types of notifications
-        //* the groupId match criteria is currently disabled
         MatchOperation matchOperation = Aggregation.match(
                 new Criteria().orOperator(
                         Criteria.where("notificationType").is("ORDER")
                                 .and("recipientUserProfileId").is(userProfile.getId()),
                         Criteria.where("notificationType").is("EVENT")
-                               // .and("groupId").is(groupId)
                                 .and("userProfileId").ne(userProfile.getId())
                 )
         );
