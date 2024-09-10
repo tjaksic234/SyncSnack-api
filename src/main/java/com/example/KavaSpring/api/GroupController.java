@@ -200,11 +200,10 @@ public class GroupController {
     }
 
     @GetMapping("joinViaInvitation/{code}")
-    public ResponseEntity<Void> joinViaInvitation(@PathVariable String code) {
+    public ResponseEntity<GroupDto> joinViaInvitation(@PathVariable String code) {
         try {
             log.info("Joining group through link");
-            groupService.joinViaInvitation(code);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(groupService.joinViaInvitation(code));
         } catch (NotFoundException | NoGroupFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.notFound().build();

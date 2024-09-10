@@ -21,5 +21,5 @@ public interface GroupService {
     void kickUserFromGroup(String groupId, String userProfileId);
     void promoteUser(String groupId, String userProfileId, Role role);
     String generateInvitation(String groupId, String invitedBy);
-    void joinViaInvitation(String code);
+    GroupDto joinViaInvitation(String code);
 }

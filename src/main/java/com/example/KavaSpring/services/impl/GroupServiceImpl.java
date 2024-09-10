@@ -458,7 +458,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public void joinViaInvitation(String code) {
+    public GroupDto joinViaInvitation(String code) {
         GroupInvitation invitation = groupInvitationRepository.findByCodeAndActiveIsTrue(code)
                 .orElseThrow(() -> new NotFoundException("Group invitation not found"));
 
@@ -468,8 +468,7 @@ public class GroupServiceImpl implements GroupService {
 
         String groupId = invitation.getGroupId();
 
-        groupRepository.findById(groupId)
-                .orElseThrow(() -> new NoGroupFoundException("Group not found"));
+        Group group = groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("Group not found"));
 
         if (groupMembershipRepository.findByUserProfileIdAndGroupId(Helper.getLoggedInUserProfileId(), groupId) != null) {
             throw new AlreadyMemberException("You are already a member of this group");
@@ -482,5 +481,7 @@ public class GroupServiceImpl implements GroupService {
 
         invitation.setActive(false);
         groupInvitationRepository.save(invitation);
+
+        return converterService.convertToGroupDto(group);
     }
 }
