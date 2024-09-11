@@ -360,8 +360,11 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public List<GroupMemberResponse> getGroupMembers(String groupId) {
+    public List<GroupMemberResponse> getGroupMembers(String groupId, Pageable pageable) {
         groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
+
+        int pageNumber = pageable.getPageNumber();
+        int pageSize = pageable.getPageSize();
 
         MatchOperation matchOperation = Aggregation.match(Criteria.where("groupId").is(groupId));
 
@@ -382,12 +385,21 @@ public class GroupServiceImpl implements GroupService {
                 .and("userProfile.lastName").as("lastName")
                 .and("userProfile.photoUri").as("photoUrl");
 
+        SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.ASC, "firstName", "lastName"));
+
+        SkipOperation skipOperation = Aggregation.skip((long) pageNumber * pageSize);
+        
+        LimitOperation limitOperation = Aggregation.limit(pageSize);
+
         Aggregation aggregation = Aggregation.newAggregation(
                 matchOperation,
                 addFieldsOperation,
                 lookupOperation,
                 unwindOperation,
-                projectionOperation
+                projectionOperation,
+                sortOperation,
+                skipOperation,
+                limitOperation
         );
 
         AggregationResults<GroupMemberDto> results = mongoTemplate.aggregate(aggregation,

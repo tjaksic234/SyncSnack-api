@@ -138,11 +138,13 @@ public class GroupController {
 
     @GetMapping("members")
     public ResponseEntity<List<GroupMemberResponse>> getGroupMembers(
-            @RequestHeader(value = "groupId") String groupId
+            @RequestHeader(value = "groupId") String groupId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
     ) {
         try {
             log.info("Fetching all members of the group");
-            return ResponseEntity.ok(groupService.getGroupMembers(groupId));
+            return ResponseEntity.ok(groupService.getGroupMembers(groupId, PageRequest.of(page, size)));
         } catch (NoGroupFoundException | NotFoundException e) {
             log.error(e.getMessage());
             return ResponseEntity.notFound().build();

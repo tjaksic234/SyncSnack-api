@@ -97,6 +97,8 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     public UserProfileDto getProfileById(String groupId, String id) {
+        //? currently a better solution needs to be figured out since the reason for these if blocks is
+        //? the api is being used by both the web and mobile application and different logic is being applied for this method
         if (groupId != null && !groupId.isEmpty()) {
             groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group found"));
         }
@@ -111,10 +113,8 @@ public class UserProfileServiceImpl implements UserProfileService {
 
         if (groupId != null && !groupId.isEmpty()) {
             GroupMembership membership = groupMembershipRepository.findByUserProfileIdAndGroupId(id, groupId);
-            if (membership != null) {
-                userProfileDto.setGroupId(membership.getGroupId());
-                userProfileDto.setScore(membership.getScore());
-            }
+            userProfileDto.setGroupId(membership.getGroupId());
+            userProfileDto.setScore(membership.getScore());
         }
 
         log.info("Get profile by id finished");
