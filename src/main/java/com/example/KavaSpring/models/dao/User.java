@@ -1,6 +1,5 @@
 package com.example.KavaSpring.models.dao;
 
-import com.example.KavaSpring.models.enums.Role;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +11,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Document(collection = "users")
 @Getter @Setter
@@ -31,8 +29,6 @@ public class User {
     @NotBlank
     @Size(max = 120)
     private String password;
-
-    List<Role> roles;
 
     @NotBlank
     private boolean isVerified = false;
