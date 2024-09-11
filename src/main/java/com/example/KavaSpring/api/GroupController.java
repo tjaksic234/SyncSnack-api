@@ -136,6 +136,17 @@ public class GroupController {
         }
     }
 
+    @GetMapping("roles")
+    public ResponseEntity<GroupMembershipDto> getGroupRoles(@RequestHeader(value = "groupId") String groupId) {
+        try {
+            log.info("Fetching roles for the group");
+            return ResponseEntity.ok(groupService.getGroupRoles(groupId));
+        } catch (NoGroupFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @GetMapping("members")
     public ResponseEntity<List<GroupMemberResponse>> getGroupMembers(
             @RequestHeader(value = "groupId") String groupId,

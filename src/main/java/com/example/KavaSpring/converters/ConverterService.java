@@ -9,6 +9,7 @@ public interface ConverterService {
     GroupDto convertToGroupDto(Group group);
     LeaderboardResponse convertToLeaderboardResponse(UserProfileExpandedResponse response);
     GroupMemberResponse convertToGroupMemberResponse(GroupMemberDto dto);
+    GroupMembershipDto convertToGroupMembershipDto(GroupMembership membership);
     EventDto convertToEventDto(Event event);
     EventResponse convertToEventResponse(EventRequest request);
     EventExpandedResponse convertToEventExpandedResponse(Event event);

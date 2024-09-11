@@ -17,6 +17,7 @@ public interface GroupService {
     GroupEditResponse editGroupInfo(String groupId, String name, String description, MultipartFile photoFile);
     LeaderboardResponse getTopScorer(String groupId);
     List<GroupDto> getProfileGroups();
+    GroupMembershipDto getGroupRoles(String groupId);
     List<GroupMemberResponse> getGroupMembers(String groupId, Pageable pageable);
     void kickUserFromGroup(String groupId, String userProfileId);
     void promoteUser(String groupId, String userProfileId, Role role);

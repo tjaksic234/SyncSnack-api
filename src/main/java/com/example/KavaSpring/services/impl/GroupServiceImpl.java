@@ -360,6 +360,15 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    public GroupMembershipDto getGroupRoles(String groupId) {
+        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
+
+        GroupMembership membership = groupMembershipRepository.findByUserProfileIdAndGroupId(Helper.getLoggedInUserProfileId(), groupId);
+
+        return converterService.convertToGroupMembershipDto(membership);
+    }
+
+    @Override
     public List<GroupMemberResponse> getGroupMembers(String groupId, Pageable pageable) {
         groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
 
@@ -388,7 +397,7 @@ public class GroupServiceImpl implements GroupService {
         SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.ASC, "firstName", "lastName"));
 
         SkipOperation skipOperation = Aggregation.skip((long) pageNumber * pageSize);
-        
+
         LimitOperation limitOperation = Aggregation.limit(pageSize);
 
         Aggregation aggregation = Aggregation.newAggregation(

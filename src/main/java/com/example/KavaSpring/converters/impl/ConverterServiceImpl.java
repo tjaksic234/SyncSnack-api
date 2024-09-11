@@ -71,6 +71,13 @@ public class ConverterServiceImpl implements ConverterService {
     }
 
     @Override
+    public GroupMembershipDto convertToGroupMembershipDto(GroupMembership membership) {
+        GroupMembershipDto groupMembershipDto = new GroupMembershipDto();
+        groupMembershipDto.setRoles(membership.getRoles());
+        return groupMembershipDto;
+    }
+
+    @Override
     public EventDto convertToEventDto(Event event) {
         EventDto eventDto = new EventDto();
         eventDto.setEventId(event.getId());
