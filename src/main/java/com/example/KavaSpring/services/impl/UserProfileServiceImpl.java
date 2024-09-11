@@ -97,18 +97,25 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     public UserProfileDto getProfileById(String groupId, String id) {
-        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group found"));
+        if (groupId != null && !groupId.isEmpty()) {
+            groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group found"));
+        }
         UserProfile userProfile = userProfileRepository.getUserProfileById(id)
                 .orElseThrow(() -> new NotFoundException("User profile not found"));
-        GroupMembership membership = groupMembershipRepository.findByUserProfileIdAndGroupId(id, groupId);
 
         UserProfileDto userProfileDto = new UserProfileDto();
         userProfileDto.setUserId(userProfile.getUserId());
         userProfileDto.setFirstName(userProfile.getFirstName());
         userProfileDto.setLastName(userProfile.getLastName());
-        userProfileDto.setGroupId(membership.getGroupId());
         userProfileDto.setPhotoUrl(converterService.convertPhotoUriToUrl(userProfile.getPhotoUri()));
-        userProfileDto.setScore(membership.getScore());
+
+        if (groupId != null && !groupId.isEmpty()) {
+            GroupMembership membership = groupMembershipRepository.findByUserProfileIdAndGroupId(id, groupId);
+            if (membership != null) {
+                userProfileDto.setGroupId(membership.getGroupId());
+                userProfileDto.setScore(membership.getScore());
+            }
+        }
 
         log.info("Get profile by id finished");
         return userProfileDto;

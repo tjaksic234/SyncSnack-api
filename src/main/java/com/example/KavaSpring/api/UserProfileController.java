@@ -50,7 +50,7 @@ public class UserProfileController {
 
     @GetMapping("{id}")
     public ResponseEntity<UserProfileDto> getProfileById (
-            @RequestHeader("groupId") String groupId,
+            @RequestHeader(value = "groupId", required = false) String groupId,
             @PathVariable("id") String id
     ) {
         try {
