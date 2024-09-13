@@ -11,7 +11,7 @@ public interface ConverterService {
     GroupMemberResponse convertToGroupMemberResponse(GroupMemberDto dto);
     GroupMembershipDto convertToGroupMembershipDto(GroupMembership membership);
     EventDto convertToEventDto(Event event);
-    EventResponse convertToEventResponse(EventRequest request);
+    EventResponse convertToEventResponse(Event event);
     EventExpandedResponse convertToEventExpandedResponse(Event event);
     EventNotification convertEventToEventNotification(Event event);
     OrderDto convertToOrderDto(Order order);

@@ -93,12 +93,12 @@ public class ConverterServiceImpl implements ConverterService {
     }
 
     @Override
-    public EventResponse convertToEventResponse(EventRequest request) {
+    public EventResponse convertToEventResponse(Event event) {
         EventResponse response = new EventResponse();
-        response.setTitle(request.getTitle());
-        response.setDescription(request.getDescription());
-        response.setEventType(request.getEventType());
-        response.setPendingTime(request.getPendingTime());
+        response.setEventId(event.getId());
+        response.setTitle(event.getTitle());
+        response.setDescription(event.getDescription());
+        response.setEventType(event.getEventType());
         return response;
     }
 

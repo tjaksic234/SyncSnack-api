@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EventRequest {
-
     @NotBlank
     @Size(max = 120)
     private String title;
