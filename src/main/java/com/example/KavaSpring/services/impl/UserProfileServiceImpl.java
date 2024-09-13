@@ -235,12 +235,14 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
-    public List<UserProfileStats> getUserProfileOrderStats() {
-        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+    public List<UserProfileStats> getUserProfileOrderStats(String groupId) {
         List<UserProfileStats> stats = new ArrayList<>();
 
+        Criteria criteria = Criteria.where("userProfileId").is(Helper.getLoggedInUserProfileId());
+        criteria.and("groupId").is(groupId);
+
         //* Aggregation for fetching the order count based on the status of the order
-        MatchOperation matchByUserProfileId = Aggregation.match(Criteria.where("userProfileId").is(userProfile.getId()));
+        MatchOperation matchByUserProfileId = Aggregation.match(criteria);
 
         GroupOperation groupByStatus = Aggregation.group("status").count().as("count");
 
@@ -292,10 +294,11 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
-    public List<UserProfileStats> getUserProfileEventStats() {
-        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
+    public List<UserProfileStats> getUserProfileEventStats(String groupId) {
+        Criteria criteria = Criteria.where("userProfileId").is(Helper.getLoggedInUserProfileId());
+        criteria.and("groupId").is(groupId);
 
-        MatchOperation matchOperation = Aggregation.match(Criteria.where("userProfileId").is(userProfile.getId()));
+        MatchOperation matchOperation = Aggregation.match(criteria);
         GroupOperation groupOperation = Aggregation.group("status", "eventType").count().as("count");
         ProjectionOperation projectionOperation = Aggregation.project()
                 .and("$_id.status").as("eventStatus")
@@ -318,10 +321,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
-    public List<MonthlyStatsDto> fetchMonthlyStats(String collection) {
-        UserProfile userProfile = userProfileRepository.getUserProfileByUserId(Helper.getLoggedInUserId());
-        String userProfileId = userProfile.getId();
-
+    public List<MonthlyStatsDto> fetchMonthlyStats(String groupId, String collection) {
         LocalDateTime currentDate = LocalDateTime.now();
         LocalDateTime maxTime = currentDate.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).minusMinutes(1).withNano(0);
         LocalDateTime minTime = currentDate.minusYears(1).withHour(0).withMinute(0).withSecond(0).withDayOfMonth(1).withNano(0);
@@ -330,7 +330,8 @@ public class UserProfileServiceImpl implements UserProfileService {
         log.info("minTime: {}", minTime);
 
         Criteria criteria = new Criteria().andOperator(
-                Criteria.where("userProfileId").is(userProfileId),
+                Criteria.where("groupId").is(groupId),
+                Criteria.where("userProfileId").is(Helper.getLoggedInUserProfileId()),
                 Criteria.where("createdAt").gte(minTime).lt(maxTime)
         );
 

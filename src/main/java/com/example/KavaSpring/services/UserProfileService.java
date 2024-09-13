@@ -13,7 +13,7 @@ public interface UserProfileService {
     UserProfileEditResponse editUserProfile(String firstName, String lastName, MultipartFile photoFile);
     void updateProfileScores(String groupId);
     void updateFcmToken(String token);
-    List<UserProfileStats> getUserProfileOrderStats();
-    List<UserProfileStats> getUserProfileEventStats();
-    List<MonthlyStatsDto> fetchMonthlyStats(String collection);
+    List<UserProfileStats> getUserProfileOrderStats(String groupId);
+    List<UserProfileStats> getUserProfileEventStats(String groupId);
+    List<MonthlyStatsDto> fetchMonthlyStats(String groupId, String collection);
 }

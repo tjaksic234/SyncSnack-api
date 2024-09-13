@@ -123,10 +123,10 @@ public class UserProfileController {
     }
 
     @GetMapping("orders/stats")
-    public ResponseEntity<List<UserProfileStats>> getUserProfileOrderStats() {
+    public ResponseEntity<List<UserProfileStats>> getUserProfileOrderStats(@RequestHeader(value = "groupId") String groupId) {
         try {
             log.info("Fetching order stats for the user");
-            return ResponseEntity.ok(userProfileService.getUserProfileOrderStats());
+            return ResponseEntity.ok(userProfileService.getUserProfileOrderStats(groupId));
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
@@ -134,10 +134,10 @@ public class UserProfileController {
     }
 
     @GetMapping("events/stats")
-    public ResponseEntity<List<UserProfileStats>> getUserProfileEventStats() {
+    public ResponseEntity<List<UserProfileStats>> getUserProfileEventStats(@RequestHeader(value = "groupId") String groupId) {
         try {
             log.info("Fetching event stats for the user");
-            return ResponseEntity.ok(userProfileService.getUserProfileEventStats());
+            return ResponseEntity.ok(userProfileService.getUserProfileEventStats(groupId));
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
@@ -146,10 +146,13 @@ public class UserProfileController {
 
 
     @GetMapping("monthly-summary/{collection}")
-    public ResponseEntity<List<MonthlyStatsDto>> getMonthlyOrderStats(@PathVariable String collection) {
+    public ResponseEntity<List<MonthlyStatsDto>> getMonthlyOrderStats(
+            @RequestHeader(value = "groupId") String groupId,
+            @PathVariable String collection
+    ) {
         try {
             log.info("Fetching monthly stats");
-            return ResponseEntity.ok(userProfileService.fetchMonthlyStats(collection));
+            return ResponseEntity.ok(userProfileService.fetchMonthlyStats(groupId, collection));
         } catch (Exception e) {
             log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
