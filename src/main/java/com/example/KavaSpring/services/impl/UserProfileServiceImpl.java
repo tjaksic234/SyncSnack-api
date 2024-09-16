@@ -239,7 +239,10 @@ public class UserProfileServiceImpl implements UserProfileService {
         List<UserProfileStats> stats = new ArrayList<>();
 
         Criteria criteria = Criteria.where("userProfileId").is(Helper.getLoggedInUserProfileId());
-        criteria.and("groupId").is(groupId);
+
+        if (groupId != null && !groupId.isEmpty()) {
+            criteria.and("groupId").is(groupId);
+        }
 
         //* Aggregation for fetching the order count based on the status of the order
         MatchOperation matchByUserProfileId = Aggregation.match(criteria);
@@ -296,7 +299,9 @@ public class UserProfileServiceImpl implements UserProfileService {
     @Override
     public List<UserProfileStats> getUserProfileEventStats(String groupId) {
         Criteria criteria = Criteria.where("userProfileId").is(Helper.getLoggedInUserProfileId());
-        criteria.and("groupId").is(groupId);
+        if (groupId != null && !groupId.isEmpty()) {
+            criteria.and("groupId").is(groupId);
+        }
 
         MatchOperation matchOperation = Aggregation.match(criteria);
         GroupOperation groupOperation = Aggregation.group("status", "eventType").count().as("count");
@@ -329,11 +334,12 @@ public class UserProfileServiceImpl implements UserProfileService {
         log.info("maxTime: {}", maxTime);
         log.info("minTime: {}", minTime);
 
-        Criteria criteria = new Criteria().andOperator(
-                Criteria.where("groupId").is(groupId),
-                Criteria.where("userProfileId").is(Helper.getLoggedInUserProfileId()),
-                Criteria.where("createdAt").gte(minTime).lt(maxTime)
-        );
+        Criteria criteria = new Criteria();
+        if (groupId != null && !groupId.isEmpty()) {
+            criteria.and("groupId").is(groupId);
+        }
+        criteria.and("userProfileId").is(Helper.getLoggedInUserProfileId());
+        criteria.and("createdAt").gte(minTime).lt(maxTime);
 
         MatchOperation matchOperation = Aggregation.match(criteria);
 

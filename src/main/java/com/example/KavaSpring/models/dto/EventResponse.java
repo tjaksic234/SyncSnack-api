@@ -13,9 +13,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EventResponse {
     @NotBlank
-    private String eventId;
-
-    @NotBlank
     @Size(max = 120)
     private String title;
 
@@ -26,6 +23,6 @@ public class EventResponse {
     @NotBlank
     private EventType eventType;
 
-   /* @NotNull
-    private int pendingTime;*/
+    @NotNull
+    private int pendingTime;
 }

@@ -28,7 +28,7 @@ public class RateLimiterServiceImpl implements RateLimiterService {
     public Bucket newBucket(String key) {
         Bandwidth bandwidth = Bandwidth.builder()
                 .capacity(5)
-                .refillGreedy(3, Duration.ofMinutes(5))
+                .refillGreedy(5, Duration.ofMinutes(5))
                 .build();
         return Bucket.builder()
                 .addLimit(bandwidth)

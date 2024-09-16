@@ -123,7 +123,9 @@ public class UserProfileController {
     }
 
     @GetMapping("orders/stats")
-    public ResponseEntity<List<UserProfileStats>> getUserProfileOrderStats(@RequestHeader(value = "groupId") String groupId) {
+    public ResponseEntity<List<UserProfileStats>> getUserProfileOrderStats(
+            @RequestHeader(value = "groupId", required = false) String groupId
+    ) {
         try {
             log.info("Fetching order stats for the user");
             return ResponseEntity.ok(userProfileService.getUserProfileOrderStats(groupId));
@@ -134,7 +136,9 @@ public class UserProfileController {
     }
 
     @GetMapping("events/stats")
-    public ResponseEntity<List<UserProfileStats>> getUserProfileEventStats(@RequestHeader(value = "groupId") String groupId) {
+    public ResponseEntity<List<UserProfileStats>> getUserProfileEventStats(
+            @RequestHeader(value = "groupId", required = false) String groupId
+    ) {
         try {
             log.info("Fetching event stats for the user");
             return ResponseEntity.ok(userProfileService.getUserProfileEventStats(groupId));
@@ -147,7 +151,7 @@ public class UserProfileController {
 
     @GetMapping("monthly-summary/{collection}")
     public ResponseEntity<List<MonthlyStatsDto>> getMonthlyOrderStats(
-            @RequestHeader(value = "groupId") String groupId,
+            @RequestHeader(value = "groupId", required = false) String groupId,
             @PathVariable String collection
     ) {
         try {

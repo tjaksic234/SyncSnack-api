@@ -92,7 +92,7 @@ public class EventServiceImpl implements EventService {
         }
 
         log.info("Event created");
-        return converterService.convertToEventResponse(event);
+        return converterService.convertToEventResponse(request);
     }
 
     @Override
