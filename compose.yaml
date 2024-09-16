@@ -3,5 +3,48 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: SyncSnack-api
     ports:
-      - "8080:8080"
+      - 8080:8080
+    networks:
+      - app-network
+    depends_on:
+      - redis
+    environment:
+      - SPRING_APPLICATION_NAME=${SPRING_APPLICATION_NAME}
+      - SPRING_MONGODB_URI=${SPRING_MONGODB_URI}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - SENDGRID_EMAIL_FROM=${SENDGRID_EMAIL_FROM}
+      - FRONTEND_URL_DEV=${FRONTEND_URL_DEV}
+      - FRONTEND_URL_PROD=${FRONTEND_URL_PROD}
+      - BACKEND_URL_DEV=${BACKEND_URL_DEV}
+      - BACKEND_URL_PROD=${BACKEND_URL_PROD}
+      - JWT_COOKIE_NAME=${JWT_COOKIE_NAME}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRATION_MS=${JWT_EXPIRATION_MS}
+      - SWAGGER_UI_PATH=${SWAGGER_UI_PATH}
+      - S3_ACCESS_KEY=${S3_ACCESS_KEY}
+      - S3_SECRET_KEY=${S3_SECRET_KEY}
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - 6379:6379
+    networks:
+      - app-network
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: redisinsight
+    ports:
+      - 5540:5540
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

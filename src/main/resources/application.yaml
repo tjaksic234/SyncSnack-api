@@ -7,6 +7,9 @@ spring:
     mongodb:
       uri: ${SPRING_MONGODB_URI}
       auto-index-creation: true
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
   sendgrid:
     api-key: ${SENDGRID_API_KEY}
     email-from: ${SENDGRID_EMAIL_FROM}
