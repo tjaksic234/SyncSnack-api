@@ -6,10 +6,6 @@ services:
     container_name: SyncSnack-api
     ports:
       - 8080:8080
-    networks:
-      - app-network
-    depends_on:
-      - redis
     environment:
       - SPRING_APPLICATION_NAME=${SPRING_APPLICATION_NAME}
       - SPRING_MONGODB_URI=${SPRING_MONGODB_URI}
@@ -28,23 +24,11 @@ services:
       - S3_BUCKET_NAME=${S3_BUCKET_NAME}
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
-
-  redis:
-    image: redis:latest
-    container_name: redis
-    ports:
-      - 6379:6379
-    networks:
-      - app-network
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
 
   redis-insight:
     image: redis/redisinsight:latest
     container_name: redisinsight
     ports:
       - 5540:5540
-    networks:
-      - app-network
 
-networks:
-  app-network:
-    driver: bridge

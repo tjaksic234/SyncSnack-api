@@ -10,6 +10,7 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
   sendgrid:
     api-key: ${SENDGRID_API_KEY}
     email-from: ${SENDGRID_EMAIL_FROM}

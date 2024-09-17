@@ -8,7 +8,7 @@ import com.example.KavaSpring.models.enums.SortCondition;
 import com.example.KavaSpring.security.services.AuthService;
 import com.example.KavaSpring.security.utils.Helper;
 import com.example.KavaSpring.services.GroupService;
-import com.example.KavaSpring.services.RateLimiterService;
+import com.example.KavaSpring.services.RateLimitService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -31,7 +31,7 @@ public class GroupController {
 
     private final AuthService authService;
 
-    private final RateLimiterService rateLimiterService;
+    private final RateLimitService rateLimitService;
 
     @PostMapping("create")
     public ResponseEntity<GroupResponse> createGroup(@RequestBody GroupRequest request) {
@@ -207,7 +207,7 @@ public class GroupController {
 
     @PostMapping("sendInvitation")
     public ResponseEntity<String> generateInvitation(@RequestHeader String groupId, @RequestParam String invitedBy) {
-        if (!rateLimiterService.allowRequest(Helper.getLoggedInUserProfileId() + ":" + groupId)) return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
+        if (!rateLimitService.tryAcquire(Helper.getLoggedInUserProfileId() + ":" + groupId)) return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
         try {
             log.info("Generating group invitation");
             return ResponseEntity.ok(groupService.generateInvitation(groupId, invitedBy));
