@@ -31,4 +31,3 @@ services:
     container_name: redisinsight
     ports:
       - 5540:5540
-
