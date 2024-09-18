@@ -207,7 +207,7 @@ public class GroupController {
 
     @PostMapping("sendInvitation")
     public ResponseEntity<String> generateInvitation(@RequestHeader String groupId, @RequestParam String invitedBy) {
-        if (!rateLimitService.tryAcquire(Helper.getLoggedInUserProfileId() + ":" + groupId)) return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
+        if (!rateLimitService.allowRequest(Helper.getLoggedInUserProfileId() + ":" + groupId)) return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
         try {
             log.info("Generating group invitation");
             return ResponseEntity.ok(groupService.generateInvitation(groupId, invitedBy));

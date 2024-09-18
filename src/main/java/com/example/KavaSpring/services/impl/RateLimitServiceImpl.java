@@ -20,11 +20,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @AllArgsConstructor
 public class RateLimitServiceImpl implements RateLimitService {
 
-    private final RedissonClient redissonClient;
+    //private final RedissonClient redissonClient;
 
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
 
-    @Override
+   /* @Override
     public boolean tryAcquire(String key) {
         RRateLimiter rateLimiter = redissonClient.getRateLimiter(key);
         rateLimiter.trySetRate(RateType.PER_CLIENT, 5, 5, RateIntervalUnit.MINUTES);
@@ -32,7 +32,7 @@ public class RateLimitServiceImpl implements RateLimitService {
         log.warn("Rate limit check for user {}: {}. Available permits: {}",
                 key, acquired ? "allowed" : "blocked", rateLimiter.availablePermits());
         return acquired;
-    }
+    }*/
 
     //* this code is for rate limiting at the application level in case
     //* something goes wrong with the redis server implementation

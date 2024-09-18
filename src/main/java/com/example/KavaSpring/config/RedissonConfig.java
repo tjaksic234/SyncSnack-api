@@ -19,7 +19,7 @@ public class RedissonConfig {
     @Value("${spring.data.redis.password}")
     private String password;
 
-    @Bean
+   /* @Bean
     public RedissonClient redissonClientConfig() {
         Config config = new Config();
         String address = String.format("redis://%s:%d", host, port);
@@ -27,5 +27,5 @@ public class RedissonConfig {
                 .setAddress(address)
                 .setPassword(password);
         return Redisson.create(config);
-    }
+    }*/
 }
