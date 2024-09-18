@@ -59,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final GroupRepository groupRepository;
 
-    @Value("${backend.url.dev}")
+    @Value("${backend.url.prod}")
     private String BACKEND_URL;
 
     @Value("${frontend.url.dev}")
