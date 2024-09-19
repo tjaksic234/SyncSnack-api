@@ -15,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -51,9 +52,9 @@ public class AuthenticationController {
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, cookie.toString())
                     .body(response);
-        } catch (UnauthorizedException e) {
+        } catch (UnauthorizedException | BadCredentialsException e) {
             log.error(String.format("Exception on user authentication: %s", e.getMessage()));
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (UnverifiedUserException e) {
             log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -61,7 +62,6 @@ public class AuthenticationController {
             log.error(e.getMessage());
             return ResponseEntity.notFound().build();
         }
-
     }
 
     @GetMapping("fetchMe")

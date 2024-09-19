@@ -117,10 +117,8 @@ public class AuthServiceImpl implements AuthService {
                 request.getPassword()
         ));
 
-        log.info("Authentication object: {}", authentication);
-
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
 
         log.info("User from from user repo: {}", user);
 
