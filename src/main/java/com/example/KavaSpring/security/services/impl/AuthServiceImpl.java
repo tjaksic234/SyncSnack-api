@@ -62,7 +62,7 @@ public class AuthServiceImpl implements AuthService {
     @Value("${backend.url.prod}")
     private String BACKEND_URL;
 
-    @Value("${frontend.url.dev}")
+    @Value("${frontend.url.prod}")
     private String FRONTEND_URL;
 
     @Value("${spring.sendgrid.email-from}")
@@ -112,6 +112,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponse login(LoginRequest request) {
+
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 request.getEmail(),
                 request.getPassword()
@@ -166,7 +167,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void sendVerificationEmail(User user) {
-
         String verificationCode = Helper.generateRandomString();
         VerificationInvitation invitation = new VerificationInvitation();
         invitation.setVerificationCode(verificationCode);
@@ -181,8 +181,8 @@ public class AuthServiceImpl implements AuthService {
         URL companyLogoUrl = amazonS3Service.generatePresignedUrl("profilePhotos/syncsnack.png");
 
         //? sending the email
-        sendGridEmailService.sendHtml(EMAIL_FROM, user.getEmail(), "Verification email", EmailTemplates.confirmationEmail(user.getEmail(), verificationUrl, companyLogoUrl));
-
+        sendGridEmailService.sendHtml(EMAIL_FROM, user.getEmail(), "Verification email",
+                EmailTemplates.confirmationEmail(user.getEmail(), verificationUrl, companyLogoUrl));
     }
 
     @Override
