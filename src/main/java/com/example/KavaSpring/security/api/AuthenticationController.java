@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("api/auth")
 public class AuthenticationController {
 
-    @Value("${frontend.url.dev}")
+    @Value("${frontend.url.prod}")
     private String FRONTEND_URL;
 
     private final AuthService authService;
