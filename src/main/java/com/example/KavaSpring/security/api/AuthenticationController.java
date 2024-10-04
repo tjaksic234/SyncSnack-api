@@ -131,5 +131,4 @@ public class AuthenticationController {
             return ResponseEntity.notFound().build();
         }
     }
-
 }
