@@ -52,7 +52,6 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     private final GroupRepository groupRepository;
 
-
     @Override
     public UserProfileResponse createUserProfile(UserProfileRequest request, MultipartFile photoFile) {
         User user = userRepository.findById(request.getUserId())

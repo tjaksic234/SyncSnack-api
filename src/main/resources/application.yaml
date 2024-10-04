@@ -3,6 +3,8 @@ spring:
     name: ${SPRING_APPLICATION_NAME}
   config:
     import: optional:file:.env[.properties]
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE}
   data:
     mongodb:
       uri: ${SPRING_MONGODB_URI}
@@ -14,14 +16,6 @@ spring:
   sendgrid:
     api-key: ${SENDGRID_API_KEY}
     email-from: ${SENDGRID_EMAIL_FROM}
-frontend:
-  url:
-    dev: ${FRONTEND_URL_DEV}
-    prod: ${FRONTEND_URL_PROD}
-backend:
-  url:
-    dev: ${BACKEND_URL_DEV}
-    prod: ${BACKEND_URL_PROD}
 jwt:
   cookie-name: ${JWT_COOKIE_NAME}
   secret: ${JWT_SECRET}
@@ -35,3 +29,24 @@ aws:
     bucket-name: ${S3_BUCKET_NAME}
 fcm:
   firebase-configuration-file: "firebase-adminsdk.json"
+---
+# Development properties
+spring:
+  config:
+    activate:
+      on-profile: dev
+  frontend:
+    url: ${FRONTEND_URL_DEV}
+  backend:
+    url: ${BACKEND_URL_DEV}
+
+---
+# Production properties
+spring:
+  config:
+    activate:
+      on-profile: prod
+  frontend:
+    url: ${FRONTEND_URL_PROD}
+  backend:
+    url: ${BACKEND_URL_PROD}

@@ -36,7 +36,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class GroupServiceImpl implements GroupService {
 
-    @Value("${frontend.url.dev}")
+    @Value("${spring.frontend.url}")
     private final String FRONTEND_URL;
 
     private final GroupRepository groupRepository;

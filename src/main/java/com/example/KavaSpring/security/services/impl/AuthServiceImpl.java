@@ -59,10 +59,10 @@ public class AuthServiceImpl implements AuthService {
 
     private final GroupRepository groupRepository;
 
-    @Value("${backend.url.prod}")
+    @Value("${spring.backend.url}")
     private String BACKEND_URL;
 
-    @Value("${frontend.url.prod}")
+    @Value("${spring.frontend.url}")
     private String FRONTEND_URL;
 
     @Value("${spring.sendgrid.email-from}")
