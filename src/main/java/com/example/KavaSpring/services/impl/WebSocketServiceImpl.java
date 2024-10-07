@@ -49,7 +49,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         notificationRepository.save(converterService.convertOrderNotificationToNotification(orderNotification, recipientUserProfileId));
 
         log.info("Notifying the event creator");
-        messagingTemplate.convertAndSend("/topic/orders/" + recipientUserProfileId,
+        messagingTemplate.convertAndSend("/topic/orders." + recipientUserProfileId,
                 orderNotification);
     }
 
