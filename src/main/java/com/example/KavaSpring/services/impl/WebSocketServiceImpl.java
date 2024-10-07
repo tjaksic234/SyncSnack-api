@@ -65,7 +65,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         log.info("Notifying {} members of the group with a new event", memberships.size());
         for (GroupMembership membership : memberships) {
             String userProfileId = membership.getUserProfileId();
-            messagingTemplate.convertAndSend("/topic/users/" + userProfileId, eventNotification);
+            messagingTemplate.convertAndSend("/topic/users." + userProfileId, eventNotification);
         }
     }
 }

@@ -1,0 +1,13 @@
+services:
+  rabbitmq:
+    container_name: 'rabbitMQ'
+    build:
+      context: .
+      dockerfile: Dockerfile.rabbitmq
+    environment:
+      - 'RABBITMQ_DEFAULT_PASS=secret'
+      - 'RABBITMQ_DEFAULT_USER=root'
+    ports:
+      - 5672:5672
+      - 15672:15672
+      - 61613:61613
