@@ -18,7 +18,6 @@ import org.springframework.context.annotation.Configuration;
         scheme = "bearer"
 )
 public class OpenAPIConfig {
-
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
