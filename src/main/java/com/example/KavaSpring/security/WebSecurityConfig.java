@@ -49,6 +49,8 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/.well-known/**").permitAll() //? for mobile functionality
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("v3/**").permitAll()
                         .requestMatchers("api/profiles/create").permitAll()
                         .requestMatchers("api/orders/create").permitAll()
                         .requestMatchers("api/events/create").permitAll()
@@ -59,7 +61,6 @@ public class WebSecurityConfig {
                         .requestMatchers("api/groups/joinViaInvitation/{code}").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/ws").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").authenticated()
                         .anyRequest().authenticated());
         http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
