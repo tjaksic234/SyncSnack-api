@@ -20,11 +20,13 @@ import com.example.KavaSpring.services.OrderService;
 import com.example.KavaSpring.services.WebSocketService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.Document;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -130,10 +132,9 @@ public class OrderServiceImpl implements OrderService {
         }
 
         if (search != null && !search.isEmpty()) {
-            criteria.and("additionalOptions.description").regex(search, "i");
+            TextCriteria textCriteria = TextCriteria.forDefaultLanguage().matching(search);
+            operations.add(Aggregation.match(textCriteria));
         }
-
-
 
         MatchOperation matchOperation = Aggregation.match(criteria);
 
