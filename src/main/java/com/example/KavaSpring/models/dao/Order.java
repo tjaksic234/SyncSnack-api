@@ -37,7 +37,6 @@ public class Order {
     @NotBlank
     private String groupId;
 
-    @TextIndexed
     private HashMap<String, Object> additionalOptions = new HashMap<>() {{
         put("description", "");
     }};

@@ -14,6 +14,7 @@ import com.example.KavaSpring.repository.EventRepository;
 import com.example.KavaSpring.repository.GroupRepository;
 import com.example.KavaSpring.repository.OrderRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
+import com.example.KavaSpring.security.utils.AtlasSearchOperation;
 import com.example.KavaSpring.security.utils.Helper;
 import com.example.KavaSpring.services.FirebaseMessagingService;
 import com.example.KavaSpring.services.OrderService;
@@ -25,7 +26,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -131,8 +131,11 @@ public class OrderServiceImpl implements OrderService {
         }
 
         if (search != null && !search.isEmpty()) {
-            TextCriteria textCriteria = TextCriteria.forDefaultLanguage().matching(search);
-            operations.add(Aggregation.match(textCriteria));
+            //? this is my previous solution where I used a text index but decided
+            //? to switch to atlas search since it has partial matching capabilities
+            /*TextCriteria textCriteria = TextCriteria.forDefaultLanguage().matchingAny(search);
+            operations.add(Aggregation.match(textCriteria));*/
+            operations.add(new AtlasSearchOperation(search));
         }
 
         MatchOperation matchOperation = Aggregation.match(criteria);
