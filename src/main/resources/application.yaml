@@ -16,6 +16,10 @@ spring:
   sendgrid:
     api-key: ${SENDGRID_API_KEY}
     email-from: ${SENDGRID_EMAIL_FROM}
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 jwt:
   cookie-name: ${JWT_COOKIE_NAME}
   secret: ${JWT_SECRET}
