@@ -18,7 +18,7 @@ spring:
     email-from: ${SENDGRID_EMAIL_FROM}
   servlet:
     multipart:
-      max-file-size: 10MB
+      max-file-size: 5MB
       max-request-size: 10MB
 jwt:
   cookie-name: ${JWT_COOKIE_NAME}
