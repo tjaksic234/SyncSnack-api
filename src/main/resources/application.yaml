@@ -16,6 +16,11 @@ spring:
   sendgrid:
     api-key: ${SENDGRID_API_KEY}
     email-from: ${SENDGRID_EMAIL_FROM}
+  rabbitmq:
+    password: ${RABBITMQ_PASSWORD}
+    username: ${RABBITMQ_USER}
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
   servlet:
     multipart:
       max-file-size: 5MB
