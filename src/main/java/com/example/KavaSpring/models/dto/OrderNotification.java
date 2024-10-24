@@ -16,6 +16,7 @@ public class OrderNotification {
     private String firstName;
     private String lastName;
     private String eventId;
+    private String groupId;
     private HashMap<String, Object> additionalOptions;
     private LocalDateTime createdAt;
     private String profilePhoto;

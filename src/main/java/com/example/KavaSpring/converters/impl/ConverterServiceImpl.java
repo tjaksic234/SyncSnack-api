@@ -203,6 +203,7 @@ public class ConverterServiceImpl implements ConverterService {
         notification.setOrderId(order.getId());
         notification.setUserProfileId(order.getUserProfileId());
         notification.setEventId(order.getEventId());
+        notification.setGroupId(order.getGroupId());
         notification.setAdditionalOptions(order.getAdditionalOptions());
         notification.setCreatedAt(order.getCreatedAt());
         return notification;

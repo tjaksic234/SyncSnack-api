@@ -1,18 +1,19 @@
 package com.example.KavaSpring.services.impl;
 
 import com.example.KavaSpring.converters.ConverterService;
+import com.example.KavaSpring.exceptions.NoGroupFoundException;
 import com.example.KavaSpring.exceptions.NotFoundException;
-import com.example.KavaSpring.models.dao.Event;
-import com.example.KavaSpring.models.dao.GroupMembership;
-import com.example.KavaSpring.models.dao.Order;
-import com.example.KavaSpring.models.dao.UserProfile;
+import com.example.KavaSpring.models.dao.*;
 import com.example.KavaSpring.models.dto.MobileNotification;
 import com.example.KavaSpring.models.dto.OrderNotification;
 import com.example.KavaSpring.repository.EventRepository;
 import com.example.KavaSpring.repository.GroupMembershipRepository;
+import com.example.KavaSpring.repository.GroupRepository;
 import com.example.KavaSpring.repository.UserProfileRepository;
+import com.example.KavaSpring.security.utils.FirebaseMessageTemplates;
 import com.example.KavaSpring.services.FirebaseMessagingService;
 import com.google.firebase.messaging.*;
+import com.google.firebase.messaging.Notification;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,8 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
     private final ConverterService converterService;
 
     private final GroupMembershipRepository groupMembershipRepository;
+
+    private final GroupRepository groupRepository;
 
     @Override
     public String sendNotification(MobileNotification mobileNotification, String token) throws FirebaseMessagingException {
@@ -97,23 +100,15 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
             return;
         }
 
+        Group group = groupRepository.findById(order.getGroupId())
+                .orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
+
         //? Convert the order into an order notification
         OrderNotification orderNotification = converterService.convertOrderToOrderNotification(order);
 
         //? Setting the notification display order
-        String title = "New order placed";
-
-        StringBuilder contentBuilder = new StringBuilder();
-        contentBuilder.append(orderNotification.getFirstName())
-                .append(" ")
-                .append(orderNotification.getLastName())
-                .append(" wants to order: ");
-
-        orderNotification.getAdditionalOptions().forEach((key, value) ->
-                contentBuilder.append(key).append(": ").append(value).append(", ")
-        );
-        contentBuilder.setLength(contentBuilder.length() - 2);
-        String content = contentBuilder.toString();
+        String title = FirebaseMessageTemplates.NEW_ORDER_TITLE;
+        String content = FirebaseMessageTemplates.buildNewOrderContent(orderNotification, group.getName());
 
         Map<String, String> data = new HashMap<>();
         data.put("eventId", orderNotification.getEventId());
@@ -134,6 +129,9 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
     public void notifyGroupOfNewEvent(Event event) throws FirebaseMessagingException {
         List<GroupMembership> groupMembershipList = groupMembershipRepository.findAllByGroupId(event.getGroupId());
 
+        Group group = groupRepository.findById(event.getGroupId())
+                .orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
+
         List<String> groupMemberIds = groupMembershipList.stream()
                 .map(GroupMembership::getUserProfileId)
                 .toList();
@@ -144,13 +142,8 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        String title = "New event created for your group";
-        String content = "New Event: " + event.getTitle() + "\n\n" +
-                "Type: " + event.getEventType() + "\n" +
-                "Description: " +
-                event.getDescription() +
-                "\n" +
-                "Pending until: " + event.getPendingUntil();
+        String title = FirebaseMessageTemplates.NEW_EVENT_TITLE;
+        String content = FirebaseMessageTemplates.buildNewEventContent(event, group.getName());
 
         Map<String, String> data = new HashMap<>();
         data.put("eventId", event.getId());
