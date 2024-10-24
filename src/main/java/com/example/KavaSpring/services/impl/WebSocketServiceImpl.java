@@ -60,7 +60,10 @@ public class WebSocketServiceImpl implements WebSocketService {
         //? saving the notification to the database
         notificationRepository.save(converterService.convertEventNotificationToNotification(eventNotification));
 
-        List<GroupMembership> memberships = groupMembershipRepository.findAllByGroupId(event.getGroupId());
+        List<GroupMembership> memberships = groupMembershipRepository.findAllByGroupId(event.getGroupId())
+                .stream()
+                .filter(membership -> !membership.getUserProfileId().equals(event.getUserProfileId()))
+                .toList();
 
         log.info("Notifying {} members of the group with a new event", memberships.size());
         for (GroupMembership membership : memberships) {
