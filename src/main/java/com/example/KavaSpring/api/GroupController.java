@@ -230,4 +230,16 @@ public class GroupController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @DeleteMapping("leaveGroup")
+    public ResponseEntity<Void> leaveGroup(@RequestHeader String groupId) {
+        try {
+            log.info("Leaving group");
+            groupService.leaveGroup(groupId);
+            return ResponseEntity.ok().build();
+        } catch (NoGroupFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

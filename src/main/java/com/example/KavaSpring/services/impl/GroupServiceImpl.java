@@ -505,4 +505,15 @@ public class GroupServiceImpl implements GroupService {
 
         return converterService.convertToGroupDto(group);
     }
+
+    @Override
+    public void leaveGroup(String groupId) {
+        groupRepository.findById(groupId).orElseThrow(() -> new NoGroupFoundException("No group associated with the groupId"));
+
+        GroupMembership membership = groupMembershipRepository.findByUserProfileIdAndGroupId(Helper.getLoggedInUserProfileId(), groupId);
+
+        groupMembershipRepository.delete(membership);
+
+        log.info("Successfully left the group");
+    }
 }
