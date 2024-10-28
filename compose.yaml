@@ -26,9 +26,3 @@ services:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
-
-  redis-insight:
-    image: redis/redisinsight:latest
-    container_name: redisinsight
-    ports:
-      - 5540:5540

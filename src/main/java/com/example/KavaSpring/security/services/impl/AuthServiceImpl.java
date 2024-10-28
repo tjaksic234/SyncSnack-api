@@ -1,5 +1,6 @@
 package com.example.KavaSpring.security.services.impl;
 
+import com.example.KavaSpring.converters.ConverterService;
 import com.example.KavaSpring.exceptions.*;
 import com.example.KavaSpring.models.dao.*;
 import com.example.KavaSpring.models.dto.GroupMembershipDto;
@@ -59,6 +60,8 @@ public class AuthServiceImpl implements AuthService {
 
     private final GroupRepository groupRepository;
 
+    private final ConverterService converterService;
+
     @Value("${spring.backend.url}")
     private String BACKEND_URL;
 
@@ -82,7 +85,7 @@ public class AuthServiceImpl implements AuthService {
             userDto.setUserProfileId(userProfile.getId());
             userDto.setFirstName(userProfile.getFirstName());
             userDto.setLastName(userProfile.getLastName());
-            userDto.setProfileUri(userProfile.getPhotoUri());
+            userDto.setProfileUri(converterService.convertPhotoUriToUrl(userProfile.getPhotoUri()));
             userDto.setVerified(true);
             userDto.setEmail(((UserDetailsImpl) authentication.getPrincipal()).getEmail());
 
