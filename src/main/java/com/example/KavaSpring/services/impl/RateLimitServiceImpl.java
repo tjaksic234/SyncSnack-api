@@ -34,8 +34,8 @@ public class RateLimitServiceImpl implements RateLimitService {
         return acquired;
     }*/
 
-    //* this code is for rate limiting at the application level in case
-    //* something goes wrong with the redis server implementation
+    //* this code is for rate limiting at the application level
+    //* in case something goes wrong with the redis server implementation
     //? this serves as a backup
     @Override
     public boolean allowRequest(String key) {
@@ -46,8 +46,8 @@ public class RateLimitServiceImpl implements RateLimitService {
     @Override
     public Bucket newBucket(String key) {
         Bandwidth bandwidth = Bandwidth.builder()
-                .capacity(5)
-                .refillGreedy(5, Duration.ofMinutes(5))
+                .capacity(3)
+                .refillGreedy(3, Duration.ofMinutes(5))
                 .build();
         return Bucket.builder()
                 .addLimit(bandwidth)
