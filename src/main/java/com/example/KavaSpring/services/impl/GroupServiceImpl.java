@@ -55,10 +55,17 @@ public class GroupServiceImpl implements GroupService {
 
     private final GroupInvitationRepository groupInvitationRepository;
 
+    private final UserProfileRepository userProfileRepository;
+
 
     @Override
     public GroupResponse createGroup(GroupRequest request) {
          Optional<Group> groupOptional = groupRepository.findByName(request.getName());
+
+         //? this is the current solution for preventing the creation
+         //? of group memberships with the missing userProfileId
+         UserProfile userProfile = userProfileRepository.findByUserId(Helper.getLoggedInUserId())
+                 .orElseThrow(() -> new NotFoundException("No userProfile present for the user id"));
 
          if(groupOptional.isPresent()) {
              String existingGroupName = groupOptional.get().getName().toLowerCase();
@@ -76,7 +83,7 @@ public class GroupServiceImpl implements GroupService {
         //? Saving the relation of the profile and group
         GroupMembership groupMembership = new GroupMembership();
         groupMembership.setGroupId(group.getId());
-        groupMembership.setUserProfileId(Helper.getLoggedInUserProfileId());
+        groupMembership.setUserProfileId(userProfile.getId());
         groupMembership.setRoles(new ArrayList<>(List.of(Role.PRESIDENT)));
         groupMembershipRepository.save(groupMembership);
 

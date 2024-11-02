@@ -27,6 +27,7 @@ public class Helper {
     public static String getLoggedInUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() != null && authentication.getPrincipal() instanceof UserDetailsImpl) {
+
             return ((UserDetailsImpl) authentication.getPrincipal()).getId();
         }
         return null;
@@ -35,8 +36,16 @@ public class Helper {
     public static String getLoggedInUserProfileId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() != null && authentication.getPrincipal() instanceof UserDetailsImpl) {
-            return (((UserDetailsImpl) authentication.getPrincipal()).getUserProfileId());
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            String userProfileId = userDetails.getUserProfileId();
+            if (userProfileId == null) {
+                log.error("UserProfileId is null for user with ID: {}", userDetails.getId());
+            }
+            return userProfileId;
         }
+        log.error("Authentication check failed: auth={}, principal={}",
+                authentication != null ? "present" : "null",
+                authentication != null && authentication.getPrincipal() != null ? "present" : "null");
         return null;
     }
 
