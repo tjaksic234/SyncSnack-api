@@ -491,6 +491,8 @@ public class GroupServiceImpl implements GroupService {
                 .orElseThrow(() -> new NotFoundException("Group invitation not found"));
 
         if (invitation.getExpiresAt().isBefore(LocalDateTime.now())) {
+            invitation.setActive(false);
+            groupInvitationRepository.save(invitation);
             throw new ExpiredInvitationException("This invitation has expired");
         }
 
@@ -507,8 +509,8 @@ public class GroupServiceImpl implements GroupService {
         membership.setGroupId(groupId);
         groupMembershipRepository.save(membership);
 
-        invitation.setActive(false);
-        groupInvitationRepository.save(invitation);
+        //invitation.setActive(false);
+        //groupInvitationRepository.save(invitation);
 
         return converterService.convertToGroupDto(group);
     }
