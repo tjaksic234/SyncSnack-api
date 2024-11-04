@@ -108,7 +108,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public GroupResponse joinGroup(GroupRequest request) {
         Group group = groupRepository.findByName(request.getName())
-                .orElseThrow(() -> new NotFoundException("Group not found"));
+                .orElseThrow(() -> new NoGroupFoundException("Group not found"));
 
         if (!passwordEncoder.matches(request.getPassword(), group.getPassword())) {
             throw new IllegalStateException("Invalid password");
@@ -120,7 +120,7 @@ public class GroupServiceImpl implements GroupService {
 
         GroupMembership existingMembership = groupMembershipRepository.findByUserProfileIdAndGroupId(Helper.getLoggedInUserProfileId(), group.getId());
         if (existingMembership != null) {
-            throw new IllegalStateException("User is already a member of this group");
+            throw new AlreadyMemberException("User is already a member of this group");
         }
 
         //? Saving the relation between a group and the profile

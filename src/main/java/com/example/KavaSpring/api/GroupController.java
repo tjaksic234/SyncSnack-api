@@ -61,6 +61,12 @@ public class GroupController {
             return ResponseEntity.ok(groupService.joinGroup(request));
         } catch (IllegalStateException e) {
             log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (NoGroupFoundException e) {
+            log.error(e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (AlreadyMemberException e) {
+            log.error(e.getMessage());
             return ResponseEntity.badRequest().build();
         }
     }
